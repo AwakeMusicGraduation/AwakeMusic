@@ -16,6 +16,7 @@ public:
     
     //自定义信号
 Q_SIGNALS:
+    void signalLogin();
     void signalSkin();
     void signalMin();
     void signalClose();
@@ -34,6 +35,7 @@ private:
     QLabel *m_labelIcon;                //程序图标
     QLabel *m_labelTitle;               //程序标题
     SearchLineEdit *m_search;           //搜索歌曲框
+    QPushButton *m_pbnLogin;            //登录
     QPushButton *m_pbnSkin;             //换肤按钮
     QPushButton *m_pbnMin;              //最小化
     QPushButton *m_pbnClose;            //关闭

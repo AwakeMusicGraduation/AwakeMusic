@@ -4,6 +4,9 @@
 #include <QHeaderView>
 #include <QContextMenuEvent>
 #include <QDebug>
+#include <QDialog>
+#include <QLineEdit>
+#include <QPushButton>
 
 
 MusicSongsLists::MusicSongsLists(QWidget *parent)
@@ -57,6 +60,7 @@ void MusicSongsLists::initWidget()
     this->addItemContent("默认列表");
     this->addItemContent("推荐列表");
     this->addItemContent("分类列表");
+    this->addItemContent("我喜欢");
 }
 
 void MusicSongsLists::initConnect()
@@ -67,6 +71,8 @@ void MusicSongsLists::initConnect()
             this,SLOT(slotAddNewPlayList()));
     connect(m_menu,SIGNAL(signalDeleteList()),
             this,SLOT(slotDeletePlayList()));
+//    connect(push,&QPushButton::clicked,
+//            this,&MusicSongsLists::slotCreateList);
 //    connect(m_menu,SIGNAL(signalRename()),
 //            this,SLOT(slotRename()));
 }
@@ -76,14 +82,36 @@ void MusicSongsLists::slotCellClicked(int row, int column)
     emit signalShowList(row);
 }
 
+//创建列表时弹出对话框
 void MusicSongsLists::slotAddNewPlayList()
 {
-    this->addItemContent("新建列表");
-    emit signalAddNewList();
+    d = new QDialog(this);
+    d->setFixedSize(200,100);
+    d->setObjectName("add");
+    d->setStyleSheet("#add {background-image:url(:/image/skin/11.png)}");
+    m = new QLineEdit(d);
+    push = new QPushButton(d);
+    push->move(50,50);
+    push->setText("确定");
+    d->show();
+    connect(push,&QPushButton::clicked,
+            this,&MusicSongsLists::slotCreateList);
+   // this->addItemContent(m->text().trimmed());
+   // emit signalAddNewList();
+
+}
+
+void MusicSongsLists::slotCreateList()
+{
+    //QString s = m->text().trimmed();
+    this->addItemContent(m->text().trimmed());
+    d->hide();
+
 }
 
 void MusicSongsLists::slotDeletePlayList()
 {
+
     int rowIndex = currentRow();
     if (rowIndex != 0)
     {

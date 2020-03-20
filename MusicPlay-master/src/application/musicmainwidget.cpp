@@ -12,6 +12,7 @@
 #include "playmusic.h"
 #include "app.h"
 #include "musicdesktoplrcmanage.h"
+#include "loginform_test.h"
 
 #include <QApplication>
 
@@ -85,6 +86,8 @@ void MusicMainWidget::initConnect()
     //标题栏信号和槽关联
     connect(m_titleWidget,SIGNAL(signalSearchClicked()),
             m_contentWidget,SLOT(slotShowMediaSongs()));
+    connect(m_titleWidget,SIGNAL(signalLogin()),
+            this,SLOT(slotShowLoginWidget()));
     connect(m_titleWidget,SIGNAL(signalSkin()),
             this,SLOT(slotShowSkinWidget()));
     connect(m_titleWidget,SIGNAL(signalMin()),
@@ -218,6 +221,13 @@ void MusicMainWidget::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
+//显示登录界面
+void MusicMainWidget::slotShowLoginWidget()
+{
+    qDebug() << "登录中";
+    loginform_test login;
+    login.exec();
+}
 
 //显示皮肤界面
 void MusicMainWidget::slotShowSkinWidget()

@@ -69,7 +69,7 @@ void Client::newConnect()
 {
     blockSize = 0;
     tcpSocket->abort();
-    tcpSocket->connectToHost("192.168.0.9", 6667);
+    tcpSocket->connectToHost("192.168.0.104", 6668);
     //connect(tcpSocket, &QIODevice::readyRead,this,&Client::showPicture);
 }
 

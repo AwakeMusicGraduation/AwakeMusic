@@ -30,6 +30,7 @@ private:
     void initConnect();
     //自定义槽函数
 private Q_SLOTS:
+    void slotShowLoginWidget();                 //显示登录界面
     void slotShowSkinWidget();                  //显示皮肤界面
     void slotShowMin();                         //最小化
     void slotClose();                           //关闭

@@ -62,5 +62,6 @@
         <file>image/MusicTitle.png</file>
         <file>image/hide</file>
         <file>image/skin/5.png</file>
+        <file>image/title/login.jpg</file>
     </qresource>
 </RCC>

@@ -224,9 +224,9 @@ void Contentwidget::slotShowList(int row)
             m_classifyList->show();
         }
         else{
-            m_musicSongList.at(row-2)->show();
-            m_currentwidget = row-2;
-            this->connectMusicList(m_currentwidget-2);
+            //m_musicSongList.at(row-2)->show();
+            //m_currentwidget = row-2;
+            //this->connectMusicList(m_currentwidget-2);
         }
     }
     m_musicSongsMedia->hide();

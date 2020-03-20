@@ -21,6 +21,7 @@ TitleWidget::~TitleWidget()
 {
     delete m_labelIcon;
     delete m_labelTitle;
+    delete m_pbnLogin;
     delete m_pbnSkin;
     delete m_pbnMin;
     delete m_pbnClose;
@@ -52,6 +53,17 @@ void TitleWidget::initWidget()
 
     //搜索框
     m_search = new SearchLineEdit(this);
+
+    //登录按钮
+    m_pbnLogin = new QPushButton(this);
+    m_pbnLogin->setCursor(Qt::PointingHandCursor);
+    m_pbnLogin->setToolTip("登录");
+    m_pbnLogin->setObjectName("pbnLogin");
+    m_pbnLogin->setFixedSize(50,26);
+    m_pbnLogin->setIcon(QIcon(":/image/title/login.jpg"));
+    m_pbnLogin->setIconSize(QSize(50,56));
+    //m_pbnLogin->setText("未登录");
+
 
     //皮肤按钮
     m_pbnSkin = new QPushButton(this);
@@ -86,6 +98,7 @@ void TitleWidget::initLayout()
     m_mainLayout->addStretch();
     m_mainLayout->addWidget(m_search);
     m_mainLayout->addStretch();
+    m_mainLayout->addWidget(m_pbnLogin);
     m_mainLayout->addWidget(m_pbnSkin);
     m_mainLayout->addWidget(m_pbnMin);
     m_mainLayout->addWidget(m_pbnClose);
@@ -96,7 +109,9 @@ void TitleWidget::initLayout()
 //信号和槽初始化
 void TitleWidget::initConnect()
 {
-    //依次为：皮肤、最小化、关闭按钮的信号关联
+    //依次为：登录、皮肤、最小化、关闭按钮的信号关联
+    connect(m_pbnLogin,SIGNAL(clicked()),
+            this,SIGNAL(signalLogin()));
     connect(m_pbnSkin,SIGNAL(clicked()),
             this,SIGNAL(signalSkin()));
     connect(m_pbnMin,SIGNAL(clicked()),
