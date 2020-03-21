@@ -5,53 +5,71 @@
 
 Sqltable::Sqltable()
 {  
-
+    user = "";
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("MusicPlayer.db");
     if(db.open()){
         qDebug() << "Database Opened";
 
-        QString create_sql = "create table music (id int primary key, name varchar(30), singer varchar(30), lyric varchar(100), album varchar(30), audiopath varchar(30))"; //创建数据表
+
+
+        QString create_sql = "create table music (id int primary key, name varchar(30), singer varchar(30), lyric varchar(100), album varchar(30), audiopath varchar(30))"; //创建数据表music
 
         //QString select_all_sql = "select * from music";
-        QString create_sql1 = "create table singer (id int primary key, name varchar(30),category varchar(30))"; //创建数据表
+        QString create_sql1 = "create table singer (id int primary key, name varchar(30),category varchar(30))"; //创建数据表singer
 
-        QString create_sql2 = "create table album (id int primary key, name varchar(30), startDate varchar(30),singername varchar(30))"; //创建数据表
+        QString create_sql2 = "create table album (id int primary key, name varchar(30), startDate varchar(30),singername varchar(30))"; //创建数据表album
 
         QString create_sql3 = "create table transform (name varchar(30), spell varchar(30))"; //创建数据表
 
-        QSqlQuery sql_query1,sql_query2,sql_query3,sql_query4;
+        QString create_sql4 = "create table user (name varchar(30), password varchar(30))"; //创建用户注册数据表
+        QString create_sql5 = "create table user_list (user varchar(30), list varchar(30))";//创建用户歌单关联表
+
+        QSqlQuery sql_query1,sql_query2,sql_query3,sql_query4,sql_query5;
         sql_query1.prepare(create_sql);
         sql_query2.prepare(create_sql1);
         sql_query3.prepare(create_sql2);
         sql_query4.prepare(create_sql3);
+        sql_query5.prepare(create_sql4);
         sql_query = sql_query1;
         sql_querySinger = sql_query2;
         sql_queryAlbum = sql_query3;
         sql_querySpell = sql_query4;
+        sql_queryUser = sql_query5;
         if(!sql_query.exec()) //查看创建表是否成功
         {
-            qDebug()<<QObject::tr("Table Create failed");
+            qDebug()<<QObject::tr("Table music Create failed");
             qDebug()<<sql_query.lastError();
         }
         if(!sql_querySinger.exec()) //查看创建表是否成功
         {
-            qDebug()<<QObject::tr("Table Create failed");
+            qDebug()<<QObject::tr("Table singer Create failed");
             qDebug()<<sql_querySinger.lastError();
         }
         if(!sql_queryAlbum.exec()) //查看创建表是否成功
         {
-            qDebug()<<QObject::tr("Table Create failed");
+            qDebug()<<QObject::tr("Table album Create failed");
             qDebug()<<sql_queryAlbum.lastError();
         }
         if(!sql_querySpell.exec()) //查看创建表是否成功
         {
-            qDebug()<<QObject::tr("Table Create failed");
+            qDebug()<<QObject::tr("Table spell Create failed");
+            qDebug()<<sql_querySpell.lastError();
+        }
+        if(!sql_queryUser.exec()) //查看创建表是否成功
+        {
+            qDebug()<<QObject::tr("Table User Create failed");
             qDebug()<<sql_querySpell.lastError();
         }
         else
         {
             qDebug()<< "Tables Created" ;
+        }
+        sql_query.prepare(create_sql5);
+        if(!sql_query.exec()) //查看创建表是否成功
+        {
+            qDebug()<<QObject::tr("Table user_list Create failed");
+            qDebug()<<sql_query.lastError();
         }
     }
 
@@ -86,6 +104,50 @@ void Sqltable::insertParmeterTransform(QString name,QString spell)
     {
         qDebug()<<sql_querySpell.lastError();
     }
+
+    db.close();
+}
+
+void Sqltable::insertParmeterUser(QString name, QString password)//查询用户名，用户名存在则不能注册
+{
+    db.open();
+    QString select_all_user = "select * from user where name = ?";
+    sql_queryUser.prepare(select_all_user);
+    sql_queryUser.addBindValue(name);
+    if(!sql_queryUser.exec())
+    {
+        qDebug()<<sql_queryUser.lastError();
+    }
+
+    if(!sql_queryUser.next())
+    {
+        QString insert_sql = "insert into user values(?,?)";    //插入数据
+
+
+        //插入数据
+        sql_queryUser.prepare(insert_sql);
+
+
+        sql_queryUser.addBindValue(name);
+        sql_queryUser.addBindValue(password);
+
+
+
+        if(!sql_queryUser.execBatch())
+        {
+            qDebug()<<sql_queryUser.lastError();
+        }
+        else
+        {
+            qDebug()<<"插入记录成功";
+        }
+        if(!sql_queryUser.exec())
+        {
+            qDebug()<<sql_queryUser.lastError();
+        }
+    }
+    else
+        qDebug()<<"用户名已存在.";
 
     db.close();
 }
@@ -218,6 +280,34 @@ void Sqltable::queryTransform()
             qDebug()<<"checked";
             qDebug()<<QString("Name:%1  Spell:%2 " ).arg(name).arg(spell);
         }
+    }
+    db.close();
+}
+
+void Sqltable::login(QString name,QString password)//先查询用户名，如果用户名存在，再比较密码，然后登录
+{
+    QString select_all_user = "select * from user where name = ?";
+    db.open();
+    sql_queryUser.prepare(select_all_user);
+    sql_queryUser.addBindValue(name);
+
+    if(!sql_queryUser.exec())
+    {
+        qDebug()<< sql_queryUser.lastError();
+    }
+    if(!sql_queryUser.next()){
+        qDebug() << "Don't have this user.";
+    }
+    else
+    {
+            QString password1 = sql_queryUser.value(1).toString();
+            if(password == password1){
+                qDebug()<<"Sign in success.";
+                user = name;
+                searchMusicList();
+            }
+            else
+                qDebug()<<"password is wrong.";
     }
     db.close();
 }
@@ -586,6 +676,60 @@ std::vector<QString> Sqltable::querySingerCategory(QString category)
     db.close();
     return singers;
 
+}
+
+void Sqltable::createMusicList(QString name)//用户自己创建的音乐列表
+{
+    db.open();
+    QString create_sql = "create table " + name +"(music varchar(30), singer varchar(30),album varchar(30))";
+    QString insert_user_list = "insert into user_list values(?,?)";
+    QSqlQuery sql_query1;
+    sql_query1.prepare(create_sql);
+    if(!sql_query1.exec()) //查看创建表是否成功
+    {
+        qDebug()<<QObject::tr("Table MusicList Create failed");
+        qDebug()<<sql_query1.lastError();
+    }
+    else{
+        qDebug()<<QObject::tr("Table MusicList Create Succeed");
+        sql_query1.prepare(insert_user_list);
+        sql_query1.addBindValue(user);
+        sql_query1.addBindValue(name);
+        if(!sql_query1.exec())
+        {
+            qDebug()<<sql_query1.lastError();
+        }
+    }
+    db.close();
+}
+
+void Sqltable::searchMusicList()//用户登录后自动搜索属于自己的歌单并加载
+{
+    db.open();
+    QString select_sql = "select * from user_list where user = '" + user +"'";
+    QSqlQuery sql_query1;
+    sql_query1.prepare(select_sql);
+    if(!sql_query1.exec())
+    {
+        qDebug() << sql_query1.lastError();
+    }
+    while(sql_query1.next())
+    {
+        qDebug() << sql_query1.value(1).toString();
+    }
+    db.close();
+//    QString search_table = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name";
+//    QSqlQuery sql_query1;
+//    sql_query1.prepare(search_table);
+//    if(!sql_query1.exec()) //查看创建表是否成功
+//    {
+//        qDebug()<<sql_query1.lastError();
+//    }
+//    while(sql_query1.next())
+//    {
+//        QString name = sql_query1.value(0).toString();
+//        qDebug() << name;
+//    }
 }
 
 
