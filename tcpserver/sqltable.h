@@ -41,7 +41,7 @@ public:
     std::vector<Singer*> querySinger();
     std::vector<Album*> queryAlbum();
     void queryTransform();
-    void login(QString name,QString password);
+    void login(QString name,QString password);//登录
     Singer* querysingleSinger(QString name);
     Album* querysingleAlbum(QString name);
     QString querysingleTransform(QString name);
@@ -49,8 +49,10 @@ public:
     std::vector<QString> queryAlbumMusics(QString name);
     std::vector<QString> querySingerCategory(QString category);
 
-    void createMusicList(QString name);
-    void searchMusicList();
+    void createMusicList(QString name);//用户自己创建的音乐列表
+    void searchMusicList();//用户登录后自动搜索属于自己的歌单并加载
+    void insertMusicList(QString list,QString music,QString album,QString singer);//用户往特定歌单插入歌曲
+    void deleteMusicList(QString list,QString music,QString album,QString singer);//用户删除特定歌单的歌曲
 };
 
 

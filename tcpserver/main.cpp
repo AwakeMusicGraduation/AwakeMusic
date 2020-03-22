@@ -12,8 +12,12 @@ int main(int argc, char *argv[])
     server->show();
     Sqltable *sqltable = new Sqltable();
     sqltable->query();
-    sqltable->insertParmeterUser("123","123");
+    //sqltable->insertParmeterUser("123","123");
+    //sqltable->insertParmeterUser("123456","123456");
+    //sqltable->login("123456","123456");
     sqltable->login("123","123");
-    sqltable->createMusicList("favor");
+    //sqltable->createMusicList("favor");
+    sqltable->insertMusicList("favor","初学者","初学者","薛之谦");
+    sqltable->deleteMusicList("favor","初学者","初学者","薛之谦");
     return a.exec();
 }

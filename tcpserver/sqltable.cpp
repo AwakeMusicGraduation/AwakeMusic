@@ -300,14 +300,14 @@ void Sqltable::login(QString name,QString password)//先查询用户名，如果
     }
     else
     {
-            QString password1 = sql_queryUser.value(1).toString();
-            if(password == password1){
-                qDebug()<<"Sign in success.";
-                user = name;
-                searchMusicList();
-            }
-            else
-                qDebug()<<"password is wrong.";
+        QString password1 = sql_queryUser.value(1).toString();
+        if(password == password1){
+            qDebug()<<"Sign in success.";
+            user = name;
+            searchMusicList();
+        }
+        else
+            qDebug()<<"password is wrong.";
     }
     db.close();
 }
@@ -718,18 +718,92 @@ void Sqltable::searchMusicList()//用户登录后自动搜索属于自己的歌�
         qDebug() << sql_query1.value(1).toString();
     }
     db.close();
-//    QString search_table = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name";
-//    QSqlQuery sql_query1;
-//    sql_query1.prepare(search_table);
-//    if(!sql_query1.exec()) //查看创建表是否成功
-//    {
-//        qDebug()<<sql_query1.lastError();
-//    }
-//    while(sql_query1.next())
-//    {
-//        QString name = sql_query1.value(0).toString();
-//        qDebug() << name;
-//    }
+    //    QString search_table = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name";
+    //    QSqlQuery sql_query1;
+    //    sql_query1.prepare(search_table);
+    //    if(!sql_query1.exec()) //查看创建表是否成功
+    //    {
+    //        qDebug()<<sql_query1.lastError();
+    //    }
+    //    while(sql_query1.next())
+    //    {
+    //        QString name = sql_query1.value(0).toString();
+    //        qDebug() << name;
+    //    }
+}
+
+void Sqltable::insertMusicList(QString list, QString music, QString album, QString singer)
+{
+    db.open();
+    QString select_sql = "select * from user_list where list = '" + list +"'";
+    QString insert_sql = "insert into " + list+ " values(?,?,?)";
+    QString select_music = "select * from '" + list + "'where music = '" + music+"'";
+    QSqlQuery sql_query1;
+    sql_query1.prepare(select_sql);
+    if(!sql_query1.exec())
+    {
+        qDebug() << sql_query1.lastError();
+    }
+    if(sql_query1.next()){
+        if(sql_query1.value(0).toString() == user)
+        {
+            sql_query1.prepare(select_music);
+            if(!sql_query1.exec())
+            {
+                qDebug() << sql_query1.lastError();
+            }
+            if(sql_query1.next())
+            {
+                qDebug() << "存在同名歌曲";
+            }
+            else{
+                sql_query1.prepare(insert_sql);
+                sql_query1.addBindValue(music);
+                sql_query1.addBindValue(singer);
+                sql_query1.addBindValue(album);
+                if(!sql_query1.exec())
+                {
+                    qDebug() << sql_query1.lastError();
+                }
+                else
+                    qDebug() << "插入歌曲成功";
+            }
+        }
+        else
+            qDebug() << "不是此用户的歌单";
+    }
+    db.close();
+}
+
+void Sqltable::deleteMusicList(QString list, QString music, QString album, QString singer)
+{
+    db.open();
+    QString delete_sql = "delete from '" +list+ "' where music = ? and album = ? and singer = ?";
+    QString select_sql = "select * from user_list where list = '" + list +"'";
+    QSqlQuery sql_query1;
+    sql_query1.prepare(select_sql);
+    if(!sql_query1.exec())
+    {
+        qDebug() << sql_query1.lastError();
+    }
+    if(sql_query1.next()){
+        if(sql_query1.value(0).toString() == user)
+        {
+            sql_query1.prepare(delete_sql);
+            sql_query1.addBindValue(music);
+            sql_query1.addBindValue(album);
+            sql_query1.addBindValue(singer);
+            if(!sql_query1.exec())
+            {
+                qDebug()<<sql_query1.lastError();
+            }
+            else
+                qDebug() << "删除歌曲成功";
+        }
+        else
+            qDebug() << "不是此用户的歌单";
+        db.close();
+    }
 }
 
 
