@@ -26,7 +26,9 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
+    musictable.cpp \
     server.cpp \
+    singertable.cpp \
     sqltable.cpp \
     music.cpp \
     musicbroker.cpp \
@@ -35,7 +37,9 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
+    musictable.h \
     server.h \
+    singertable.h \
     sqltable.h \
     music.h \
     musicbroker.h \
@@ -43,7 +47,9 @@ HEADERS += \
     album.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+        musictable.ui \
+        singertable.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
