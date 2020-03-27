@@ -775,7 +775,7 @@ void Sqltable::insertMusicList(QString list, QString music, QString album, QStri
     db.close();
 }
 
-void Sqltable::deleteMusicList(QString list, QString music, QString album, QString singer)
+void Sqltable::deleteMusicFromList(QString list, QString music, QString album, QString singer)
 {
     db.open();
     QString delete_sql = "delete from '" +list+ "' where music = ? and album = ? and singer = ?";
@@ -804,6 +804,100 @@ void Sqltable::deleteMusicList(QString list, QString music, QString album, QStri
             qDebug() << "不是此用户的歌单";
         db.close();
     }
+}
+
+void Sqltable::deleteMusicList(QString list)
+{
+    db.open();
+    QString select_sql = "select * from user_list where list = '" + list +"'";
+    QString delete_sql = "drop table '" + list +"'";
+    QString delete_user_list = "delete from user_list where list = '" + list + "'";
+    QSqlQuery sql_query1;
+    sql_query1.prepare(select_sql);
+    if(!sql_query1.exec())
+    {
+        qDebug() << sql_query1.lastError();
+    }
+    if(sql_query1.next()){
+        if(sql_query1.value(0).toString() == user)
+        {
+            sql_query1.prepare(delete_sql);
+            if(!sql_query1.exec())
+            {
+                qDebug() << "删除表失败";
+                qDebug() << sql_query1.lastError();
+            }
+            else{
+                sql_query1.prepare(delete_user_list);
+                if(!sql_query1.exec())
+                {
+                    qDebug() << sql_query1.lastError();
+                }
+            }
+        }
+        else
+            qDebug() << "不是此用户的歌单";
+    }
+    db.close();
+}
+
+void Sqltable::search(QString content)
+{
+    db.open();
+    QString select_music = "select * from music where name = '" + content+ "'";
+    QString select_singer = "select * from music where singer = '" + content + "'";
+    QString select_album = "select * from music where album = '" + content + "'";
+    QString select_list = "select * from user_list where list = '" + content + "'";
+    QSqlQuery sql_query1;
+    //搜索音乐
+    sql_query1.prepare(select_music);
+    if(!sql_query1.exec())
+    {
+        qDebug() << sql_query1.lastError();
+    }
+    else{
+        while(sql_query1.next())
+        {
+            qDebug() << "music " << sql_query1.value(1).toString() << " " << sql_query1.value(2).toString() << " "<<sql_query1.value(5).toString();
+        }
+    }
+    //搜索歌手
+    sql_query1.prepare(select_singer);
+    if(!sql_query1.exec())
+    {
+        qDebug() << sql_query1.lastError();
+    }
+    else{
+        while(sql_query1.next())
+        {
+            qDebug() << "singer " << sql_query1.value(1).toString() << " " << sql_query1.value(2).toString() << " "<<sql_query1.value(5).toString();
+        }
+    }
+    //搜索专辑
+    sql_query1.prepare(select_album);
+    if(!sql_query1.exec())
+    {
+        qDebug() << sql_query1.lastError();
+    }
+    else{
+        while(sql_query1.next())
+        {
+            qDebug() << "album " << sql_query1.value(1).toString() << " " << sql_query1.value(2).toString() << " "<<sql_query1.value(5).toString();
+        }
+    }
+    //搜索歌单
+    sql_query1.prepare(select_list);
+    if(!sql_query1.exec())
+    {
+        qDebug() << sql_query1.lastError();
+    }
+    else{
+        while(sql_query1.next())
+        {
+            qDebug() << "list " << sql_query1.value(1).toString();
+        }
+    }
+    db.close();
 }
 
 
