@@ -108,7 +108,7 @@ void Sqltable::insertParmeterTransform(QString name,QString spell)
     db.close();
 }
 
-void Sqltable::insertParmeterUser(QString name, QString password)//查询用户名，用户名存在则不能注册
+QString Sqltable::insertParmeterUser(QString name, QString password)//查询用户名，用户名存在则不能注册
 {
     db.open();
     QString select_all_user = "select * from user where name = ?";
@@ -119,6 +119,7 @@ void Sqltable::insertParmeterUser(QString name, QString password)//查询用户�
         qDebug()<<sql_queryUser.lastError();
     }
 
+    QString m;
     if(!sql_queryUser.next())
     {
         QString insert_sql = "insert into user values(?,?)";    //插入数据
@@ -139,6 +140,7 @@ void Sqltable::insertParmeterUser(QString name, QString password)//查询用户�
         }
         else
         {
+            m = "插入记录成功";
             qDebug()<<"插入记录成功";
         }
         if(!sql_queryUser.exec())
@@ -147,9 +149,13 @@ void Sqltable::insertParmeterUser(QString name, QString password)//查询用户�
         }
     }
     else
+    {
         qDebug()<<"用户名已存在.";
+        m ="用户名已存在";
+    }
 
     db.close();
+    return m;
 }
 
 
@@ -284,8 +290,9 @@ void Sqltable::queryTransform()
     db.close();
 }
 
-void Sqltable::login(QString name,QString password)//先查询用户名，如果用户名存在，再比较密码，然后登录
+std::vector<QString> Sqltable::login(QString name,QString password)//先查询用户名，如果用户名存在，再比较密码，然后登录
 {
+    std::vector<QString> m;
     QString select_all_user = "select * from user where name = ?";
     db.open();
     sql_queryUser.prepare(select_all_user);
@@ -293,23 +300,36 @@ void Sqltable::login(QString name,QString password)//先查询用户名，如果
 
     if(!sql_queryUser.exec())
     {
+        QString s = "error";
+        m.push_back(s);
         qDebug()<< sql_queryUser.lastError();
     }
     if(!sql_queryUser.next()){
+        QString s = "Don't have this user";
+        m.push_back(s);
         qDebug() << "Don't have this user.";
     }
     else
     {
         QString password1 = sql_queryUser.value(1).toString();
         if(password == password1){
+            QString s = "Sign in success";
+            m.push_back(s);
             qDebug()<<"Sign in success.";
             user = name;
-            searchMusicList();
+            searchMusicList(m);
+            //return m;
         }
         else
+        {
+            QString s = "password is wrong";
+            m.push_back(s);
             qDebug()<<"password is wrong.";
+        }
     }
     db.close();
+    qDebug() << "返回查询到的列表";
+    return m;
 }
 
 std::vector<Singer*> Sqltable::querySinger()
@@ -703,9 +723,10 @@ void Sqltable::createMusicList(QString name)//用户自己创建的音乐列表
     db.close();
 }
 
-void Sqltable::searchMusicList()//用户登录后自动搜索属于自己的歌单并加载
+void Sqltable::searchMusicList(std::vector<QString> m)//用户登录后自动搜索属于自己的歌单并加载
 {
     db.open();
+    qDebug() << "查询用户创建的列表";
     QString select_sql = "select * from user_list where user = '" + user +"'";
     QSqlQuery sql_query1;
     sql_query1.prepare(select_sql);
@@ -715,6 +736,8 @@ void Sqltable::searchMusicList()//用户登录后自动搜索属于自己的歌�
     }
     while(sql_query1.next())
     {
+        QString s = sql_query1.value(1).toString();
+        m.push_back(s);
         qDebug() << sql_query1.value(1).toString();
     }
     db.close();
@@ -775,7 +798,7 @@ void Sqltable::insertMusicList(QString list, QString music, QString album, QStri
     db.close();
 }
 
-void Sqltable::deleteMusicFromList(QString list, QString music, QString album, QString singer)
+void Sqltable::deletemusicFromList(QString list, QString music, QString album, QString singer)
 {
     db.open();
     QString delete_sql = "delete from '" +list+ "' where music = ? and album = ? and singer = ?";

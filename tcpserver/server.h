@@ -30,6 +30,8 @@ private slots:
     void sendSinger();
     void sendAlbum();
     void sendMusic();
+    void sendLoginMessage();//验证登录信息
+    void sendRegisterMessage();//验证注册信息
 
     void displayError(QAbstractSocket::SocketError socketError);
 
@@ -53,6 +55,8 @@ private:
     QString data1;
     QString data2;
     QString identity;
+    QString name;
+    QString password;
 
     QString message1;//歌名
     QString message2;//歌手

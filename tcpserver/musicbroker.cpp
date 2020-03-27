@@ -57,4 +57,16 @@ std::vector<QString> MusicBroker::findSpells(std::vector<QString> info)
     return infos;
 }
 
+//查找用户和密码是否匹配
+std::vector<QString> MusicBroker::findUser(QString name, QString password)
+{
+    return sqltable->login(name,password);
+}
+
+QString MusicBroker::findRegisterInfo(QString name,QString password)
+{
+    return sqltable->insertParmeterUser(name,password);
+}
+
+
 

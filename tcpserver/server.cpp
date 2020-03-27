@@ -19,7 +19,7 @@ Server::Server(QWidget *parent)
 
     qDebug() << "构造函数赋值成功！";
 
-    tcpServer->listen(QHostAddress::Any,6667);
+    tcpServer->listen(QHostAddress::Any,6668);
     // tcpServer->listen( QHostAddress::LocalHost, 6667);
     connect(tcpServer,&QTcpServer::newConnection,this,&Server::acceptConnection);
     //调用了qtcpserver类的listen（）函数来监听到来的连接，这里监听了本地主机的6666端口，这样可以实现客户端和服务端在同一台计算机上运行并通信，也可以换成其他地址。
@@ -46,6 +46,7 @@ Server::~Server()
 void Server::acceptConnection()
 {
     ui->label->setText("连接成功");
+    qDebug() << "connect success";
     clientConnection = tcpServer->nextPendingConnection();
     //sendPlaylist();
     connect(clientConnection, &QIODevice::readyRead,this,&Server::receiveData);
@@ -212,13 +213,69 @@ void Server::receiveData()
 
     //        }
 
-    if(!data.isNull())
+    if(data == "user")
     {
-        sendMessage();
+        in >> name;
+        in >> password;
+        sendLoginMessage();
+        qDebug() << "登录";
+        ui->label->setText("用户登录");
+    }
+    else if(data == "register")
+    {
+        in >> name;
+        in >> password;
+        sendRegisterMessage();
+        qDebug() << "注册";
+        ui->label->setText("注册用户");
+    }
+    else{
+
+        if(!data.isNull())
+        {
+              sendMessage();
+        }
     }
 
     blockSize = 0;
     //显示接收到的数据
+}
+
+
+//登陆时验证信息是否正确
+void Server::sendLoginMessage()
+{
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_10);
+    musicBroker = new MusicBroker();
+    std::vector<QString> m = musicBroker->findUser(name,password);
+    qint32 total = 0;
+    for(auto l:m)
+    {
+        total += l.size();
+    }
+    out << qint32(total);
+    for(auto l:m)
+    {
+        out << l;
+    }
+    clientConnection->write(block);
+    qDebug() << "传输登录信息";
+    clientConnection->disconnectFromHost();
+}
+
+void Server::sendRegisterMessage()
+{
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_10);
+    musicBroker = new MusicBroker();
+    QString m = musicBroker->findRegisterInfo(name,password);
+    out << qint32(m.size());
+    out << m;
+    clientConnection->write(block);
+    clientConnection->disconnectFromHost();
 }
 
 void Server::sendMessage()
