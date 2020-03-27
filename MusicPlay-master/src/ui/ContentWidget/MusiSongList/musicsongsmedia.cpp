@@ -3,7 +3,7 @@
 #include <QHeaderView>
 #include <QDebug>
 //#define MusicPath "rtsp://10.253.241.175/mp3/"
-#define MusicPath "rtsp://192.168.0.104/"
+#define MusicPath "rtsp://192.168.43.46/"
 
 
 MusicSongsMedia::MusicSongsMedia(QWidget *parent)

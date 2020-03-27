@@ -13,6 +13,7 @@ class QStackedWidget;
 class PlayMusic;
 class MusicDesktopLrcManage;
 class Client;
+class loginform_test;
 
 class MusicMainWidget : public QFrame
 {
@@ -43,6 +44,7 @@ private Q_SLOTS:
 
     void slotTest(const QString &);
 
+
 protected :
     virtual void mousePressEvent(QMouseEvent *);
     virtual void mouseReleaseEvent(QMouseEvent *);
@@ -64,6 +66,7 @@ private:
     Client *m_client;
 
     PlayMusic *m_player;                //控制音乐播放
+    loginform_test *login;
 };
 
 #endif // MUSICMAINWIDGET_H

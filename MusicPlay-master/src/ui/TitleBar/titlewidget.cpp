@@ -4,6 +4,7 @@
 #include <QHBoxLayout>
 #include "controlvalues.h"
 #include "searchlineedit.h"
+#include <QDebug>
 //#include "iconhelper.h"
 
 //构造函数
@@ -59,7 +60,7 @@ void TitleWidget::initWidget()
     m_pbnLogin->setCursor(Qt::PointingHandCursor);
     m_pbnLogin->setToolTip("登录");
     m_pbnLogin->setObjectName("pbnLogin");
-    m_pbnLogin->setFixedSize(50,26);
+    m_pbnLogin->setFixedSize(80,26);
     m_pbnLogin->setIcon(QIcon(":/image/title/login.jpg"));
     m_pbnLogin->setIconSize(QSize(50,56));
     //m_pbnLogin->setText("未登录");
@@ -122,4 +123,12 @@ void TitleWidget::initConnect()
             this,SIGNAL(signalSearchContent(QString)));
     connect(m_search,SIGNAL(signalSearchClicked()),
             this,SIGNAL(signalSearchClicked()));
+}
+
+void TitleWidget::slotUpdateName(QString name)
+{
+    m_pbnLogin->setText(name);
+    m_pbnLogin->setFont(QFont("Times New Roman", 15, QFont::Black));
+    m_pbnLogin->setIconSize(QSize(0,0));
+    qDebug() << name;
 }

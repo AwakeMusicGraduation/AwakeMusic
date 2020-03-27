@@ -5,6 +5,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGridLayout>
+#include "client.h"
 
 loginform_test::loginform_test(QDialog *parent) :
     QDialog(parent)
@@ -80,10 +81,17 @@ loginform_test::loginform_test(QDialog *parent) :
     //m_grid->addLayout(m_layout1,2,1);
 
 
+    m_client = new Client();
 
     //单击登录按钮时 执行 LoginForm::login 槽函数；//单击退出按钮时 执行 LoginForm::close 槽函数
     connect(loginBtn,&QPushButton::clicked,this,&loginform_test::login);
+    connect(this,&loginform_test::signalLoginClicked,m_client,&Client::sendLoginData);
+    connect(m_client,&Client::signalAcceptUserMessage,
+            this,&loginform_test::slotAcceptUserMessage);
     connect(reBtn,&QPushButton::clicked,this,&loginform_test::regis);
+    connect(this,&loginform_test::signalRegisterClicked,m_client,&Client::sendRegisterData);
+    connect(m_client,SIGNAL(signalAcceptRegisterMessage(QString)),
+            this,SLOT(slotAcceptRegisterMessage(QString)));
     connect(exitBtn,&QPushButton::clicked,this,&loginform_test::close);
 
 
@@ -91,39 +99,100 @@ loginform_test::loginform_test(QDialog *parent) :
 
 void loginform_test::login()
 {
+    QString user = "user";
+    m_name = userNameLEd->text().trimmed();
     QString name = userNameLEd->text().trimmed();
     QString password = pwdLEd->text().trimmed();
     //获得userNameLEd输入框的文本userNameLEd->text()；
     //trimmed()去掉前后空格
     //tr()函数，防止设置中文时乱码
-    if(d.queryAll(name,password))
+    qDebug() << "登录";
+    emit signalLoginClicked(user,name,password);
+ /*   if(d.queryAll(name,password))
     {
        accept();//关闭窗体，并设置返回值为Accepted
     } else {
        QMessageBox::warning(this, tr("警告！"),
                    tr("用户名或密码错误！"),
                    QMessageBox::Yes);
-       // 清空内容
-       userNameLEd->clear();
-       pwdLEd->clear();
+       // 清空内容*/
+       //userNameLEd->clear();
+       //pwdLEd->clear();
        //定位光标
-       userNameLEd->setFocus();
+    //   userNameLEd->setFocus();
+ //   }
+}
+
+void loginform_test::slotAcceptUserMessage(std::vector<QString> userMessage)
+{
+    qDebug() << "接收登录信息";
+    QString m = userMessage.at(0);
+    if(m == "error")
+    {
+        QMessageBox::warning(this,tr("警告！"),
+                             tr("error!"),
+                             QMessageBox::Yes);
+    }
+    else if(m == "Don't have this user")
+    {
+        QMessageBox::warning(this,tr("警告！"),
+                             tr("用户不存在!"),
+                             QMessageBox::Yes);
+    }
+    else if(m == "password is wrong")
+    {
+        QMessageBox::warning(this,tr("警告！"),
+                             tr("密码错误!"),
+                             QMessageBox::Yes);
+    }
+    else if(m == "Sign in success"){
+        QMessageBox::warning(this,tr("警告！"),
+                             tr("登录成功!"),
+                             QMessageBox::Yes);
+        userNameLEd->clear();
+        pwdLEd->clear();
+        accept();//关闭窗体
+        userMessage.pop_back();
+        emit signalUpdateList(userMessage);//更新用户列表
+        emit signalUpdateName(m_name);//更新用户名
     }
 }
 
 void loginform_test::regis()
 {
-
+    QString user = "register";
     QString name = userNameLEd->text().trimmed();
     QString password = pwdLEd->text().trimmed();
-    if(d.insert(name,password)){
+    if(name == ""){
         QMessageBox::warning(this, tr("警告！"),
-                    tr("注册成功"),
+                    tr("用户名不能为空"),
                     QMessageBox::Yes);
     }
-    else {
+    else if(password == "")
+    {
         QMessageBox::warning(this, tr("警告！"),
-                    tr("注册失败，该用户已存在"),
+                    tr("密码不能为空"),
+                    QMessageBox::Yes);
+    }
+    else
+    {
+        emit signalRegisterClicked(user,name,password);
+        qDebug() << "注册";
+    }
+}
+
+void loginform_test::slotAcceptRegisterMessage(QString message)
+{
+    if(message == "用户名已存在")
+    {
+        QMessageBox::warning(this, tr("警告！"),
+                    tr("用户名已存在"),
+                    QMessageBox::Yes);
+    }
+    else
+    {
+        QMessageBox::warning(this, tr("警告！"),
+                    tr("注册成功"),
                     QMessageBox::Yes);
     }
 }

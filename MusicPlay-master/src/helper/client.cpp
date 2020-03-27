@@ -65,6 +65,40 @@ void Client::sendData(QString data)
     connect(tcpSocket, &QIODevice::readyRead, this, &Client::showString);
 }
 
+void Client::sendLoginData(QString user, QString name, QString password)
+{
+    newConnect();
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+
+    out.setVersion(QDataStream::Qt_5_10);
+    out << quint32(user.size() + name.size() + password.size());
+
+    out << user << name << password;
+    tcpSocket->write(block);
+    block.resize(0);
+    qDebug() << "发送登录信息";
+
+    connect(tcpSocket,&QIODevice::readyRead,this,&Client::acceptUserMessage);
+}
+
+void Client::sendRegisterData(QString user,QString name,QString password)
+{
+    newConnect();
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+
+    out.setVersion(QDataStream::Qt_5_10);
+    out << quint32(user.size() + name.size() + password.size());
+
+    out << user << name << password;
+    tcpSocket->write(block);
+    qDebug() << "注册中客户";
+    block.resize(0);
+
+    connect(tcpSocket,&QIODevice::readyRead,this,&Client::acceptRegisterMessage);
+}
+
 void Client::newConnect()
 {
     blockSize = 0;
@@ -77,7 +111,7 @@ void Client::newFileConnect()
 {
     blockSize = 0;
     fileSocket->abort();
-    fileSocket->connectToHost("192.168.0.9", 8888);
+    fileSocket->connectToHost("192.168.43.46", 8888);
     connect(fileSocket, &QIODevice::readyRead, this, &Client::receivePlaylist);
 }
 
@@ -85,7 +119,7 @@ void Client::newSingerConnect()
 {
     blockSize = 0;
     singerSocket->abort();
-    singerSocket->connectToHost("192.168.0.9", 2222);
+    singerSocket->connectToHost("192.168.43.46", 2222);
 
     qDebug() << "连接成功";
     connect(singerSocket, &QIODevice::readyRead, this, &Client::receiveCategory);
@@ -314,6 +348,57 @@ void Client::showString()
     bytesReceived = 0;
     totalBytes= 0;
     fileNameSize = 0;
+}
+
+void Client::acceptUserMessage()
+{
+    QDataStream in(tcpSocket);
+    in.setVersion(QDataStream::Qt_5_10);
+
+    if(blockSize==0){
+        //判断接收数据是否大于两字节
+        //如果时则保存到blockSize变量中，否则直接返回，继续接受数据
+        if(tcpSocket->bytesAvailable() < (int)sizeof(quint32)) return;
+        in >> blockSize;
+    }
+
+    //如果没有得到全部的数据，则返回，继续接收数据
+    if(tcpSocket->bytesAvailable()<blockSize) return;
+
+    std::vector<QString> userMessage;
+    QString message;
+    while(blockSize)
+    {
+        in >> message;
+        userMessage.push_back(message);
+        blockSize -= message.size();
+    }
+    emit signalAcceptUserMessage(userMessage);
+    tcpSocket->close();
+    blockSize = 0;
+}
+
+void Client::acceptRegisterMessage()
+{
+    QDataStream in(tcpSocket);
+    in.setVersion(QDataStream::Qt_5_10);
+
+    if(blockSize==0){
+        //判断接收数据是否大于两字节
+        //如果时则保存到blockSize变量中，否则直接返回，继续接受数据
+        if(tcpSocket->bytesAvailable() < (int)sizeof(quint32)) return;
+        in >> blockSize;
+    }
+
+    //如果没有得到全部的数据，则返回，继续接收数据
+    if(tcpSocket->bytesAvailable()<blockSize) return;
+
+    QString message;
+    in >> message;
+    emit signalAcceptRegisterMessage(message);
+    tcpSocket->close();
+    blockSize = 0;
+
 }
 
 void Client::displayError(QAbstractSocket::SocketError)

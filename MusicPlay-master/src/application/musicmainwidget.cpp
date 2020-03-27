@@ -55,6 +55,7 @@ void MusicMainWidget::initForm()
 //窗体初始化
 void MusicMainWidget::initWidget()
 {
+    login = new loginform_test();
     m_titleWidget = new TitleWidget(this);
     //标题栏安装事件监听器
     installEventFilter(m_titleWidget);
@@ -168,7 +169,7 @@ void MusicMainWidget::initConnect()
     connect(m_bottomWidget,SIGNAL(signalPlayCmd(int)),
             m_contentWidget,SIGNAL(signalRequestPlayCmd(int)));
     connect(m_contentWidget,SIGNAL(signalSendPlayCmdMusic(QString)),
-            m_player,SLOT(slotReceivePlayCmdMusic(QString)));
+            m_player,SLOT(slotReceivePlayCmdMusic(QString)));//signalCategoryClicked;
     /******************获取从服务器发过来的消息**********************/
     connect(m_client,SIGNAL(signalShowImage(QImage)),
             m_bottomWidget,SLOT(slotShowImage(QImage)));
@@ -192,6 +193,16 @@ void MusicMainWidget::initConnect()
             m_contentWidget,SLOT(slotShowMediaSongs()));
     connect(m_client,SIGNAL(signalMediaPinYins(QString,QString)),
             m_contentWidget,SIGNAL(signalShowMusics(QString,QString)));
+
+    //刷新用户登录列表
+    //connect(login,&loginform_test::signalUpdateList,
+    //        m_contentWidget,&Contentwidget::signalUpdateList);
+    //connect(this,&MusicMainWidget::slotUpdateList,m_contentWidget,&)
+    connect(login,&loginform_test::signalUpdateList,
+            m_contentWidget,&Contentwidget::signalUpdateList);
+    qDebug() << "更新登录列表";
+    connect(login,&loginform_test::signalUpdateName,m_titleWidget,&TitleWidget::slotUpdateName);
+    qDebug() << "设置登录名";
 }
 
 void MusicMainWidget::mousePressEvent(QMouseEvent *event)
@@ -225,8 +236,16 @@ void MusicMainWidget::mouseMoveEvent(QMouseEvent *event)
 void MusicMainWidget::slotShowLoginWidget()
 {
     qDebug() << "登录中";
-    loginform_test login;
-    login.exec();
+    //loginform_test login;
+    //login = new loginform_test();
+
+    login->exec();
+   // connect(login,&loginform_test::signalUpdateList,
+   //         m_contentWidget,&Contentwidget::signalUpdateList);
+   // qDebug() << "更新登录列表";
+   // connect(login,&loginform_test::signalUpdateName,m_titleWidget,&TitleWidget::slotUpdateName);
+   // qDebug() << "设置登录名";
+    //connect(&login,loginform_test::login,this,MusicMainWidget::slotLogin);
 }
 
 //显示皮肤界面

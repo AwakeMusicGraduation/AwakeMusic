@@ -28,7 +28,11 @@ public slots:
     void receivePlaylist();
     void showString();
     void sendData(QString data);
+    void sendLoginData(QString user,QString name,QString password);//发送登录信息
+    void sendRegisterData(QString user,QString name,QString password);//发送注册信息
     void displayError(QAbstractSocket::SocketError);
+    void acceptUserMessage();//接收登录信息
+    void acceptRegisterMessage();//接收注册信息
 
 Q_SIGNALS:
     void signalShowImage(QImage image);
@@ -40,6 +44,8 @@ Q_SIGNALS:
     void signalSendList(QString);
     void signalShowMusicWidget();
     void signalMediaPinYins(QString,QString);
+    void signalAcceptUserMessage(std::vector<QString> userMessage);//接收点击登录后传回的相关信息
+    void signalAcceptRegisterMessage(QString message);//接收是否注册成功
 
 private:
     QTcpSocket *tcpSocket;

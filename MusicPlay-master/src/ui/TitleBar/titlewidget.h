@@ -22,8 +22,10 @@ Q_SIGNALS:
     void signalClose();
     void signalSearchContent(const QString &test);
     void signalSearchClicked();
-    
+public Q_SLOTS:
+    void slotUpdateName(QString name);//更新用户名
 private Q_SLOTS:
+
 
 private:
     void initForm();                    //样式初始化

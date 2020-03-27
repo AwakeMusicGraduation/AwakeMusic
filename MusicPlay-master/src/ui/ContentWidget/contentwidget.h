@@ -4,12 +4,14 @@
 #include <QWidget>
 #include "controlvalues.h"
 
+
 class MusicLyrcWidget;
 class QHBoxLayout;
 class MusicSongsLists;
 class MusicSongsListWidget;
 class MusicSongsMedia;
 class classifyList;
+class DisplaySearchContent;
 
 class Contentwidget : public QWidget
 {
@@ -62,6 +64,8 @@ Q_SIGNALS:
     void signalSendList(QString);
     void signalCategoryClicked();
     void signalShowMusics(QString,QString);
+
+    void signalUpdateList(std::vector<QString> userMessage);//更新用户列表
     
 public slots:
     //接收bottombar发送过来的播放命令
@@ -82,6 +86,7 @@ private:
     MusicSongsMedia *m_musicSongsMedia;
     MusicSongsMedia *m_musicSongsMedia2;
     classifyList *m_classifyList;
+    DisplaySearchContent *m_searchContent;
     int m_currentwidget;
     bool m_showOrHide;
 

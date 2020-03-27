@@ -109,6 +109,14 @@ void MusicSongsLists::slotCreateList()
 
 }
 
+void MusicSongsLists::slotUpdateList(std::vector<QString> userMessage)
+{
+    for(auto l:userMessage)
+    {
+        this->addItemContent(l);
+    }
+}
+
 void MusicSongsLists::slotDeletePlayList()
 {
 

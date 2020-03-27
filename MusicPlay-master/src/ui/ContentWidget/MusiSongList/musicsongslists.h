@@ -1,4 +1,4 @@
-#ifndef MUSICSONGSLISTS_H
+﻿#ifndef MUSICSONGSLISTS_H
 #define MUSICSONGSLISTS_H
 #include <QTableWidget>
 class MusicListMenu;
@@ -26,6 +26,8 @@ private Q_SLOTS:
     void slotAddNewPlayList();
     void slotDeletePlayList();
     void slotCreateList();
+public Q_SLOTS:
+    void slotUpdateList(std::vector<QString> userMessage);
 protected:
     virtual void contextMenuEvent(QContextMenuEvent *event);
 private:

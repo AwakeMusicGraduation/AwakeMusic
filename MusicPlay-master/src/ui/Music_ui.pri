@@ -13,7 +13,8 @@ HEADERS += \
     $$PWD/BottomBar/playmodemenu.h \
     $$PWD/ContentWidget/MusiSongList/musicsongslists.h \
     $$PWD/ContentWidget/MusiSongList/musicsongsmedia.h \
-    $$PWD/ContentWidget/MusiSongList/classifylist.h
+    $$PWD/ContentWidget/MusiSongList/classifylist.h \
+    $$PWD/ContentWidget/MusiSongList/displaysearchcontent.h
 
 SOURCES += \
     $$PWD/TitleBar/titlewidget.cpp \
@@ -30,4 +31,5 @@ SOURCES += \
     $$PWD/BottomBar/playmodemenu.cpp \
     $$PWD/ContentWidget/MusiSongList/musicsongslists.cpp \
     $$PWD/ContentWidget/MusiSongList/musicsongsmedia.cpp \
-    $$PWD/ContentWidget/MusiSongList/classifylist.cpp
+    $$PWD/ContentWidget/MusiSongList/classifylist.cpp \
+    $$PWD/ContentWidget/MusiSongList/displaysearchcontent.cpp

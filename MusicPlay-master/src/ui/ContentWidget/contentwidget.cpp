@@ -5,6 +5,7 @@
 #include "MusiSongList/musicsongslistwidget.h"
 #include "MusiSongList/musicsongslists.h"
 #include "MusiSongList/classifylist.h"
+#include "MusiSongList/displaysearchcontent.h"
 #include <QHBoxLayout>
 //#include "MusiSongList/musicsongssummarizied.h"
 #include <QDebug>
@@ -49,6 +50,7 @@ void Contentwidget::initWidget()
     m_musicSongsMedia2 = new MusicSongsMedia(this);
     m_classifyList = new classifyList(this);
     MusicSongsListWidget *widget = new MusicSongsListWidget(this);
+    m_searchContent = new DisplaySearchContent(this);
     m_musicSongList.append(widget);
     widget->addMusicFold("/root/CloudMusic/");
 }
@@ -56,13 +58,14 @@ void Contentwidget::initWidget()
 void Contentwidget::initLayout()
 {
     m_mainLayout = new QHBoxLayout(this);
-    //    m_mainLayout->addWidget(m_songsSummarizied,Qt::AlignLeft);
+//    m_mainLayout->addWidget(m_songsSummarizied,Qt::AlignLeft);
     m_mainLayout->addWidget(m_musicSongsLists,Qt::AlignLeft);
     m_mainLayout->addWidget(m_musicLyrcWidget,Qt::AlignRight);
     m_mainLayout->addWidget(m_musicSongList.at(0),Qt::AlignRight);
     m_mainLayout->addWidget(m_musicSongsMedia,Qt::AlignRight);
     m_mainLayout->addWidget(m_musicSongsMedia2,Qt::AlignRight);
     m_mainLayout->addWidget(m_classifyList,Qt::AlignRight);
+    m_mainLayout->addWidget(m_searchContent,Qt::AlignRight);
     m_currentwidget = 0;
     this->connectMusicList(m_currentwidget);
     m_mainLayout->setContentsMargins(0,0,0,0);
@@ -71,6 +74,9 @@ void Contentwidget::initLayout()
     m_musicSongsMedia->hide();
     m_musicSongsMedia2->hide();
     m_classifyList->hide();
+    m_musicSongList.at(m_currentwidget)->hide();
+
+    //m_searchContent->setVisible(true);
     m_showOrHide = false;
 }
 
@@ -92,6 +98,7 @@ void Contentwidget::initConnect()
             this,SLOT(slotDeleteList(int)));
     connect(m_musicSongsMedia,SIGNAL(signalPlayMediaMusic(QString)),
             this,SIGNAL(signalPlayMediaMusic(QString)));
+
     /***************显示客户端传输数据**********************/
     connect(this,SIGNAL(signalShowInfo(QString,QString,QString)),
             m_musicSongsMedia,SLOT(slotAddItem(QString,QString,QString)));
@@ -108,7 +115,6 @@ void Contentwidget::initConnect()
             m_musicSongsMedia2,SLOT(slotAddItem(QString,QString,QString)));
     connect(this,SIGNAL(signalMediaPinYin(QString,QString)),
             m_musicSongsMedia2,SLOT(slotSaveMusicInfo(QString,QString)));
-
     /***************分类列表向客户端发送数据**********************/
     connect(m_classifyList,SIGNAL(signalSendData(QString,QString)),
             this,SIGNAL(signalSendData(QString,QString)));
@@ -118,6 +124,10 @@ void Contentwidget::initConnect()
             m_classifyList,SLOT(addItemContent(QString)));
     connect(this,SIGNAL(signalShowMusics(QString,QString)),
             m_musicSongsMedia,SLOT(slotShowMusics(QString,QString)));
+
+    //更新用户列表
+    connect(this,&Contentwidget::signalUpdateList,//SIGNAL(signalUpdateList(std::vector<QString>)),
+            m_musicSongsLists,&MusicSongsLists::slotUpdateList);//SLOT(slotUpdateList(std::vector<QString>)));
 }
 
 void Contentwidget::connectMusicList(int index)
@@ -142,6 +152,7 @@ void Contentwidget::connectMusicList(int index)
             m_musicSongList.at(m_currentwidget),SLOT(slotSendPlayCmd(int)));
     connect(m_musicSongList.at(m_currentwidget),SIGNAL(signalSendPlayCmdMusicInfo(QString)),
             this,SIGNAL(signalSendPlayCmdMusic(QString)));
+
 }
 
 void Contentwidget::disConnectMusicList(int index)
