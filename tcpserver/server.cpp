@@ -8,6 +8,7 @@ Server::Server(QWidget *parent)
     : ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+//    m_ui = new MainWindow;
     tcpServer = new QTcpServer();
 
     blockSize = 0;
@@ -55,7 +56,7 @@ void Server::acceptConnection()
 
 void Server::acceptFileConnection()
 {
-    ui->label->setText("发送推荐列表");
+//    ui->label->setText("发送推荐列表");
     fileConnection = fileServer->nextPendingConnection();
     sendPlaylist();
 }
@@ -63,6 +64,7 @@ void Server::acceptFileConnection()
 void Server::acceptSingerConnection()
 {
     ui->label->setText("发送歌手分类");
+    emit sendToMainWindow();
     singerConnection = singerServer->nextPendingConnection();
     connect(singerConnection, &QIODevice::readyRead,this,&Server::receiveCategoryData);
 }

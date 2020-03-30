@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "server.h"
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QSqlTableModel>
@@ -12,6 +13,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    Server *server = new Server;
+//    server->show();
+    connect(server,SIGNAL(sendToMainWindow()),this, SLOT(receiveServer()));
     initUI();
 }
 
@@ -99,4 +103,10 @@ void MainWindow::on_pushButton_6_clicked()
     case 1:
         m_psingerTab->descendDB();
     }
+}
+
+void MainWindow::receiveServer()
+{
+    qDebug()<<"发送成功";
+    ui->label->setText("发送成功");
 }

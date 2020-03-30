@@ -33,9 +33,15 @@ private slots:
 
     void on_pushButton_6_clicked();
 
+public slots:
+    void receiveServer();
+
+public:
+        QLabel *label;
+
 private:
     Ui::MainWindow *ui;
-    QLabel label;
+
     Sqltable *m_pCreateDb;
 //    QTableView *m_pTableView;
     MusicTable *m_ptab;

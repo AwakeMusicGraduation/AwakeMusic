@@ -2,6 +2,7 @@
 #define SERVER_H
 
 #include <QDialog>
+#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QTcpServer>
 #include <QBuffer>
@@ -15,9 +16,14 @@ class Ui_MainWindow;
 
 class Server: public QMainWindow
 {
+    Q_OBJECT
+
 public:
     explicit Server(QWidget *parent = nullptr);
     ~Server();
+
+signals:
+    void sendToMainWindow();
 
 private slots:
     void sendMessage();
@@ -48,7 +54,9 @@ private:
     MusicBroker *musicBroker;
 
     Ui::MainWindow *ui;
+    //    MainWindow *m_ui;
     QPixmap pix;
+
 
     quint32 blockSize;
     QString data;
