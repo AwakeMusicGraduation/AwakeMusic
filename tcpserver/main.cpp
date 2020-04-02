@@ -9,8 +9,8 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-//    Server *server = new Server;
-//    server->show();
+    //Server *server = new Server;
+    //server->show();
     Sqltable *sqltable = new Sqltable();
 //    sqltable->query();
     //sqltable->insertParmeterUser("123","123");

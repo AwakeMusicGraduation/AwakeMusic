@@ -22,6 +22,7 @@ private:
     QSqlQuery sql_queryAlbum;
     QSqlQuery sql_querySpell;
     QSqlQuery sql_queryUser;
+public:
     QString user;//当前用户名
 
 public:
@@ -49,11 +50,11 @@ public:
     std::vector<QString> queryAlbumMusics(QString name);
     std::vector<QString> querySingerCategory(QString category);
 
-    void createMusicList(QString name);//用户自己创建的音乐列表
-    void searchMusicList(std::vector<QString> m);//用户登录后自动搜索属于自己的歌单并加载
+    QString createMusicList(QString name);//用户自己创建的音乐列表
+    void searchMusicList(std::vector<QString> *m);//用户登录后自动搜索属于自己的歌单并加载
     void insertMusicList(QString list,QString music,QString album,QString singer);//用户往特定歌单插入歌曲
     void deletemusicFromList(QString list,QString music,QString album,QString singer);//用户删除特定歌单的歌曲
-    void deleteMusicList(QString list);//用户删除特定歌单
+    QString deleteMusicList(QString list);//用户删除特定歌单
     void search(QString content);//根据搜素内容搜素
 };
 

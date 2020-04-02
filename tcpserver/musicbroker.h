@@ -19,6 +19,8 @@ public:
     std::vector<QString> findSpells(std::vector<QString> info);
     std::vector<QString> findUser(QString name,QString password);//查找用户和密码是否正确
     QString findRegisterInfo(QString name,QString password);//插入注册数据是否存在
+    QString createSongsList(QString user,QString list);//创建音乐列表
+    QString deleteSongsList(QString user,QString list);//删除音乐列表
     //Music findBySinger(QString singer);
 
 private:

@@ -2,12 +2,12 @@
 #define SERVER_H
 
 #include <QDialog>
-#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QTcpServer>
 #include <QBuffer>
 #include"music.h"
 #include "musicbroker.h"
+//#include <QObject>
 class QTcpServer;
 
 namespace Ui{
@@ -17,13 +17,9 @@ class Ui_MainWindow;
 class Server: public QMainWindow
 {
     Q_OBJECT
-
 public:
     explicit Server(QWidget *parent = nullptr);
     ~Server();
-
-signals:
-    void sendToMainWindow();
 
 private slots:
     void sendMessage();
@@ -38,8 +34,12 @@ private slots:
     void sendMusic();
     void sendLoginMessage();//验证登录信息
     void sendRegisterMessage();//验证注册信息
+    void sendCreateSongsList();//创建歌曲列表
+    void sendDeleteSongsList();//删除列表
 
     void displayError(QAbstractSocket::SocketError socketError);
+signals:
+    void sendToMaiWindow();
 
 private:
     QTcpServer *tcpServer;
@@ -54,9 +54,7 @@ private:
     MusicBroker *musicBroker;
 
     Ui::MainWindow *ui;
-    //    MainWindow *m_ui;
     QPixmap pix;
-
 
     quint32 blockSize;
     QString data;
@@ -79,6 +77,8 @@ private:
     qint32 bytesToWrite;
     qint32 payloadSize;
     qint32 totalBytes;
+    QString user;//用户
+    QString list;//列表
 };
 
 #endif // SERVER_H

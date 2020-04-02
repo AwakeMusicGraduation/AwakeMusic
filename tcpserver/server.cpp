@@ -8,7 +8,6 @@ Server::Server(QWidget *parent)
     : ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-//    m_ui = new MainWindow;
     tcpServer = new QTcpServer();
 
     blockSize = 0;
@@ -48,6 +47,7 @@ void Server::acceptConnection()
 {
     ui->label->setText("连接成功");
     qDebug() << "connect success";
+    emit sendToMaiWindow();
     clientConnection = tcpServer->nextPendingConnection();
     //sendPlaylist();
     connect(clientConnection, &QIODevice::readyRead,this,&Server::receiveData);
@@ -56,7 +56,7 @@ void Server::acceptConnection()
 
 void Server::acceptFileConnection()
 {
-//    ui->label->setText("发送推荐列表");
+    ui->label->setText("发送推荐列表");
     fileConnection = fileServer->nextPendingConnection();
     sendPlaylist();
 }
@@ -64,7 +64,6 @@ void Server::acceptFileConnection()
 void Server::acceptSingerConnection()
 {
     ui->label->setText("发送歌手分类");
-    emit sendToMainWindow();
     singerConnection = singerServer->nextPendingConnection();
     connect(singerConnection, &QIODevice::readyRead,this,&Server::receiveCategoryData);
 }
@@ -231,6 +230,20 @@ void Server::receiveData()
         qDebug() << "注册";
         ui->label->setText("注册用户");
     }
+    else if(data == "creatlist")
+    {
+        in >> user;
+        in >> list;
+        sendCreateSongsList();
+        ui->label->setText("创建歌曲列表");
+    }
+    else if(data == "deletelist")
+    {
+        in >> user;
+        in >> list;
+        sendDeleteSongsList();
+        ui->label->setText("删除列表");
+    }
     else{
 
         if(!data.isNull())
@@ -261,10 +274,13 @@ void Server::sendLoginMessage()
     for(auto l:m)
     {
         out << l;
+        qDebug() << l << "音乐列表名";
     }
     clientConnection->write(block);
     qDebug() << "传输登录信息";
     clientConnection->disconnectFromHost();
+    //connect(clientConnection, &QAbstractSocket::disconnected,
+    //        clientConnection, &QObject::deleteLater);
 }
 
 void Server::sendRegisterMessage()
@@ -278,7 +294,38 @@ void Server::sendRegisterMessage()
     out << m;
     clientConnection->write(block);
     clientConnection->disconnectFromHost();
+    //connect(clientConnection, &QAbstractSocket::disconnected,
+    //        clientConnection, &QObject::deleteLater);
 }
+
+void Server::sendCreateSongsList()
+{
+    musicBroker = new MusicBroker();
+    QString message = musicBroker->createSongsList(user,list);
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_10);
+    //QString message = "创建列表成功";
+    out << qint32(message.size());
+    out << message;
+    clientConnection->write(block);
+    clientConnection->disconnectFromHost();
+}
+
+void Server::sendDeleteSongsList()
+{
+    musicBroker = new MusicBroker();
+    QString message = musicBroker->deleteSongsList(user,list);
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_10);
+    //QString message = "删除列表成功";
+    out << qint32(message.size());
+    out << message;
+    clientConnection->write(block);
+    clientConnection->disconnectFromHost();
+}
+
 
 void Server::sendMessage()
 {

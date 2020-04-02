@@ -68,5 +68,17 @@ QString MusicBroker::findRegisterInfo(QString name,QString password)
     return sqltable->insertParmeterUser(name,password);
 }
 
+QString MusicBroker::createSongsList(QString user,QString list)
+{
+    sqltable->user = user;
+    return sqltable->createMusicList(list);
+}
+
+QString MusicBroker::deleteSongsList(QString user, QString list)
+{
+    sqltable->user = user;
+    return sqltable->deleteMusicList(list);
+}
+
 
 

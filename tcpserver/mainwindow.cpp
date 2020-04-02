@@ -1,21 +1,20 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "server.h"
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QSqlTableModel>
 #include <QSettings>
 #include <QDebug>
 #include <QMessageBox>
+#include "server.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    Server *server = new Server;
-//    server->show();
-    connect(server,SIGNAL(sendToMainWindow()),this, SLOT(receiveServer()));
+    Server *server = new Server();
+    connect(server,SIGNAL(sendToMainWindow()),this,SLOT(receiveServer()));
     initUI();
 }
 
@@ -107,6 +106,6 @@ void MainWindow::on_pushButton_6_clicked()
 
 void MainWindow::receiveServer()
 {
-    qDebug()<<"发送成功";
-    ui->label->setText("发送成功");
+    qDebug() << "连接成功";
+    ui->label->setText("连接成功");
 }
