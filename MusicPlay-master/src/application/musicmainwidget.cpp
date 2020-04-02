@@ -150,6 +150,9 @@ void MusicMainWidget::initConnect()
             this,SLOT(slotNextMusic(QString)));
     connect(m_contentWidget,SIGNAL(signalSendPlayPreviouseMusic(QString)),
             this,SLOT(slotPreviousMusic(QString)));
+    //删除用户创建的音乐列表
+    connect(m_contentWidget,SIGNAL(signalDeleteListFromServer(QString,QString,QString)),
+            m_client,SLOT(sendDeleteListFromServer(QString,QString,QString)));
 
     /**********************解析歌词信号关联**************************/
     connect(m_player,SIGNAL(signalSendPlayingMusic(QString)),
@@ -203,6 +206,9 @@ void MusicMainWidget::initConnect()
     qDebug() << "更新登录列表";
     connect(login,&loginform_test::signalUpdateName,m_titleWidget,&TitleWidget::slotUpdateName);
     qDebug() << "设置登录名";
+    connect(login,&loginform_test::signalUpdateName,m_contentWidget,&Contentwidget::slotSetName);
+    connect(m_contentWidget,&Contentwidget::signalCreateSongsList,
+            m_client,&Client::sendSongsListData);//传输列表名
 }
 
 void MusicMainWidget::mousePressEvent(QMouseEvent *event)

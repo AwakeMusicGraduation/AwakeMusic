@@ -30,9 +30,13 @@ public slots:
     void sendData(QString data);
     void sendLoginData(QString user,QString name,QString password);//发送登录信息
     void sendRegisterData(QString user,QString name,QString password);//发送注册信息
+    void sendSongsListData(QString label,QString name,QString list);//发送创建的列表名
+    void sendDeleteListFromServer(QString label,QString name,QString list);//发送删除用户创建的列表名
     void displayError(QAbstractSocket::SocketError);
     void acceptUserMessage();//接收登录信息
     void acceptRegisterMessage();//接收注册信息
+    void acceptCreateList();//创建列表成功
+    void acceptDeleteList();//删除列表
 
 Q_SIGNALS:
     void signalShowImage(QImage image);

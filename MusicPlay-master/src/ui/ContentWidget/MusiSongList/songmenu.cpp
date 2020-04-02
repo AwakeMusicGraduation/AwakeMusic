@@ -38,6 +38,7 @@ void SongMenu::initConnect()
             this,SIGNAL(signalAddNewList()));
     connect(m_actionDeleteList,SIGNAL(triggered()),
             this,SIGNAL(signalDeleteList()));
+    //connect(m_actionDeleteList,SIGNAL(triggered()),this,SIGNAL(obtainLsitName()));
 //    connect(m_actionReName,SIGNAL(triggered()),
 //            this,SIGNAL(signalRename()));
 }

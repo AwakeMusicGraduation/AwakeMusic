@@ -96,6 +96,8 @@ void Contentwidget::initConnect()
             this,SLOT(slotAddNewList()));
     connect(m_musicSongsLists,SIGNAL(signalDeleteList(int)),
             this,SLOT(slotDeleteList(int)));
+    connect(m_musicSongsLists,SIGNAL(signalDeleteListFromServer(QString,QString,QString)),
+            this,SIGNAL(signalDeleteListFromServer(QString,QString,QString)));//发送删除列表的信息
     connect(m_musicSongsMedia,SIGNAL(signalPlayMediaMusic(QString)),
             this,SIGNAL(signalPlayMediaMusic(QString)));
 
@@ -126,8 +128,11 @@ void Contentwidget::initConnect()
             m_musicSongsMedia,SLOT(slotShowMusics(QString,QString)));
 
     //更新用户列表
-    connect(this,&Contentwidget::signalUpdateList,//SIGNAL(signalUpdateList(std::vector<QString>)),
-            m_musicSongsLists,&MusicSongsLists::slotUpdateList);//SLOT(slotUpdateList(std::vector<QString>)));
+    connect(this,&Contentwidget::signalUpdateList,
+            m_musicSongsLists,&MusicSongsLists::slotUpdateList);
+    //传输创建的列表名
+    connect(m_musicSongsLists,&MusicSongsLists::signalCreateSongsList,
+            this,&Contentwidget::signalCreateSongsList);
 }
 
 void Contentwidget::connectMusicList(int index)
@@ -276,3 +281,7 @@ void Contentwidget::slotShowMediaSongs()
     m_showOrHide = false;
 }
 
+void Contentwidget::slotSetName(QString name)
+{
+    m_musicSongsLists->user = name;
+}

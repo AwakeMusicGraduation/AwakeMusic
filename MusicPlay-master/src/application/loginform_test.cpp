@@ -152,7 +152,18 @@ void loginform_test::slotAcceptUserMessage(std::vector<QString> userMessage)
         userNameLEd->clear();
         pwdLEd->clear();
         accept();//关闭窗体
-        userMessage.pop_back();
+        for(auto l:userMessage)
+        {
+            qDebug() << l <<"listname";
+        }
+        qDebug() << "如下";
+        //userMessage.pop_back();
+        std::vector<QString>::iterator i = userMessage.begin();
+        userMessage.erase(i);
+        for(auto l:userMessage)
+        {
+            qDebug() << l <<"listname";
+        }
         emit signalUpdateList(userMessage);//更新用户列表
         emit signalUpdateName(m_name);//更新用户名
     }
@@ -183,6 +194,7 @@ void loginform_test::regis()
 
 void loginform_test::slotAcceptRegisterMessage(QString message)
 {
+    qDebug() << "接收注册信息";
     if(message == "用户名已存在")
     {
         QMessageBox::warning(this, tr("警告！"),

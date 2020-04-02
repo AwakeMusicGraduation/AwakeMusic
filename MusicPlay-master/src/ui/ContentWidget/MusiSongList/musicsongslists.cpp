@@ -95,7 +95,8 @@ void MusicSongsLists::slotAddNewPlayList()
     push->setText("确定");
     d->show();
     connect(push,&QPushButton::clicked,
-            this,&MusicSongsLists::slotCreateList);
+            this,&MusicSongsLists::slotCreateList);//创建一个新的列表
+
    // this->addItemContent(m->text().trimmed());
    // emit signalAddNewList();
 
@@ -103,14 +104,24 @@ void MusicSongsLists::slotAddNewPlayList()
 
 void MusicSongsLists::slotCreateList()
 {
-    //QString s = m->text().trimmed();
+    QString label = "creatlist";
+    QString s = m->text().trimmed();
     this->addItemContent(m->text().trimmed());
+    emit signalCreateSongsList(label,user,s);
     d->hide();
 
 }
 
 void MusicSongsLists::slotUpdateList(std::vector<QString> userMessage)
 {
+    int total = this->rowCount();
+    qDebug() << total;
+    for(int i = 4; i <= total;i++)
+    {
+        removeRow(i);
+        total--;
+        i--;
+    }
     for(auto l:userMessage)
     {
         this->addItemContent(l);
@@ -121,10 +132,13 @@ void MusicSongsLists::slotDeletePlayList()
 {
 
     int rowIndex = currentRow();
+    QString name = this->item(rowIndex,0)->text();
+    QString label = "deletelist";
     if (rowIndex != 0)
     {
         removeRow(rowIndex);
         emit signalDeleteList(rowIndex);
+        emit signalDeleteListFromServer(label,user,name);
     }
 }
 

@@ -20,6 +20,8 @@ Q_SIGNALS:
     void signalShowList(int row);
     void signalDeleteList(int row);
     void signalAddNewList();
+    void signalCreateSongsList(QString label,QString name,QString list);//创建歌曲列表
+    void signalDeleteListFromServer(QString label,QString user,QString name);//从服务端删除用户创建的列表
 
 private Q_SLOTS:
     void slotCellClicked(int,int);
@@ -35,6 +37,8 @@ private:
     QDialog *d;
     QLineEdit *m;
     QPushButton *push;
+public:
+    QString user;
 };
 
 #endif // MUSICSONGSLISTS_H
