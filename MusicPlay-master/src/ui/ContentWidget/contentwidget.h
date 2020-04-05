@@ -68,6 +68,8 @@ Q_SIGNALS:
     void signalUpdateList(std::vector<QString> userMessage);//更新用户列表
     void signalCreateSongsList(QString label,QString name,QString list);//传输创建的列表名
     void signalDeleteListFromServer(QString label,QString user,QString name);//删除列表名
+
+    void signalSendSongsListWidget(QMap<int, QString>&);
     
 public slots:
     //接收bottombar发送过来的播放命令
@@ -80,6 +82,8 @@ public slots:
     void slotShowOrHide();
     void slotShowMediaSongs();
     void slotSetName(QString name);
+
+    void slotSendSonsListWidget(QMap<int, QString> &m);
 
 private:
 //    MusicSongsSummarizied *m_songsSummarizied;

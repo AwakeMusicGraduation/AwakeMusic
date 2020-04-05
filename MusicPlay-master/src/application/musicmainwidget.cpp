@@ -13,6 +13,7 @@
 #include "app.h"
 #include "musicdesktoplrcmanage.h"
 #include "loginform_test.h"
+#include "MusiSongList/mymediaplaylist.h"
 
 #include <QApplication>
 
@@ -22,6 +23,7 @@ MusicMainWidget::MusicMainWidget(QWidget *parent) :
     initForm();
     initWidget();
     initLayout();
+    initPlayList();
     initConnect();
 
 }
@@ -62,6 +64,7 @@ void MusicMainWidget::initWidget()
 
     m_contentWidget = new Contentwidget(this);
     m_bottomWidget = new BottomWidget(this);
+    m_playlist = new MyMediaPlayList(this);
 
     m_player = new PlayMusic(this);
     m_desktopLrc = new MusicDesktopLrcManage;
@@ -127,6 +130,7 @@ void MusicMainWidget::initConnect()
             m_contentWidget,SLOT(slotShowOrHide()));
     connect(m_bottomWidget,SIGNAL(signalHidOrShowLyrc(int)),
             this,SLOT(slotShowOrHideDesktopLrc(int)));
+    connect(m_bottomWidget,SIGNAL(signalHidOrShowPlayList()),this,SLOT(slotShowOrHideCornorList()));
     connect(m_bottomWidget,SIGNAL(signalPreviousMusic()),
             m_contentWidget,SIGNAL(signalSendPlayPreviouse()));
 
@@ -209,6 +213,15 @@ void MusicMainWidget::initConnect()
     connect(login,&loginform_test::signalUpdateName,m_contentWidget,&Contentwidget::slotSetName);
     connect(m_contentWidget,&Contentwidget::signalCreateSongsList,
             m_client,&Client::sendSongsListData);//传输列表名
+
+    //刷新播放列表
+    connect(m_contentWidget,SIGNAL(signalSendSongsListWidget(QMap<int, QString> &)),this,SLOT(slotFlushPlayList(QMap<int, QString> &)));
+}
+
+void MusicMainWidget::initPlayList()
+{
+    qDebug()<<"显示播放列表";
+    m_playlist->setGeometry(427,140,450,400);
 }
 
 void MusicMainWidget::mousePressEvent(QMouseEvent *event)
@@ -358,7 +371,23 @@ void MusicMainWidget::slotShowOrHideDesktopLrc(int value)
     }
 }
 
+void MusicMainWidget::slotShowOrHideCornorList()
+{
+    if(m_playlist->isHidden()){
+        //    显示播放列表
+        m_playlist->show();
+    }
+    else{
+        m_playlist->hide();
+    }
+}
+
 void MusicMainWidget::slotTest(const QString &name)
 {
     qDebug()<<"请求回来的歌曲为:"<<name;
+}
+
+void MusicMainWidget::slotFlushPlayList(QMap<int, QString> &m)
+{
+    m_playlist->slotReceiveList1(m);
 }

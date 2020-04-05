@@ -21,6 +21,7 @@ Q_SIGNALS:
     void signalNextMusic();             //下一首
     void signalPlayProgressChange(int); //播放进度改变
     void signalHidOrShowLyrc(int);      //显示或者隐藏桌面歌词
+    void signalHidOrShowPlayList();   //显示或者隐藏播放列表
     void signalSendPlayVolume(int);     //发送当前媒体音量
     void signalSendPlayPostion(qint64); //发送当前媒体播放进度
 
@@ -37,6 +38,7 @@ private Q_SLOTS:
     void slotSetPlayOrPause(int);       //设置播放模式
     void slotNoVoice();
     void slotShowOrHideLyrc();          //显示或者隐藏桌面歌词
+    void slotShowOrHidePlayList();      //显示或隐藏播放列表
 //    void slotPlayMode();                //播放模式
     void slotVoiceValue(int);           //声音改变槽函数
     void slotPlayPostionChange(int);    //播放进度条改变槽函数
@@ -64,6 +66,7 @@ private:
     PlayModeMenu *m_pMOdeMenu;          //播放模式菜单
 
     QPushButton *m_pbnDesktopLyrc;      //显示桌面歌词
+    QPushButton *m_pbnPlayList;         //显示播放列表
 
     QLabel *m_labelTotalTime;           //歌曲总时间
     QLabel *m_labelCurTime;             //歌曲当前播放时间

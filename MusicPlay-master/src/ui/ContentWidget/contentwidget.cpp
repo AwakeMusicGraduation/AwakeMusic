@@ -133,6 +133,8 @@ void Contentwidget::initConnect()
     //传输创建的列表名
     connect(m_musicSongsLists,&MusicSongsLists::signalCreateSongsList,
             this,&Contentwidget::signalCreateSongsList);
+
+    connect(m_musicSongList.at(m_currentwidget), SIGNAL(signalSendToPlayList(QMap<int,QString> &)),this,SLOT(slotSendSonsListWidget(QMap<int, QString> &)));
 }
 
 void Contentwidget::connectMusicList(int index)
@@ -284,4 +286,9 @@ void Contentwidget::slotShowMediaSongs()
 void Contentwidget::slotSetName(QString name)
 {
     m_musicSongsLists->user = name;
+}
+
+void Contentwidget::slotSendSonsListWidget(QMap<int, QString> &m)
+{
+    emit signalSendSongsListWidget(m);
 }

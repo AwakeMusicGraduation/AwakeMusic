@@ -108,6 +108,11 @@ void BottomWidget::slotShowOrHideLyrc()
     m_isShowLyrc = !m_isShowLyrc;
 }
 
+void BottomWidget::slotShowOrHidePlayList()
+{
+    emit signalHidOrShowPlayList();
+}
+
 
 //当声音滑块值变化时，进入该槽函数
 void BottomWidget::slotVoiceValue(int value)
@@ -264,6 +269,15 @@ void BottomWidget::initWidget()
     m_labelTotalTime->setObjectName("whiteLabel");
     m_labelTotalTime->setText("00:00");
     m_labelTotalTime->setFont(QFont("Times", 12, QFont::Bold));
+
+    //显示或隐藏播放列表
+    m_pbnPlayList = new QPushButton(this);
+    m_pbnPlayList->setFlat(true);
+    m_pbnPlayList->setCursor(Qt::PointingHandCursor);
+    m_pbnPlayList->setToolTip("打开播放列表");
+    m_pbnPlayList->setObjectName("pbnPlayList");
+    m_pbnPlayList->setIcon(QIcon(":/image/playControl/btn_miniplaylist (2).png"));
+    m_pbnPlayList->setIconSize(QSize(45,45));
 }
 
 void BottomWidget::initLayout()
@@ -287,6 +301,7 @@ void BottomWidget::initLayout()
     m_mainLayout->addWidget(m_voiceSlider);
     m_mainLayout->addWidget(m_pbnPlayMode);
     m_mainLayout->addWidget(m_pbnDesktopLyrc);
+    m_mainLayout->addWidget(m_pbnPlayList);
     m_mainLayout->addSpacing(20);
     m_mainLayout->setContentsMargins(0,0,0,0);
     setLayout(m_mainLayout);
@@ -317,6 +332,8 @@ void BottomWidget::initConnect()
     //初始化播放模式菜单传递过来的信息
     connect(m_pMOdeMenu,SIGNAL(signalSendPlayMode(int)),
             this,SLOT(slotChangePlayModeIcon(int)));
+
+    connect(m_pbnPlayList, SIGNAL(clicked()),this, SLOT(slotShowOrHidePlayList()));
 }
 
 void BottomWidget::playMusic()

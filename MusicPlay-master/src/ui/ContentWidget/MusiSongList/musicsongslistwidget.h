@@ -53,6 +53,9 @@ Q_SIGNALS:
     //向下发送所请求的播放歌曲
     void signalSendPlayCmdMusicInfo(const QString &);
 
+    //将列表中的所有歌曲显示到播放列表中
+    void signalSendToPlayList(QMap<int,QString> &);
+
 private Q_SLOTS:
     void slotCellDoubleClicked(int,int);
 
@@ -84,7 +87,8 @@ protected:
 
 private:
     MusicListMenu *m_menu;
-    QMap<QString,QString>m_musicInfo;           //歌曲信息
+    QMap<QString,QString> m_musicInfo;           //歌曲信息
+    QMap<int, QString> m_musicname;              //保存音乐名
 };
 
 #endif // MUSICSONGSLISTWIDGET_H

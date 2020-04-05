@@ -63,5 +63,6 @@
         <file>image/hide</file>
         <file>image/skin/5.png</file>
         <file>image/title/login.jpg</file>
+        <file>image/playControl/btn_miniplaylist (2).png</file>
     </qresource>
 </RCC>

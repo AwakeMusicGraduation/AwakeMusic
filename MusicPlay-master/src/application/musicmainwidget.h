@@ -14,6 +14,7 @@ class PlayMusic;
 class MusicDesktopLrcManage;
 class Client;
 class loginform_test;
+class MyMediaPlayList;
 
 class MusicMainWidget : public QFrame
 {
@@ -29,6 +30,7 @@ private:
     void initWidget();
     void initLayout();
     void initConnect();
+    void initPlayList();
     //自定义槽函数
 private Q_SLOTS:
     void slotShowLoginWidget();                 //显示登录界面
@@ -41,9 +43,11 @@ private Q_SLOTS:
     void slotNextMusic(const QString &);        //下一首
     void slotPlayProgressChange(int);           //播放进度改变
     void slotShowOrHideDesktopLrc(int);         //显示或者隐藏桌面歌词
+    void slotShowOrHideCornorList();         //显示或隐藏播放列表
 
     void slotTest(const QString &);
 
+    void slotFlushPlayList(QMap<int, QString> &m);   //刷新播放列表
 
 protected :
     virtual void mousePressEvent(QMouseEvent *);
@@ -58,6 +62,8 @@ private:
     //QStackedWidget *m_stackedWidget;
     MusicDesktopLrcManage *m_desktopLrc;//桌面歌词
     QVBoxLayout *m_mainLayout;          //主布局
+    MyMediaPlayList *m_playlist;
+
 
     QPoint m_move_point;                //移动的距离
     bool m_mouse_press;                 //按下鼠标左键

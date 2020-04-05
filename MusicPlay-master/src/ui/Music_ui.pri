@@ -1,4 +1,5 @@
 HEADERS += \
+    $$PWD/ContentWidget/MusiSongList/mymediaplaylist.h \
     $$PWD/TitleBar/titlewidget.h \
     $$PWD/BottomBar/bottomwidget.h \
     $$PWD/ContentWidget/contentwidget.h \
@@ -17,6 +18,7 @@ HEADERS += \
     $$PWD/ContentWidget/MusiSongList/displaysearchcontent.h
 
 SOURCES += \
+    $$PWD/ContentWidget/MusiSongList/mymediaplaylist.cpp \
     $$PWD/TitleBar/titlewidget.cpp \
     $$PWD/BottomBar/bottomwidget.cpp \
     $$PWD/ContentWidget/contentwidget.cpp \
@@ -33,3 +35,6 @@ SOURCES += \
     $$PWD/ContentWidget/MusiSongList/musicsongsmedia.cpp \
     $$PWD/ContentWidget/MusiSongList/classifylist.cpp \
     $$PWD/ContentWidget/MusiSongList/displaysearchcontent.cpp
+
+FORMS += \
+    $$PWD/ContentWidget/MusiSongList/mymediaplaylist.ui
