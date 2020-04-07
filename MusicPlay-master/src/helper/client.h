@@ -37,6 +37,11 @@ public slots:
     void acceptRegisterMessage();//接收注册信息
     void acceptCreateList();//创建列表成功
     void acceptDeleteList();//删除列表
+    void slotAddMusicToList(QString label,QString list,QString name,QString singer,QString album);//将歌曲加入到对应的列表并传到服务器
+    void slotLoadMusicFromList(QString label,QString list);//从服务端加载音乐列表里面的歌曲到客户端
+    void acceptMusicFromList();//接收服务端传会的列表中的音乐
+    void acceptMusicInsertList();//是否插入成功
+
 
 Q_SIGNALS:
     void signalShowImage(QImage image);

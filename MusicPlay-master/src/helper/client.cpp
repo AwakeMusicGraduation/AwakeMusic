@@ -132,6 +132,39 @@ void Client::sendDeleteListFromServer(QString label,QString name,QString list)
     connect(tcpSocket,&QIODevice::readyRead,this,&Client::acceptDeleteList);
 }
 
+void Client::slotAddMusicToList(QString label,QString list,QString name,QString singer,QString album)
+{
+    newConnect();
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+
+    out.setVersion(QDataStream::Qt_5_10);
+    out << quint32(label.size() + list.size() + name.size()+singer.size() + album.size());
+
+    out << label << list << name << singer << album;
+    tcpSocket->write(block);
+    qDebug() << "添加音乐到列表";
+    block.resize(0);
+    connect(tcpSocket,&QIODevice::readyRead,this,&Client::acceptMusicInsertList);
+}
+
+void Client::slotLoadMusicFromList(QString label,QString list)
+{
+    newConnect();
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+
+    out.setVersion(QDataStream::Qt_5_10);
+    out << quint32(label.size() + list.size());
+
+    out << label << list;
+    tcpSocket->write(block);
+    qDebug() << "从列表中查出音乐";
+    block.resize(0);
+    connect(tcpSocket,&QIODevice::readyRead,this,&Client::acceptMusicFromList);
+
+}
+
 void Client::acceptCreateList()
 {
     QDataStream in(tcpSocket);
@@ -174,12 +207,62 @@ void Client::acceptDeleteList()
     tcpSocket->close();
 }
 
+void Client::acceptMusicInsertList()
+{
+    QDataStream in(tcpSocket);
+    //设置数据流版本，这里要和服务器端相同。
+    in.setVersion(QDataStream::Qt_5_10);
+
+    //如果这是刚开始接受数据
+    if(blockSize==0){
+        //判断接收数据是否大于两字节，也就是文件的大小信息所占的空间
+        //如果时则保存到blockSize变量中，否则直接返回，继续接受数据
+        if(tcpSocket->bytesAvailable() < (int)sizeof(quint32)) return;
+        in >> blockSize;
+    }
+    //如果没有得到全部的数据，则返回，继续接收数据
+    if(tcpSocket->bytesAvailable()<blockSize) return;
+    QString message;
+    in >> message;
+    qDebug() << message;
+    tcpSocket->close();
+}
+
+void Client::acceptMusicFromList()
+{
+    QDataStream in(tcpSocket);
+    //设置数据流版本，这里要和服务器端相同。
+    in.setVersion(QDataStream::Qt_5_10);
+
+    //如果这是刚开始接受数据
+    if(blockSize==0){
+        //判断接收数据是否大于两字节，也就是文件的大小信息所占的空间
+        //如果时则保存到blockSize变量中，否则直接返回，继续接受数据
+        if(tcpSocket->bytesAvailable() < (int)sizeof(quint32)) return;
+        in >> blockSize;
+    }
+    //if(tcpSocket->bytesAvailable())
+    if(tcpSocket->bytesAvailable()<blockSize) return;
+    while(tcpSocket->bytesAvailable())
+   {
+        QString music,singer,album;
+        in >> music;
+        in >> singer;
+        in >> album;
+        qDebug() << music << singer << album;
+        emit signalSendInfo(music,singer,album);
+   }
+
+
+    tcpSocket->close();
+}
+
 void Client::newConnect()
 {
     blockSize = 0;
     tcpSocket = new QTcpSocket();
     //tcpSocket->abort();
-    tcpSocket->connectToHost("192.168.43.46", 6668);
+    tcpSocket->connectToHost("192.168.0.104", 6668);
     //connect(tcpSocket, &QIODevice::readyRead,this,&Client::showPicture);
 }
 
@@ -187,7 +270,7 @@ void Client::newFileConnect()
 {
     blockSize = 0;
     fileSocket->abort();
-    fileSocket->connectToHost("192.168.43.46", 8888);
+    fileSocket->connectToHost("192.168.0.104", 8888);
     connect(fileSocket, &QIODevice::readyRead, this, &Client::receivePlaylist);
 }
 
@@ -195,7 +278,7 @@ void Client::newSingerConnect()
 {
     blockSize = 0;
     singerSocket->abort();
-    singerSocket->connectToHost("192.168.43.46", 2222);
+    singerSocket->connectToHost("192.168.0.104", 2222);
 
     qDebug() << "连接成功";
     connect(singerSocket, &QIODevice::readyRead, this, &Client::receiveCategory);

@@ -5,6 +5,7 @@
 #include "loginform_test.h"
 #include <QtSql>
 #include <QSqlQuery>
+#include <ContentWidget/MusiSongList/musiccenterwidget.h>
 
 int main(int argc,char *argv[])
 {
@@ -25,6 +26,10 @@ int main(int argc,char *argv[])
     App::ReadConfig();
     MusicMainWidget widget;
     widget.show();
+
+//    MusicCenterWidget *c = new MusicCenterWidget;
+//    c->show();
+
     return app.exec();
     //}
     // else {

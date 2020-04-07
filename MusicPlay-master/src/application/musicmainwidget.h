@@ -15,6 +15,7 @@ class MusicDesktopLrcManage;
 class Client;
 class loginform_test;
 class MyMediaPlayList;
+class Music;
 
 class MusicMainWidget : public QFrame
 {
@@ -47,7 +48,7 @@ private Q_SLOTS:
 
     void slotTest(const QString &);
 
-    void slotFlushPlayList(QMap<int, QString> &m);   //刷新播放列表
+    void slotFlushPlayList(QList<Music> &m);   //刷新播放列表
 
 protected :
     virtual void mousePressEvent(QMouseEvent *);

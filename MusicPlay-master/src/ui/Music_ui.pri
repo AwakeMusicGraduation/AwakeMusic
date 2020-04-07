@@ -1,4 +1,6 @@
 HEADERS += \
+    $$PWD/ContentWidget/MusiSongList/music.h \
+    $$PWD/ContentWidget/MusiSongList/musiccenterwidget.h \
     $$PWD/ContentWidget/MusiSongList/mymediaplaylist.h \
     $$PWD/TitleBar/titlewidget.h \
     $$PWD/BottomBar/bottomwidget.h \
@@ -18,6 +20,7 @@ HEADERS += \
     $$PWD/ContentWidget/MusiSongList/displaysearchcontent.h
 
 SOURCES += \
+    $$PWD/ContentWidget/MusiSongList/musiccenterwidget.cpp \
     $$PWD/ContentWidget/MusiSongList/mymediaplaylist.cpp \
     $$PWD/TitleBar/titlewidget.cpp \
     $$PWD/BottomBar/bottomwidget.cpp \

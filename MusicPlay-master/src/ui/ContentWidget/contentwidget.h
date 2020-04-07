@@ -12,6 +12,7 @@ class MusicSongsListWidget;
 class MusicSongsMedia;
 class classifyList;
 class DisplaySearchContent;
+class Music;
 
 class Contentwidget : public QWidget
 {
@@ -69,21 +70,24 @@ Q_SIGNALS:
     void signalCreateSongsList(QString label,QString name,QString list);//传输创建的列表名
     void signalDeleteListFromServer(QString label,QString user,QString name);//删除列表名
 
-    void signalSendSongsListWidget(QMap<int, QString>&);
+    void signalAddMusicToList(QString label,QString list,QString name,QString singer,QString album);//将歌曲加入到对应的列表并传到服务器
+    void signalLoadMusicFromList(QString label,QString list);//加载用户创建的列表里面的内容
+
+    void signalSendSongsListWidget(QList<Music>&);
     
 public slots:
     //接收bottombar发送过来的播放命令
     void slotReceiveFirstPlayMusic(int);
     void slotShowLrc();
     void slotHideLrc();
-    void slotShowList(int row);
+    void slotShowList(int row,QString list);
     void slotAddNewList();
     void slotDeleteList(int row);
     void slotShowOrHide();
     void slotShowMediaSongs();
     void slotSetName(QString name);
 
-    void slotSendSonsListWidget(QMap<int, QString> &m);
+    void slotSendSonsListWidget(QList<Music> &m);
 
 private:
 //    MusicSongsSummarizied *m_songsSummarizied;

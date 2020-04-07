@@ -8,6 +8,7 @@
 #include "controlvalues.h"
 #include "client.h"
 #include "myhelper.h"
+#include "music.h"
 
 MusicSongsListWidget::MusicSongsListWidget(QWidget *parent)
     :QTableWidget(parent)
@@ -100,7 +101,7 @@ void MusicSongsListWidget::addMusicFold(QString path)
         fileinfo = fileinfolist.at(i);
         string_song = fileinfo.filePath();//把fileinfo变量中的文件名转换成QString并赋给string_song
         stringlist_song << string_song;//把歌曲名赋给stringlist_song表
-//      m_musicname = stringlist_song;
+
         i++;
     }
     importMusicSongsName(stringlist_song);
@@ -149,8 +150,10 @@ void MusicSongsListWidget::importMusicSongsName(const QStringList &file_name_lis
     {
         //将歌曲名称插入到列表中
         this->addItemContent(fileNameList.at(i));
-        m_musicname[i]=fileNameList.at(i);
         //保存歌曲信息，以便进行歌曲播放
+        Music music(fileNameList.at(i));
+        m_music.append(music);
+
         this->saveMusicInfo(fileNameList.at(i),filePath.at(i));
     }
 }
@@ -262,7 +265,7 @@ void MusicSongsListWidget::slotRemoveItem()
 void MusicSongsListWidget::slotPlayMusic()
 {
     QString songName = getSelectContent();
-    emit signalSendToPlayList(m_musicname);
+    emit signalSendToPlayList(m_music);
     PlayMusic(songName);
 }
 

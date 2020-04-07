@@ -62,7 +62,7 @@ void TitleWidget::initWidget()
     m_pbnLogin->setObjectName("pbnLogin");
     m_pbnLogin->setFixedSize(80,26);
     m_pbnLogin->setIcon(QIcon(":/image/title/login.jpg"));
-    m_pbnLogin->setIconSize(QSize(50,56));
+    m_pbnLogin->setIconSize(QSize(80,26));
     //m_pbnLogin->setText("未登录");
 
 

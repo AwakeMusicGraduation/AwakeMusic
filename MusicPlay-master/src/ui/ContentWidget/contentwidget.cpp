@@ -46,11 +46,12 @@ void Contentwidget::initWidget()
     //    m_songsSummarizied = new MusicSongsSummarizied(this);
     m_musicSongsLists = new MusicSongsLists(this);
     m_musicLyrcWidget = new MusicLyrcWidget(this);
-    m_musicSongsMedia = new MusicSongsMedia(this);
-    m_musicSongsMedia2 = new MusicSongsMedia(this);
+    m_musicSongsMedia = new MusicSongsMedia(this);//搜素列表,分类列表
+    m_musicSongsMedia2 = new MusicSongsMedia(this);//推荐列表
     m_classifyList = new classifyList(this);
     MusicSongsListWidget *widget = new MusicSongsListWidget(this);
     m_searchContent = new DisplaySearchContent(this);
+    m_searchContent->hide();
     m_musicSongList.append(widget);
     widget->addMusicFold("/root/CloudMusic/");
 }
@@ -65,7 +66,7 @@ void Contentwidget::initLayout()
     m_mainLayout->addWidget(m_musicSongsMedia,Qt::AlignRight);
     m_mainLayout->addWidget(m_musicSongsMedia2,Qt::AlignRight);
     m_mainLayout->addWidget(m_classifyList,Qt::AlignRight);
-    m_mainLayout->addWidget(m_searchContent,Qt::AlignRight);
+//    m_mainLayout->addWidget(m_searchContent,Qt::AlignRight);
     m_currentwidget = 0;
     this->connectMusicList(m_currentwidget);
     m_mainLayout->setContentsMargins(0,0,0,0);
@@ -90,8 +91,8 @@ void Contentwidget::initConnect()
     connect(m_musicLyrcWidget,SIGNAL(signalHideLrc()),
             this,SLOT(slotHideLrc()));
     /***************根据点击的列表显示列表内容**********************/
-    connect(m_musicSongsLists,SIGNAL(signalShowList(int)),
-            this,SLOT(slotShowList(int)));
+    connect(m_musicSongsLists,SIGNAL(signalShowList(int,QString)),
+            this,SLOT(slotShowList(int,QString)));
     connect(m_musicSongsLists,SIGNAL(signalAddNewList()),
             this,SLOT(slotAddNewList()));
     connect(m_musicSongsLists,SIGNAL(signalDeleteList(int)),
@@ -134,7 +135,19 @@ void Contentwidget::initConnect()
     connect(m_musicSongsLists,&MusicSongsLists::signalCreateSongsList,
             this,&Contentwidget::signalCreateSongsList);
 
-    connect(m_musicSongList.at(m_currentwidget), SIGNAL(signalSendToPlayList(QMap<int,QString> &)),this,SLOT(slotSendSonsListWidget(QMap<int, QString> &)));
+    //获取创建的列表名
+    connect(m_musicSongsMedia,&MusicSongsMedia::signalObtainListName,
+            m_musicSongsLists,&MusicSongsLists::slotObtainListName);
+    connect(m_musicSongsMedia2,&MusicSongsMedia::signalObtainListName,
+            m_musicSongsLists,&MusicSongsLists::slotObtainListName);
+    //接收列表名
+    connect(m_musicSongsLists,&MusicSongsLists::signalSendListName,m_musicSongsMedia,&MusicSongsMedia::slotReceiveListName);
+    connect(m_musicSongsLists,&MusicSongsLists::signalSendListName,m_musicSongsMedia2,&MusicSongsMedia::slotReceiveListName);
+    //将歌曲加入到对应列表并传到服务器
+    connect(m_musicSongsMedia,&MusicSongsMedia::signalAddMusicToList,this,&Contentwidget::signalAddMusicToList);
+    connect(m_musicSongsMedia2,&MusicSongsMedia::signalAddMusicToList,this,&Contentwidget::signalAddMusicToList);
+
+    connect(m_musicSongList.at(m_currentwidget), SIGNAL(signalSendToPlayList(QList<Music> &)),this,SLOT(slotSendSonsListWidget(QList<Music>  &)));
 }
 
 void Contentwidget::connectMusicList(int index)
@@ -220,11 +233,13 @@ void Contentwidget::slotHideLrc()
     m_showOrHide = false;
 }
 
-void Contentwidget::slotShowList(int row)
+void Contentwidget::slotShowList(int row,QString list)
 {
+    qDebug() << row << "选择的行";
     m_musicLyrcWidget->hide();
     m_showOrHide = false;
     m_musicSongList.at(m_currentwidget)->hide();
+    m_musicSongsMedia->hide();
     this->disConnectMusicList(m_currentwidget);
     if(row == 1){
         m_classifyList->hide();
@@ -240,14 +255,20 @@ void Contentwidget::slotShowList(int row)
         else if(row == 2){
             m_classifyList->initCurrent();
             m_classifyList->show();
+
         }
         else{
+            qDebug() << "执行";
+            m_musicSongsMedia->removeAllItem();
+            m_musicSongsMedia->show();
+            QString label = "loadmusicfromlist";
+            emit signalLoadMusicFromList(label,list);
+
             //m_musicSongList.at(row-2)->show();
             //m_currentwidget = row-2;
             //this->connectMusicList(m_currentwidget-2);
         }
     }
-    m_musicSongsMedia->hide();
 }
 
 void Contentwidget::slotAddNewList()
@@ -288,7 +309,7 @@ void Contentwidget::slotSetName(QString name)
     m_musicSongsLists->user = name;
 }
 
-void Contentwidget::slotSendSonsListWidget(QMap<int, QString> &m)
+void Contentwidget::slotSendSonsListWidget(QList<Music> &m)
 {
     emit signalSendSongsListWidget(m);
 }

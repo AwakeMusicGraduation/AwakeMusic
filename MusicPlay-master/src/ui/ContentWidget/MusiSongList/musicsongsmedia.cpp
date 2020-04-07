@@ -2,8 +2,12 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QDebug>
+#include <QMenu>
+#include <QAction>
+#include <QContextMenuEvent>
+#include <QActionGroup>
 //#define MusicPath "rtsp://10.253.241.175/mp3/"
-#define MusicPath "rtsp://192.168.43.46/"
+#define MusicPath "rtsp://192.168.0.104/"
 
 
 MusicSongsMedia::MusicSongsMedia(QWidget *parent)
@@ -63,14 +67,31 @@ void MusicSongsMedia::initForm()
     verticalHeader()->setVisible(false);
     QVBoxLayout *mainLayout = new QVBoxLayout;
     setLayout(mainLayout);
+
+    menu = new QMenu();
+    action = new QAction("加入列表",this);
+    menu->addAction(action);
+    group = new QActionGroup(this);
 }
 
 void MusicSongsMedia::initConnect()
 {
     connect(this,SIGNAL(cellDoubleClicked(int,int)),
             this,SLOT(slotCellDoubleClicked(int,int)));
+
+    connect(action,&QAction::triggered,this,&MusicSongsMedia::slot);
+    //connect(action,SIGNAL(triggered()),this,SIGNAL(signalObtainListName()));
+    connect(group,&QActionGroup::triggered,this,&MusicSongsMedia::slotResponse);
+
 }
 
+void MusicSongsMedia::slot()
+{
+    qDebug() << "begin";
+    emit signalObtainListName();
+}
+
+//显示搜索结果
 void MusicSongsMedia::slotAddItem(QString title, QString singer, QString album)
 {
     QTableWidgetItem *item1 = new QTableWidgetItem (title);
@@ -97,4 +118,60 @@ void MusicSongsMedia::slotCellDoubleClicked(int row, int cloumn)
     QString songPinYin = getMusicPinYin(songName);
     emit signalShowMediaLrc(songPinYin);
     emit signalPlayMediaMusic(MusicPath + songPinYin + ".mp3");
+}
+
+void MusicSongsMedia::contextMenuEvent(QContextMenuEvent *event)
+{
+    //menu = new QMenu();
+    //furtherMenu = new QMenu();
+    //右键显示菜单
+    //action = new QAction("加入列表",this);
+    //QAction *action_1 = new QAction("我喜欢",this);
+    //menu->addAction(action);
+    //furtherMenu->addAction(action_1);
+    menu->exec(QCursor::pos());
+    furtherMenu->exec(QCursor::pos());
+    //furtherMenu->exec(QCursor::pos());
+    //connect(action,SIGNAL(triggered()),this,SIGNAL(signalObtainListName()));
+    //窗口关闭
+    event->accept();
+}
+
+
+void MusicSongsMedia::slotReceiveListName(std::vector<QString> listname)
+{
+    qDebug() << "accept";
+    furtherMenu = new QMenu();
+    //QActionGroup *group = new QActionGroup(this);
+    QAction *action1;
+    qDebug() << "hello";
+    //action1 = new QAction("hhh",this);
+    for(auto l:listname)
+    {
+        qDebug() << l << "listnamename";
+        //group->addAction(action1);
+        action1 = new QAction(l,this);
+        //action1->setText(l);
+        furtherMenu->addAction(action1);
+        group->addAction(action1);
+        furtherMenu->addSeparator();
+        //connect(action1,&QAction::triggered,furtherMenu,&QMenu::clear);
+        //action1 = NULL;
+    }
+    //action->destroyed();
+   // furtherMenu->exec(QCursor::pos());
+}
+
+void MusicSongsMedia::slotResponse(QAction *action)
+{
+    QString list = action->text();
+    //furtherMenu->
+    qDebug() << "like the name" << list;
+    int row = currentRow();
+    QString label = "addmusictolist";
+    QString name = this->item(row,0)->text();
+    QString singer = this->item(row,1)->text();
+    QString album = this->item(row,2)->text();
+    qDebug() << name << singer << album;
+    emit signalAddMusicToList(label,list,name,singer,album);
 }

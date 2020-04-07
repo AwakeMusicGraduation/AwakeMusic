@@ -57,10 +57,10 @@ void MusicSongsLists::initForm()
 
 void MusicSongsLists::initWidget()
 {
-    this->addItemContent("默认列表");
+    this->addItemContent("本地音乐");
     this->addItemContent("推荐列表");
     this->addItemContent("分类列表");
-    this->addItemContent("我喜欢");
+    //this->addItemContent("我喜欢");
 }
 
 void MusicSongsLists::initConnect()
@@ -79,7 +79,8 @@ void MusicSongsLists::initConnect()
 
 void MusicSongsLists::slotCellClicked(int row, int column)
 {
-    emit signalShowList(row);
+    QString list = item(row,column)->text();
+    emit signalShowList(row,list);
 }
 
 //创建列表时弹出对话框
@@ -112,11 +113,33 @@ void MusicSongsLists::slotCreateList()
 
 }
 
+void MusicSongsLists::slotObtainListName()
+{
+    qDebug() << "获取列名";
+    int total = rowCount();
+    qDebug() << total;
+    std::vector<QString> listname;
+    if(total <= 3)
+    {
+        emit signalSendListName(listname);
+    }
+    else{
+    for(int i = 3; i < total; i++)
+    {
+        QString m = this->item(i,0)->text();
+        qDebug() << m;
+        listname.push_back(m);
+    }
+    emit signalSendListName(listname);
+    }
+
+}
+
 void MusicSongsLists::slotUpdateList(std::vector<QString> userMessage)
 {
     int total = this->rowCount();
     qDebug() << total;
-    for(int i = 4; i <= total;i++)
+    for(int i = 3; i <= total;i++)
     {
         removeRow(i);
         total--;
