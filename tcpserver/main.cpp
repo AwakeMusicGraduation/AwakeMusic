@@ -20,6 +20,9 @@ int main(int argc, char *argv[])
     //sqltable->createMusicList("favor");
 //    sqltable->insertMusicList("favor","初学者","初学者","薛之谦");
 //    sqltable->deleteMusicList("favor","初学者","初学者","薛之谦");
+
+
+
     MainWindow *w=new MainWindow;
     w->show();
     return a.exec();

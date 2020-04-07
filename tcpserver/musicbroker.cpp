@@ -80,5 +80,14 @@ QString MusicBroker::deleteSongsList(QString user, QString list)
     return sqltable->deleteMusicList(list);
 }
 
+QString MusicBroker::addMusicToList(QString list, QString name, QString singer,QString album)
+{
+    return sqltable->insertMusicList(list,name,singer,album);
+}
 
+std::vector<QString> MusicBroker::findMusicFromList(QString list)
+{
+    qDebug() << "musicBroker";
+    return sqltable->loadMusicFromList(list);
+}
 

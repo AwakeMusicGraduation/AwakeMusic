@@ -13,7 +13,7 @@ Sqltable::Sqltable()
 
 
 
-        QString create_sql = "create table music (id int primary key, name varchar(30), singer varchar(30), lyric varchar(100), audiopath varchar(30), album varchar(30))"; //创建数据表music
+        QString create_sql = "create table music (id int primary key, name varchar(30), singer varchar(30), lyric varchar(100), album varchar(30), audiopath varchar(30))"; //创建数据表music
 
         //QString select_all_sql = "select * from music";
         QString create_sql1 = "create table singer (id int primary key, name varchar(30),category varchar(30))"; //创建数据表singer
@@ -646,7 +646,7 @@ std::vector<QString> Sqltable::queryAlbumMusics(QString name)
 {
     std::vector<QString> musics;
     db.open();
-    QString select_sql = "select * from music where album = '" + name +"'";
+    QString select_sql = "select * from music where audiopath = '" + name +"'";
     sql_query.prepare(select_sql);
     //sql_query.addBindValue(name);
     if(!sql_query.exec())
@@ -759,21 +759,22 @@ void Sqltable::searchMusicList(std::vector<QString> *m)//用户登录后自动�
     //    }
 }
 
-void Sqltable::insertMusicList(QString list, QString music, QString album, QString singer)
+QString Sqltable::insertMusicList(QString list, QString music, QString album, QString singer)
 {
     db.open();
     QString select_sql = "select * from user_list where list = '" + list +"'";
     QString insert_sql = "insert into " + list+ " values(?,?,?)";
     QString select_music = "select * from '" + list + "'where music = '" + music+"'";
     QSqlQuery sql_query1;
+    QString message;
     sql_query1.prepare(select_sql);
     if(!sql_query1.exec())
     {
         qDebug() << sql_query1.lastError();
     }
     if(sql_query1.next()){
-        if(sql_query1.value(0).toString() == user)
-        {
+        //if(sql_query1.value(0).toString() == user)
+        //{
             sql_query1.prepare(select_music);
             if(!sql_query1.exec())
             {
@@ -781,6 +782,7 @@ void Sqltable::insertMusicList(QString list, QString music, QString album, QStri
             }
             if(sql_query1.next())
             {
+                message = "存在同名歌曲";
                 qDebug() << "存在同名歌曲";
             }
             else{
@@ -793,13 +795,15 @@ void Sqltable::insertMusicList(QString list, QString music, QString album, QStri
                     qDebug() << sql_query1.lastError();
                 }
                 else
+                    message = "插入歌曲成功";
                     qDebug() << "插入歌曲成功";
             }
-        }
-        else
-            qDebug() << "不是此用户的歌单";
+       // }
+       // else
+       //     qDebug() << "不是此用户的歌单";
     }
     db.close();
+    return message;
 }
 
 void Sqltable::deletemusicFromList(QString list, QString music, QString album, QString singer)
@@ -930,6 +934,42 @@ void Sqltable::search(QString content)
         }
     }
     db.close();
+}
+
+std::vector<QString> Sqltable::loadMusicFromList(QString list)
+{
+    db.open();
+    std::vector<QString> allmusics;
+    qDebug() << "正在查" << list;
+    QString select_all_sql = "select * from " + list;
+    qDebug() << select_all_sql;
+
+    QSqlQuery sql_query;
+
+    sql_query.prepare(select_all_sql);
+
+
+    if(!sql_query.exec())
+    {
+        qDebug()<<sql_query.lastError();
+    }
+    else
+    {
+        qDebug()<<"查询成功" ;
+        while(sql_query.next())
+        {
+            QString name = sql_query.value(0).toString();
+            QString singer = sql_query.value(1).toString();
+            QString album = sql_query.value(2).toString();
+            allmusics.push_back(name);
+            allmusics.push_back(singer);
+            allmusics.push_back(album);
+            qDebug()<<"checked";
+            qDebug()<< QString("music:%1  singer:%2  album:%3").arg(name).arg(singer).arg(album);
+        }
+    }
+    db.close();
+    return allmusics;
 }
 
 

@@ -205,7 +205,7 @@ void Server::receiveData()
     if(clientConnection->bytesAvailable()<blockSize) return;
     //将接收到的数据存放到变量中
     in >> data;
-    qDebug()<< data;
+    qDebug()<< data << "what";
 
     //        if(data1 == "music"){
     //            sendMessage();
@@ -213,6 +213,7 @@ void Server::receiveData()
     //        if(data1 == "singer"){
 
     //        }
+
 
     if(data == "user")
     {
@@ -243,6 +244,20 @@ void Server::receiveData()
         in >> list;
         sendDeleteSongsList();
         ui->label->setText("删除列表");
+    }
+    else if(data == "addmusictolist")
+    {
+        QString list,name,singer,album;
+        in >> list >> name >> singer >> album;
+        sendAddMusicToList(list,name,singer,album);
+    }
+
+    else if(data == "loadmusicfromlist")
+    {
+        QString list;
+        in >> list;
+        qDebug() << list;
+        sendMusicFromList(list);
     }
     else{
 
@@ -326,6 +341,41 @@ void Server::sendDeleteSongsList()
     clientConnection->disconnectFromHost();
 }
 
+void Server::sendAddMusicToList(QString list,QString name,QString singer,QString album)
+{
+    musicBroker = new MusicBroker();
+    QString message = musicBroker->addMusicToList(list,name,singer,album);
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_10);
+    out << qint32(message.size());
+    out << message;
+    clientConnection->write(block);
+    clientConnection->disconnectFromHost();
+}
+
+void Server::sendMusicFromList(QString list)
+{
+    qDebug() << "准备从数据库查找音乐";
+    musicBroker = new MusicBroker();
+    std::vector<QString> allmusics = musicBroker->findMusicFromList(list);
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_10);
+    int total = 0;
+    for(auto l:allmusics)
+    {
+        total += l.size();
+    }
+    out << qint32(total);
+    for(auto l:allmusics)
+    {
+        out << l;
+        qDebug() << l << "musicfromlist";
+    }
+    clientConnection->write(block);
+    clientConnection->close();
+}
 
 void Server::sendMessage()
 {

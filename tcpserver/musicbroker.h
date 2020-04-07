@@ -21,6 +21,8 @@ public:
     QString findRegisterInfo(QString name,QString password);//插入注册数据是否存在
     QString createSongsList(QString user,QString list);//创建音乐列表
     QString deleteSongsList(QString user,QString list);//删除音乐列表
+    QString addMusicToList(QString list, QString name, QString singer,QString album);//添加歌曲到列表
+    std::vector<QString> findMusicFromList(QString list);//从列表查询音乐
     //Music findBySinger(QString singer);
 
 private:
