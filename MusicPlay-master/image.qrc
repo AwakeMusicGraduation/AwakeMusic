@@ -64,5 +64,10 @@
         <file>image/skin/5.png</file>
         <file>image/title/login.jpg</file>
         <file>image/playControl/btn_miniplaylist (2).png</file>
+        <file>image/contextMenu/context_play.png</file>
+        <file>image/contextMenu/playlist.png</file>
+        <file>image/contextMenu/music.png</file>
+        <file>image/contextMenu/music-hover.png</file>
+        <file>image/contextMenu/indicator_menu (1).png</file>
     </qresource>
 </RCC>

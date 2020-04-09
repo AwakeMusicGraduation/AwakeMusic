@@ -1,4 +1,5 @@
 #include "classifylist.h"
+#include "controlvalues.h"
 #include <QVBoxLayout>
 #include <QHeaderView>
 
@@ -41,6 +42,9 @@ void classifyList::initCurrent()
 
 void classifyList::initForm()
 {
+        this->setStyleSheet("selection-background-color:lightblue;");
+    setAlternatingRowColors(true);
+    setFixedWidth(CENTERWIDGET_RIGHT);
     setFocusPolicy(Qt::NoFocus);
     setColumnCount(1);
     setRowCount(0);
@@ -53,7 +57,7 @@ void classifyList::initForm()
 
     QHeaderView *headerview = horizontalHeader();
     headerview->setVisible(false);
-    headerview->resizeSection(0, 580);
+    headerview->resizeSection(0, 600);
     verticalHeader()->setVisible(false);
     QVBoxLayout *mainLayout = new QVBoxLayout;
     setLayout(mainLayout);

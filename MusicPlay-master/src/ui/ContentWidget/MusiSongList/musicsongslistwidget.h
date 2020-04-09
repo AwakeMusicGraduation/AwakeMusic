@@ -4,8 +4,7 @@
 
 #include <QTableWidget>
 
-class MusicListMenu;
-class Music;
+class QMenu;
 
 class MusicSongsListWidget : public QTableWidget
 {
@@ -24,7 +23,7 @@ public:
     QString getSelectContent();
     //添加文件中的mp3
     void addMusicFold(QString path);
-
+    QList<QStringList> returnMusicInfo();
     //保存歌曲信息
     void saveMusicInfo(const QString &name,const QString &path);
     //获取歌曲路径
@@ -48,7 +47,7 @@ Q_SIGNALS:
 
     //向下发送所要请求的歌曲信息
     void signalSendNextMusic(const QString &name);
-    void signalSendPreviousMusic(const QString &naem);
+    void signalSendPreviousMusic(const QString &name);
 
     //向bottombar发送开始要播放的歌曲
     void signalSendFirstPlayMusic(const QString &);
@@ -57,7 +56,11 @@ Q_SIGNALS:
     void signalSendPlayCmdMusicInfo(const QString &);
 
     //将列表中的所有歌曲显示到播放列表中
-    void signalSendToPlayList(QList<Music> &);
+    void signalSendToPlayList(QList<QStringList> &);
+
+    //QMenu的信号
+    void signalQmenuPlayMusic();
+    void signalQmenuDeleteAllMusic();
 
 private Q_SLOTS:
     void slotCellDoubleClicked(int,int);
@@ -82,6 +85,7 @@ public Q_SLOTS:
 private:
     void initForm();
     void initConnect();
+    void initMenu();
 
     void setRadomPlayMusic();       //设置随机播放
 
@@ -89,9 +93,9 @@ protected:
     virtual void contextMenuEvent(QContextMenuEvent *event);
 
 private:
-    MusicListMenu *m_menu;
+    QMenu *m_menu;
     QMap<QString,QString> m_musicInfo;           //歌曲信息
-    QList<Music> m_music;
+    QList<QStringList> m_music;
 };
 
 #endif // MUSICSONGSLISTWIDGET_H

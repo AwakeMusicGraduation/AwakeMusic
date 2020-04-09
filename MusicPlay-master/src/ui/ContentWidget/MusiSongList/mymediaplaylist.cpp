@@ -7,8 +7,6 @@
 #include <QMap>
 #include <QVBoxLayout>
 #include <QHeaderView>
-#include "musiclistmenu.h"
-#include "music.h"
 
 MyMediaPlayList::MyMediaPlayList(QWidget *parent) :
     QDockWidget(parent),
@@ -46,6 +44,9 @@ void MyMediaPlayList::initWidget()
 
 void MyMediaPlayList::initForm()
 {
+    this->setStyleSheet("selection-background-color:lightblue;");
+    m_table1->setAlternatingRowColors(true);
+    m_table2->setAlternatingRowColors(true);
     //设置没有焦点，这样就可以避免删除时，不选中行也能删除的问题!
     setFocusPolicy(Qt::NoFocus);
     m_table1->setColumnCount(3);
@@ -68,16 +69,16 @@ void MyMediaPlayList::initForm()
     //    m_menu = new MusicListMenu(this);
 }
 
-void MyMediaPlayList::addContenItem(Music m)
+void MyMediaPlayList::addContenItem(QStringList m)
 {
-    qDebug()<<m.name();
+    qDebug()<<m.at(0);
     int rowIndex = m_table1->rowCount();
     //总函数加1
     m_table1->setRowCount(rowIndex + 1);
     //添加一条记录到表格中来
-    m_table1->setItem(rowIndex,0,new QTableWidgetItem(m.name()));
-    m_table1->setItem(rowIndex,1,new QTableWidgetItem(m.singer()));
-    m_table1->setItem(rowIndex,2,new QTableWidgetItem(m.album()));
+    m_table1->setItem(rowIndex,0,new QTableWidgetItem(m.at(0)));
+    m_table1->setItem(rowIndex,1,new QTableWidgetItem(m.at(1)));
+    m_table1->setItem(rowIndex,2,new QTableWidgetItem(m.at(2)));
 }
 
 void MyMediaPlayList::removeAllItem()
@@ -86,7 +87,7 @@ void MyMediaPlayList::removeAllItem()
     m_table1->clearContents();
 }
 
-void MyMediaPlayList::slotReceiveList1(QList<Music>  &musicname)
+void MyMediaPlayList::slotReceiveList1(QList<QStringList>  &musicname)
 {
     qDebug()<<"接收到默认播放列表";
     removeAllItem();

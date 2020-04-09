@@ -1,20 +1,22 @@
 ﻿#include "musicsongslistwidget.h"
-#include "musiclistmenu.h"
 #include <QContextMenuEvent>
 #include <QHeaderView>
 #include <QDebug>
 #include <QVBoxLayout>
 #include <QFileDialog>
+#include <QAction>
+#include <QMenu>
 #include "controlvalues.h"
 #include "client.h"
 #include "myhelper.h"
-#include "music.h"
 
 MusicSongsListWidget::MusicSongsListWidget(QWidget *parent)
     :QTableWidget(parent)
 {
     initForm();
     initConnect();
+    initMenu();
+    addMusicFold("/root/CloudMusic");
 }
 
 MusicSongsListWidget::~MusicSongsListWidget()
@@ -107,6 +109,11 @@ void MusicSongsListWidget::addMusicFold(QString path)
     importMusicSongsName(stringlist_song);
 }
 
+QList<QStringList> MusicSongsListWidget::returnMusicInfo()
+{
+    return m_music;
+}
+
 //保存歌曲信息
 void MusicSongsListWidget::saveMusicInfo(const QString &name, const QString &path)
 {
@@ -129,7 +136,7 @@ bool MusicSongsListWidget::tableWidgetIsEmpty()
 void MusicSongsListWidget::importMusicSongsName(const QStringList &file_name_list)
 {
     //获取当前列表索引
-//    int index = currentIndex();
+    //    int index = currentIndex();
     QFileInfo finfo;
     QStringList fileNameList;
     QStringList filePath;
@@ -151,8 +158,9 @@ void MusicSongsListWidget::importMusicSongsName(const QStringList &file_name_lis
         //将歌曲名称插入到列表中
         this->addItemContent(fileNameList.at(i));
         //保存歌曲信息，以便进行歌曲播放
-        Music music(fileNameList.at(i));
-        m_music.append(music);
+        QStringList s;
+        s << fileNameList.at(i) << "" << "";
+        m_music.append(s);
 
         this->saveMusicInfo(fileNameList.at(i),filePath.at(i));
     }
@@ -163,10 +171,11 @@ void MusicSongsListWidget::slotCellDoubleClicked(int row, int column)
 {
     QString songName = item(row,column)->text();
     QString s = songName;
-//    Client *client = new Client();
-//    client->sendData(s.remove(s.right(4)));
+    //    Client *client = new Client();
+    //    client->sendData(s.remove(s.right(4)));
     emit signalShowLyric();
-//    emit signalPlayMusic(songName);
+    emit signalSendToPlayList(m_music);
+    //    emit signalPlayMusic(songName);
     PlayMusic(songName);
 }
 
@@ -271,7 +280,7 @@ void MusicSongsListWidget::slotPlayMusic()
 
 void MusicSongsListWidget::PlayMusic(const QString name)
 {
-//    int index = currentIndex();
+    //    int index = currentIndex();
     QString musicPath = "";
     if (this->tableWidgetIsEmpty())
     {
@@ -335,7 +344,7 @@ void MusicSongsListWidget::slotSendPlayCmd(int mode)
         emit signalSendPlayCmdMusicInfo("");
         break;
     case RADOM_PLAY:            //随机播放
-         setRadomPlayMusic();
+        setRadomPlayMusic();
         break;
     default:
         break;
@@ -344,40 +353,85 @@ void MusicSongsListWidget::slotSendPlayCmd(int mode)
 
 void MusicSongsListWidget::initForm()
 {
-//    setAttribute(Qt::WA_TranslucentBackground, true);
+    //    setAttribute(Qt::WA_TranslucentBackground, true);
     //设置没有焦点，这样就可以避免删除时，不选中行也能删除的问题!
+    setAlternatingRowColors(true);
+    this->setStyleSheet("selection-background-color:lightblue;");
+    setFixedWidth(CENTERWIDGET_RIGHT);
     setFocusPolicy(Qt::NoFocus);
-    setColumnCount(1);
+    setColumnCount(3);
     setRowCount(0);
-    setShowGrid(true);//display the grid
+    //    setShowGrid(true);//display the grid
     setEditTriggers(QAbstractItemView::NoEditTriggers);     //设置表格不能编辑
     setSelectionBehavior(QAbstractItemView::SelectRows);    //设置整行选中
     setSelectionMode(QAbstractItemView::SingleSelection);
     verticalHeader()->setDefaultSectionSize(45);
 
+    QStringList sListHeader;
+    sListHeader << "音乐标题" << "歌手" << "专辑";
+    setHorizontalHeaderLabels(sListHeader);
     QHeaderView *headerview = horizontalHeader();
-    headerview->setVisible(false);
+    headerview->setStretchLastSection(true);
+    setShowGrid(false);
     verticalHeader()->setVisible(false);
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    setLayout(mainLayout);
-
+    horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
+    setColumnWidth(0, 300);                                    //设置第一列宽度
+    setColumnWidth(1,150);
+    setColumnWidth(2,150);
 
     //鼠标右键初始化
-    m_menu = new MusicListMenu(this);
+    m_menu = new QMenu(this);
 }
 
 //鼠标右键信号和槽的关联
 void MusicSongsListWidget::initConnect()
 {
-    connect(m_menu,SIGNAL(signalPlayMusic()),
-            this,SLOT(slotPlayMusic()));
-    connect(m_menu,SIGNAL(signalDeleteAllMusic()),
-            this,SLOT(slotRemoveAllItem()));
-    connect(m_menu,SIGNAL(signalDeleteMusic()),
-            this,SLOT(slotRemoveItem()));
+    //    connect(m_menu,SIGNAL(signalQmenuPlayMusic()),
+    //            this,SLOT(slotPlayMusic()));
+    //    connect(m_menu,SIGNAL(signalQmenuDeleteAllMusic()),
+    //            this,SLOT(slotRemoveAllItem()));
+    //    connect(m_menu,SIGNAL(signalQmenuDeleteMusic()),
+    //            this,SLOT(slotRemoveItem()));
     connect(this,SIGNAL(cellDoubleClicked(int,int)),
             this,SLOT(slotCellDoubleClicked(int,int)));
-    connect(m_menu,SIGNAL(signalAddMusic()),this,SLOT(slotAddMusic()));
+    //    connect(m_menu,SIGNAL(signalAddMusic()),this,SLOT(slotAddMusic()));
+
+}
+
+void MusicSongsListWidget::initMenu()
+{
+    QAction *actionPlayMusic = new QAction("播放音乐",this);
+
+    QAction *actionAddMusic = new QAction("添加歌曲",this);
+
+    QAction *actionDeleteMusic = new QAction(QIcon(":/image/contextMenu/context_delete.png"),
+                                             "删除音乐",this);
+
+    QAction *actionDeleteAll = new QAction("删除所有音乐",this);
+
+    addAction(actionPlayMusic);
+    m_menu->addSeparator();
+    m_menu->addAction(actionPlayMusic);
+    m_menu->addAction(actionAddMusic);
+
+    //    addAction(m_actionAddMusicFolder);
+    m_menu->addSeparator();
+    m_menu->addAction(actionDeleteMusic);
+    m_menu->addAction(actionDeleteAll);
+
+    //关联menu
+    connect(actionPlayMusic,SIGNAL(triggered(bool)),
+            this,SLOT(slotPlayMusic()));
+    connect(actionAddMusic,SIGNAL(triggered(bool)),
+            this,SLOT(slotAddMusic()));
+    /*
+    connect(m_actionAddMusicFolder,SIGNAL(triggered(bool)),
+            this,SIGNAL(signalAddMusicFolder()));
+    */
+    connect(actionDeleteMusic,SIGNAL(triggered(bool)),
+            this,SLOT(slotRemoveItem()));
+    connect(actionDeleteAll,SIGNAL(triggered(bool)),
+            this,SLOT(slotRemoveAllItem()));
 }
 
 void MusicSongsListWidget::setRadomPlayMusic()

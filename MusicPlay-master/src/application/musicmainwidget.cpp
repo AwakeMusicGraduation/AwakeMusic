@@ -89,7 +89,7 @@ void MusicMainWidget::initConnect()
 {
     //标题栏信号和槽关联
     connect(m_titleWidget,SIGNAL(signalSearchClicked()),
-            m_contentWidget,SLOT(slotShowMediaSongs()));
+            m_contentWidget,SLOT(slotShowMediaSongs()));//显示搜索框
     connect(m_titleWidget,SIGNAL(signalLogin()),
             this,SLOT(slotShowLoginWidget()));
     connect(m_titleWidget,SIGNAL(signalSkin()),
@@ -221,7 +221,7 @@ void MusicMainWidget::initConnect()
     connect(m_contentWidget,&Contentwidget::signalLoadMusicFromList,
             m_client,&Client::slotLoadMusicFromList);
     //刷新播放列表
-    connect(m_contentWidget,SIGNAL(signalSendSongsListWidget(QList<Music> &)),this,SLOT(slotFlushPlayList(QList<Music>&)));
+    connect(m_contentWidget,SIGNAL(signalSendSongsListWidget(QList<QStringList> &)),this,SLOT(slotFlushPlayList(QList<QStringList>&)));
 }
 
 void MusicMainWidget::initPlayList()
@@ -394,7 +394,7 @@ void MusicMainWidget::slotTest(const QString &name)
     qDebug()<<"请求回来的歌曲为:"<<name;
 }
 
-void MusicMainWidget::slotFlushPlayList(QList<Music> &m)
+void MusicMainWidget::slotFlushPlayList(QList<QStringList> &m)
 {
     m_playlist->slotReceiveList1(m);
 }

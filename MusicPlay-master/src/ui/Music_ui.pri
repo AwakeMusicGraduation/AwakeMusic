@@ -1,5 +1,4 @@
 HEADERS += \
-    $$PWD/ContentWidget/MusiSongList/music.h \
     $$PWD/ContentWidget/MusiSongList/musiccenterwidget.h \
     $$PWD/ContentWidget/MusiSongList/mymediaplaylist.h \
     $$PWD/TitleBar/titlewidget.h \
@@ -9,15 +8,13 @@ HEADERS += \
     $$PWD/ContentWidget/MusisLyrc/musiclyrcwidget.h \
     $$PWD/ContentWidget/MusiSongList/musicsongslistwidget.h \
     $$PWD/ContentWidget/MusiSongList/songmenu.h \
-    $$PWD/ContentWidget/MusiSongList/musiclistmenu.h \
     $$PWD/DesktopLrc/musicdesktoplrcmanage.h \
     $$PWD/DesktopLrc/lyrctoolbarwidget.h \
     $$PWD/DesktopLrc/lyrcpushbutton.h \
     $$PWD/BottomBar/playmodemenu.h \
     $$PWD/ContentWidget/MusiSongList/musicsongslists.h \
     $$PWD/ContentWidget/MusiSongList/musicsongsmedia.h \
-    $$PWD/ContentWidget/MusiSongList/classifylist.h \
-    $$PWD/ContentWidget/MusiSongList/displaysearchcontent.h
+    $$PWD/ContentWidget/MusiSongList/classifylist.h
 
 SOURCES += \
     $$PWD/ContentWidget/MusiSongList/musiccenterwidget.cpp \
@@ -29,15 +26,13 @@ SOURCES += \
     $$PWD/ContentWidget/MusisLyrc/musiclyrcwidget.cpp \
     $$PWD/ContentWidget/MusiSongList/musicsongslistwidget.cpp \
     $$PWD/ContentWidget/MusiSongList/songmenu.cpp \
-    $$PWD/ContentWidget/MusiSongList/musiclistmenu.cpp \
     $$PWD/DesktopLrc/musicdesktoplrcmanage.cpp \
     $$PWD/DesktopLrc/lyrctoolbarwidget.cpp \
     $$PWD/DesktopLrc/lyrcpushbutton.cpp \
     $$PWD/BottomBar/playmodemenu.cpp \
     $$PWD/ContentWidget/MusiSongList/musicsongslists.cpp \
     $$PWD/ContentWidget/MusiSongList/musicsongsmedia.cpp \
-    $$PWD/ContentWidget/MusiSongList/classifylist.cpp \
-    $$PWD/ContentWidget/MusiSongList/displaysearchcontent.cpp
+    $$PWD/ContentWidget/MusiSongList/classifylist.cpp
 
 FORMS += \
     $$PWD/ContentWidget/MusiSongList/mymediaplaylist.ui

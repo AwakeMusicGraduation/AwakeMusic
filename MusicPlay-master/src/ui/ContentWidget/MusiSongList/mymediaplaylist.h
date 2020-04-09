@@ -6,7 +6,6 @@
 
 class QTabWidget;
 class QTableWidget;
-class Music;
 
 namespace Ui {
 class MyMediaPlayList;
@@ -23,12 +22,12 @@ public:
 private:
     void initWidget();
     void initForm();
-    void addContenItem(Music);
+    void addContenItem(QStringList);
     void removeAllItem();//在添加一个新列表前先删除播放列表的内容
 
 public slots:
     //将默认列表显示到播放列表中
-    void slotReceiveList1(QList<Music> &);
+    void slotReceiveList1(QList<QStringList> &);
 
 private:
     Ui::MyMediaPlayList *ui;

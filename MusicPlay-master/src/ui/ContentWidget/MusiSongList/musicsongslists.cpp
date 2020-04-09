@@ -1,5 +1,6 @@
 #include "musicsongslists.h"
 #include "songmenu.h"
+#include "controlvalues.h"
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QContextMenuEvent>
@@ -7,11 +8,17 @@
 #include <QDialog>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QLabel>
+#include <QPixmap>
+#include <QPalette>
+#include <QMouseEvent>
+#include <QHBoxLayout>
 
 
 MusicSongsLists::MusicSongsLists(QWidget *parent)
-:QTableWidget(parent)
+    :QTableWidget(parent)
 {
+
     initForm();
     initWidget();
     initConnect();
@@ -19,38 +26,59 @@ MusicSongsLists::MusicSongsLists(QWidget *parent)
 
 void MusicSongsLists::addItemContent(QString content)
 {
-    QTableWidgetItem *item = new QTableWidgetItem (content);
-    item->setTextAlignment(Qt::AlignLeft |Qt::AlignVCenter);
+    //    QTableWidgetItem *item = new QTableWidgetItem (content);//列表名
+    QWidget *widget = new QWidget;
+    QLabel *label1 = new QLabel;
+    QLabel *label2 = new QLabel(content);
+    QLabel *label3 = new QLabel;
+    QPixmap *pic = new QPixmap(":/image/contextMenu/indicator_menu (1).png");
+    QSize sz(5, 5);
+    pic->scaled(sz,Qt::KeepAspectRatio);
+    label1->setPixmap(*pic);
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout->addWidget(label1);
+    layout->addWidget(label2);
+    layout->addWidget(label3);
+    widget->setFixedWidth(180);
+    widget->setLayout(layout);
+    //    item->setTextAlignment(Qt::AlignLeft |Qt::AlignVCenter);
+    //    label->setAlignment(Qt::AlignCenter);
     int rowIndex = rowCount();
     if (rowIndex >= 0)
     {
         //总函数加1
+        listName.push_back(content);
         setRowCount(rowIndex + 1);
         //添加一条记录到表格中来
-        setItem(rowIndex,0,item);
+        //        setItem(rowIndex,1,item);
+        setCellWidget(rowIndex,0,widget);
     }
 }
 
 void MusicSongsLists::initForm()
 {
-    setFocusPolicy(Qt::NoFocus);
+    setAlternatingRowColors(true);
+    this->setStyleSheet("selection-background-color:lightblue;");
+    setFixedWidth(CENTERWIDGET_LEFT);
+    //    setFocusPolicy(Qt::NoFocus);
     setColumnCount(1);
     setRowCount(0);
-    setShowGrid(true);//display the grid
+    setShowGrid(false);//display the grid
     setEditTriggers(QAbstractItemView::NoEditTriggers);     //设置表格不能编辑
     setSelectionBehavior(QAbstractItemView::SelectRows);    //设置整行选中
     setSelectionMode(QAbstractItemView::SingleSelection);
-//    horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+    //    horizontalHeader()->setResizeMode(QHeaderView::Stretch);
     verticalHeader()->setDefaultSectionSize(45);
 
     QHeaderView *headerview = horizontalHeader();
     headerview->setVisible(false);
-    headerview->resizeSection(0, 300);
-    //    headerview->resizeSection(1, 20);
-    //    headerview->resizeSection(2, 40);
+    setColumnWidth(0,180);
+    //    setColumnWidth(1,80);
+    //    setColumnWidth(2,10);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     verticalHeader()->setVisible(false);
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    setLayout(mainLayout);
+    //    QVBoxLayout *mainLayout = new QVBoxLayout;
+    //    setLayout(mainLayout);
 
     m_menu = new SongMenu(this);
 }
@@ -71,15 +99,12 @@ void MusicSongsLists::initConnect()
             this,SLOT(slotAddNewPlayList()));
     connect(m_menu,SIGNAL(signalDeleteList()),
             this,SLOT(slotDeletePlayList()));
-//    connect(push,&QPushButton::clicked,
-//            this,&MusicSongsLists::slotCreateList);
-//    connect(m_menu,SIGNAL(signalRename()),
-//            this,SLOT(slotRename()));
+    //    connect(this,SIGNAL(cellEntered(int,int)),this,SLOT(cellEntered(int,int)));
 }
 
 void MusicSongsLists::slotCellClicked(int row, int column)
 {
-    QString list = item(row,column)->text();
+    QString list = listName[row];
     emit signalShowList(row,list);
 }
 
@@ -98,8 +123,8 @@ void MusicSongsLists::slotAddNewPlayList()
     connect(push,&QPushButton::clicked,
             this,&MusicSongsLists::slotCreateList);//创建一个新的列表
 
-   // this->addItemContent(m->text().trimmed());
-   // emit signalAddNewList();
+    // this->addItemContent(m->text().trimmed());
+    // emit signalAddNewList();
 
 }
 
@@ -109,6 +134,7 @@ void MusicSongsLists::slotCreateList()
     QString s = m->text().trimmed();
     this->addItemContent(m->text().trimmed());
     emit signalCreateSongsList(label,user,s);
+    qDebug()<<label<<user<<s;
     d->hide();
 
 }
@@ -121,23 +147,23 @@ void MusicSongsLists::slotObtainListName()
     std::vector<QString> listname;
     if(total <= 3)
     {
-        emit signalSendListName(listname);
+        emit signalSendListName(listName);
     }
     else{
-    for(int i = 3; i < total; i++)
-    {
-        QString m = this->item(i,0)->text();
-        qDebug() << m;
-        listname.push_back(m);
-    }
-    emit signalSendListName(listname);
+        for(int i = 3; i < total; i++)
+        {
+            QString m = this->item(i,1)->text();
+            qDebug() << m;
+            listname.push_back(m);
+        }
+        emit signalSendListName(listName);
     }
 
 }
 
 void MusicSongsLists::slotUpdateList(std::vector<QString> userMessage)
 {
-    int total = this->rowCount();
+    int total = rowCount();
     qDebug() << total;
     for(int i = 3; i <= total;i++)
     {
@@ -155,7 +181,7 @@ void MusicSongsLists::slotDeletePlayList()
 {
 
     int rowIndex = currentRow();
-    QString name = this->item(rowIndex,0)->text();
+    QString name = listName.at(rowIndex);
     QString label = "deletelist";
     if (rowIndex != 0)
     {

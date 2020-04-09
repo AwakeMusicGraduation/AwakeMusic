@@ -224,6 +224,7 @@ void Client::acceptMusicInsertList()
     if(tcpSocket->bytesAvailable()<blockSize) return;
     QString message;
     in >> message;
+    qDebug() << "输出结果";
     qDebug() << message;
     tcpSocket->close();
 }

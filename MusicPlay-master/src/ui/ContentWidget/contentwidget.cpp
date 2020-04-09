@@ -5,7 +5,6 @@
 #include "MusiSongList/musicsongslistwidget.h"
 #include "MusiSongList/musicsongslists.h"
 #include "MusiSongList/classifylist.h"
-#include "MusiSongList/displaysearchcontent.h"
 #include <QHBoxLayout>
 //#include "MusiSongList/musicsongssummarizied.h"
 #include <QDebug>
@@ -50,30 +49,30 @@ void Contentwidget::initWidget()
     m_musicSongsMedia2 = new MusicSongsMedia(this);//推荐列表
     m_classifyList = new classifyList(this);
     MusicSongsListWidget *widget = new MusicSongsListWidget(this);
-    m_searchContent = new DisplaySearchContent(this);
-    m_searchContent->hide();
     m_musicSongList.append(widget);
-    widget->addMusicFold("/root/CloudMusic/");
+    //    widget->addMusicFold("/root/CloudMusic/");
 }
 
 void Contentwidget::initLayout()
 {
     m_mainLayout = new QHBoxLayout(this);
-//    m_mainLayout->addWidget(m_songsSummarizied,Qt::AlignLeft);
-    m_mainLayout->addWidget(m_musicSongsLists,Qt::AlignLeft);
-    m_mainLayout->addWidget(m_musicLyrcWidget,Qt::AlignRight);
-    m_mainLayout->addWidget(m_musicSongList.at(0),Qt::AlignRight);
-    m_mainLayout->addWidget(m_musicSongsMedia,Qt::AlignRight);
+    //    m_mainLayout->addWidget(m_songsSummarizied,Qt::AlignLeft);
+    m_mainLayout->addWidget(m_musicSongsLists,Qt::AlignLeft);       //右边列表栏
+    m_mainLayout->addWidget(m_musicLyrcWidget,Qt::AlignRight);      //歌词栏
+    m_mainLayout->addWidget(m_musicSongList.at(0),Qt::AlignRight);  //本地列表
+    m_mainLayout->addWidget(m_musicSongsMedia,Qt::AlignRight);      //推荐列表
     m_mainLayout->addWidget(m_musicSongsMedia2,Qt::AlignRight);
     m_mainLayout->addWidget(m_classifyList,Qt::AlignRight);
-//    m_mainLayout->addWidget(m_searchContent,Qt::AlignRight);
+
+    m_mainLayout->setSpacing(5);
+
     m_currentwidget = 0;
     this->connectMusicList(m_currentwidget);
     m_mainLayout->setContentsMargins(0,0,0,0);
     setLayout(m_mainLayout);
     m_musicLyrcWidget->hide();
     m_musicSongsMedia->hide();
-    m_musicSongsMedia2->hide();
+    m_musicSongsMedia2->show();
     m_classifyList->hide();
     m_musicSongList.at(m_currentwidget)->hide();
 
@@ -147,7 +146,7 @@ void Contentwidget::initConnect()
     connect(m_musicSongsMedia,&MusicSongsMedia::signalAddMusicToList,this,&Contentwidget::signalAddMusicToList);
     connect(m_musicSongsMedia2,&MusicSongsMedia::signalAddMusicToList,this,&Contentwidget::signalAddMusicToList);
 
-    connect(m_musicSongList.at(m_currentwidget), SIGNAL(signalSendToPlayList(QList<Music> &)),this,SLOT(slotSendSonsListWidget(QList<Music>  &)));
+    connect(m_musicSongList.at(m_currentwidget), SIGNAL(signalSendToPlayList(QList<QStringList> &)),this,SLOT(slotSendSonsListWidget(QList<QStringList>  &)));
 }
 
 void Contentwidget::connectMusicList(int index)
@@ -293,6 +292,7 @@ void Contentwidget::slotShowOrHide()
         slotShowLrc();
 }
 
+//显示搜索结果
 void Contentwidget::slotShowMediaSongs()
 {
     m_musicSongsMedia->removeAllItem();
@@ -309,7 +309,7 @@ void Contentwidget::slotSetName(QString name)
     m_musicSongsLists->user = name;
 }
 
-void Contentwidget::slotSendSonsListWidget(QList<Music> &m)
+void Contentwidget::slotSendSonsListWidget(QList<QStringList> &m)
 {
     emit signalSendSongsListWidget(m);
 }

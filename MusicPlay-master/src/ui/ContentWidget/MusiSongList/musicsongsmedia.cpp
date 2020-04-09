@@ -1,4 +1,5 @@
 #include "musicsongsmedia.h"
+#include "controlvalues.h"
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QDebug>
@@ -45,6 +46,9 @@ void MusicSongsMedia::removeAllItem()
 
 void MusicSongsMedia::initForm()
 {
+    this->setStyleSheet("selection-background-color:lightblue;");
+    setAlternatingRowColors(true);
+    setFixedWidth(CENTERWIDGET_RIGHT);
     setFocusPolicy(Qt::NoFocus);
     setColumnCount(3);
     setRowCount(0);
@@ -62,8 +66,8 @@ void MusicSongsMedia::initForm()
     headerview->setStretchLastSection(true);
     headerview->setVisible(true);
     headerview->resizeSection(0, 300);
-    headerview->resizeSection(1, 20);
-    headerview->resizeSection(2, 40);
+    headerview->resizeSection(1, 150);
+    headerview->resizeSection(2, 150);
     verticalHeader()->setVisible(false);
     QVBoxLayout *mainLayout = new QVBoxLayout;
     setLayout(mainLayout);

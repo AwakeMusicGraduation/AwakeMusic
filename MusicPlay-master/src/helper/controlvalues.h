@@ -14,6 +14,10 @@
 #define WIDGET_HEIGHT           620
 #define WIDGET_WIDTH            880
 
+//设置中间窗体左边和右边的大小
+#define CENTERWIDGET_LEFT        180
+#define CENTERWIDGET_RIGHT       700
+
 #define TITLE_HEIGHT            40  //标题栏宽度
 #define BOTTOM_HEIGHT           70  //底部
 
