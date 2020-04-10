@@ -86,7 +86,7 @@ void Server::receiveCategoryData()
     //将接收到的数据存放到变量中
     in >> data1 >> data2;
     qDebug()<< data1 << data2;
-   if(data1 == "singer"){
+    if(data1 == "singer"){
         sendSinger();
     }
     if(data1 == "album"){
@@ -259,11 +259,16 @@ void Server::receiveData()
         qDebug() << list;
         sendMusicFromList(list);
     }
+    else if(data == "picture")
+    {
+        in >> name;
+        sendPicture();
+    }
     else{
 
         if(!data.isNull())
         {
-              sendMessage();
+            sendMessage();
         }
     }
 
@@ -382,6 +387,7 @@ void Server::sendMessage()
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     QBuffer buffer;
+    //    identity = "music";
 
     out.setVersion(QDataStream::Qt_5_10);
     //m = new Music();
@@ -408,15 +414,15 @@ void Server::sendMessage()
         message2 = a.at(1);//歌手
         message3 = a.at(2);//专辑
 
-        albumFilePath = a.at(3) + ".JPG";
-        qDebug() << albumFilePath;
-        a.clear();
-        QPixmap(albumFilePath).save(&buffer,"JPG");
+        //albumFilePath = a.at(3) + ".JPG";
+        //qDebug() << albumFilePath;
+        //a.clear();
+        //QPixmap(albumFilePath).save(&buffer,"JPG");
 
-        out << quint32(message1.size() +message2.size()+message3.size() +message4.size() + buffer.data().size());
+        out << quint32(message1.size() +message2.size()+message3.size() +message4.size() +identity.size() /*+ buffer.data().size()*/);
         out << message1 << message4 << message2 << message3;
 
-        block.append(buffer.data());
+        //block.append(buffer.data());
 
         connect(clientConnection, &QAbstractSocket::disconnected,
                 clientConnection, &QObject::deleteLater);
@@ -470,8 +476,56 @@ void Server::sendMessage()
         localFile->close();
 
         clientConnection->disconnectFromHost();
+        qDebug() << "传输歌词成功";
     }
     ui->label->setText("发送歌曲成功");
+    a.clear();
+}
+
+void Server::sendPicture()
+{
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    QBuffer buffer;
+    //    identity = "picture";
+
+    out.setVersion(QDataStream::Qt_5_10);
+    musicBroker = new MusicBroker();
+    m = musicBroker->findByName(name);
+    if(m == nullptr){
+        QString error = "亲，我们暂时没有权限哟！";
+        qDebug() << error;
+        out << qint32(error.size());
+        out << error;
+        clientConnection->write(block);
+        ui->label->setText("歌曲不存在！");
+    }
+    else{
+        //        out << identity;
+        a = m->getInformation(a);
+        delete m;
+        m = nullptr;
+        albumFilePath = a.at(3) + ".JPG";
+        qDebug() << albumFilePath;
+        a.clear();
+        QPixmap(albumFilePath).save(&buffer,"JPG");
+
+        out << quint32(buffer.data().size());
+        block.append(buffer.data());
+
+        connect(clientConnection, &QAbstractSocket::disconnected,
+                clientConnection, &QObject::deleteLater);
+
+        clientConnection->write(block);
+
+        ui->label->setText("发送图片成功");
+    }
+    block.resize(0);
+
+    clientConnection->reset();
+    out.device()->seek(0);
+
+    clientConnection->disconnectFromHost();
 }
 
 

@@ -23,6 +23,7 @@ public:
 
 private slots:
     void sendMessage();
+    void sendPicture();//双击歌曲时发送音乐
     void receiveData();
     void acceptConnection();
     void acceptFileConnection();

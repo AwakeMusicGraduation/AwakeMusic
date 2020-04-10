@@ -13,7 +13,7 @@ Sqltable::Sqltable()
 
 
 
-        QString create_sql = "create table music (id int primary key, name varchar(30), singer varchar(30), lyric varchar(100), album varchar(30), audiopath varchar(30))"; //创建数据表music
+        QString create_sql = "create table music (id int primary key, name varchar(30), singer varchar(30), lyric varchar(100), audiopath varchar(30), album varchar(30))"; //创建数据表music
 
         //QString select_all_sql = "select * from music";
         QString create_sql1 = "create table singer (id int primary key, name varchar(30),category varchar(30))"; //创建数据表singer
@@ -646,7 +646,7 @@ std::vector<QString> Sqltable::queryAlbumMusics(QString name)
 {
     std::vector<QString> musics;
     db.open();
-    QString select_sql = "select * from music where audiopath = '" + name +"'";
+    QString select_sql = "select * from music where album = '" + name +"'";
     sql_query.prepare(select_sql);
     //sql_query.addBindValue(name);
     if(!sql_query.exec())
@@ -701,7 +701,7 @@ std::vector<QString> Sqltable::querySingerCategory(QString category)
 QString Sqltable::createMusicList(QString name)//用户自己创建的音乐列表
 {
     db.open();
-    QString create_sql = "create table " + name +"(music varchar(30), singer varchar(30),album varchar(30))";
+    QString create_sql = "create table '" + name +"'(music varchar(30), singer varchar(30),album varchar(30))";
     QString insert_user_list = "insert into user_list values(?,?)";
     QSqlQuery sql_query1;
     sql_query1.prepare(create_sql);
