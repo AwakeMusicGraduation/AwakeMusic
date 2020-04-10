@@ -224,7 +224,6 @@ void Client::acceptMusicInsertList()
     if(tcpSocket->bytesAvailable()<blockSize) return;
     QString message;
     in >> message;
-    qDebug() << "输出结果";
     qDebug() << message;
     tcpSocket->close();
 }
@@ -245,14 +244,14 @@ void Client::acceptMusicFromList()
     //if(tcpSocket->bytesAvailable())
     if(tcpSocket->bytesAvailable()<blockSize) return;
     while(tcpSocket->bytesAvailable())
-   {
+    {
         QString music,singer,album;
         in >> music;
         in >> singer;
         in >> album;
         qDebug() << music << singer << album;
         emit signalSendInfo(music,singer,album);
-   }
+    }
 
 
     tcpSocket->close();
@@ -263,7 +262,7 @@ void Client::newConnect()
     blockSize = 0;
     tcpSocket = new QTcpSocket();
     //tcpSocket->abort();
-    tcpSocket->connectToHost("192.168.0.104", 6668);
+    tcpSocket->connectToHost("192.168.0.14", 6668);
     //connect(tcpSocket, &QIODevice::readyRead,this,&Client::showPicture);
 }
 
@@ -271,7 +270,7 @@ void Client::newFileConnect()
 {
     blockSize = 0;
     fileSocket->abort();
-    fileSocket->connectToHost("192.168.0.104", 8888);
+    fileSocket->connectToHost("192.168.0.14", 8888);
     connect(fileSocket, &QIODevice::readyRead, this, &Client::receivePlaylist);
 }
 
@@ -279,7 +278,7 @@ void Client::newSingerConnect()
 {
     blockSize = 0;
     singerSocket->abort();
-    singerSocket->connectToHost("192.168.0.104", 2222);
+    singerSocket->connectToHost("192.168.0.14", 2222);
 
     qDebug() << "连接成功";
     connect(singerSocket, &QIODevice::readyRead, this, &Client::receiveCategory);
@@ -306,7 +305,7 @@ void Client::receiveCategory()
             in >> f;
             qDebug() << f;
             emit signalSendList(f);
-//            info.push_back(f);
+            //            info.push_back(f);
         }
 
     }
@@ -325,13 +324,13 @@ void Client::receiveCategory()
 
 void Client::sendIdentity(QString idendity, QString name)
 {
-  QByteArray block;
-  QDataStream out(&block, QIODevice::WriteOnly);
-   out.setVersion(QDataStream::Qt_5_10);
-   out << qint32(idendity.size() + name.size());
-   out << idendity << name;
-   singerSocket->write(block);
-   //singerSocket->close();
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_10);
+    out << qint32(idendity.size() + name.size());
+    out << idendity << name;
+    singerSocket->write(block);
+    //singerSocket->close();
 }
 
 void Client::receivePlaylist()
@@ -388,10 +387,10 @@ void Client::receivePlaylist()
         for(int i = 0; i<keys.size(); i++){
             qDebug() << "Key" << i << "is" <<keys.at(i);
             QJsonObject subObj = rootObj.value(keys.at(i)).toObject();
-//            qDebug() << "name: " << subObj["name"].toString();
-//            qDebug() << "spell: " << subObj["spell"].toString();
-//            qDebug() << "singer: " << subObj["singer"].toString();
-//            qDebug() << "album: " << subObj["album"].toString();
+            //            qDebug() << "name: " << subObj["name"].toString();
+            //            qDebug() << "spell: " << subObj["spell"].toString();
+            //            qDebug() << "singer: " << subObj["singer"].toString();
+            //            qDebug() << "album: " << subObj["album"].toString();
             emit signalMediaInfo(subObj["name"].toString(),subObj["singer"].toString(),subObj["album"].toString());
             emit signalMediaPinYin(subObj["name"].toString(),subObj["spell"].toString());
         }
@@ -406,6 +405,11 @@ void Client::receivePlaylist()
     bytesReceived = 0;
     totalBytes= 0;
     fileNameSize = 0;
+}
+
+void Client::showData()
+{
+
 }
 
 void Client::showString()
@@ -445,20 +449,20 @@ void Client::showString()
     //            in>>blockSize;
     //        }
     // if(tcpSocket->bytesAvailable()<blockSize) return;
-    QByteArray array = tcpSocket->read(blockSize);
-    QBuffer buffer(&array);
-    buffer.open(QIODevice::ReadOnly);
 
-    QImageReader reader(&buffer,"JPG");
-    QImage image = reader.read();
-    if(!image.isNull())
-    {
-        QString filename = "/root/image/test.jpg";
-        image.save(filename);
-        // tcpSocket->close();
-        emit signalShowImage(image);
-    }
-    blockSize = 0;
+    //    QByteArray array = tcpSocket->read(blockSize);
+    //    QBuffer buffer(&array);
+    //    buffer.open(QIODevice::ReadOnly);
+
+    //    QImageReader reader(&buffer,"JPG");
+    //    QImage image = reader.read();
+    //    if(!image.isNull())
+    //    {
+    //        QString filename = "/root/image/test.jpg";
+    //        image.save(filename);
+    //        // tcpSocket->close();
+    //        emit signalShowImage(image);
+    //    }
 
     if(bytesReceived <= sizeof(qint32)*2)
     {
@@ -475,7 +479,7 @@ void Client::showString()
             //fileName = "music";
             qDebug() << "readd";
             bytesReceived += fileNameSize;
-            QString name = "/root/MusicPlay-master/Lrc/" + fileName;
+            QString name = "/root/AwakeMusic/MusicPlay-master/Lrc/" + fileName;
             localFile = new QFile(name);
             qDebug() << fileName;
             if(!localFile->open(QFile::WriteOnly))
@@ -508,6 +512,50 @@ void Client::showString()
     bytesReceived = 0;
     totalBytes= 0;
     fileNameSize = 0;
+}
+
+void Client::sendPictureName(QString name)
+{
+    newConnect();
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    QString identity = "picture";
+
+    out.setVersion(QDataStream::Qt_5_10);
+    out << quint32(identity.size() + name.size());
+
+    out << identity << name;
+    tcpSocket->write(block);
+    block.resize(0);
+    connect(tcpSocket,&QIODevice::readyRead,this,&Client::showPicture);
+}
+
+void Client::showPicture()
+{
+    QDataStream in(tcpSocket);
+    in.setVersion(QDataStream::Qt_5_10);
+
+    if(blockSize==0){
+        if(tcpSocket->bytesAvailable() < (int)sizeof(quint32)) return;
+        in >> blockSize;
+    }
+    if(tcpSocket->bytesAvailable()<blockSize) return;
+
+    QByteArray array = tcpSocket->read(blockSize);
+    QBuffer buffer(&array);
+    buffer.open(QIODevice::ReadOnly);
+
+    QImageReader reader(&buffer,"JPG");
+    QImage image = reader.read();
+    if(!image.isNull())
+    {
+        qDebug() << "是我啊";
+        QString filename = "/root/image/test.jpg";
+        image.save(filename);
+        // tcpSocket->close();
+        emit signalShowImage(image);
+    }
+    blockSize = 0;
 }
 
 void Client::acceptUserMessage()
@@ -563,7 +611,7 @@ void Client::acceptRegisterMessage()
     qDebug() << "客户端接收注册信息";
     tcpSocket->close();
     //tcpSocket->abort();
-     blockSize = 0;
+    blockSize = 0;
     emit signalAcceptRegisterMessage(message);
 
 

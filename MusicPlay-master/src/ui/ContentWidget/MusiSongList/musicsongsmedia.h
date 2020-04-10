@@ -23,6 +23,7 @@ private:
 Q_SIGNALS:
     void signalPlayMediaMusic(QString path);
     void signalShowMediaLrc(QString songPinYin);
+    void signalShowPicture(QString name);
     void signalObtainListName();//获取列表名
     void signalAddMusicToList(QString label,QString list,QString name,QString singer,QString album);//将歌曲加入到对应的列表并传到服务器
 public Q_SLOTS:

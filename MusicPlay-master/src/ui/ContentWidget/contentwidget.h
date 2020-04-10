@@ -31,6 +31,7 @@ Q_SIGNALS:
     //发送要播放的音乐(包括音乐具体信息)
     void signalPlayMusic(QString music);
     void signalPlayMediaMusic(QString path);
+    void signalShowPicture(QString songName);
 
     //向上发送播放上一首、下一首请求，歌曲列表收到该信号后会向下返回要播放的歌曲信息
     void signalSendPlayNext();

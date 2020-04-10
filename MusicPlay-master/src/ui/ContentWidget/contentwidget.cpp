@@ -108,6 +108,9 @@ void Contentwidget::initConnect()
             m_musicSongsMedia,SLOT(slotSaveMusicInfo(QString,QString)));
     connect(m_musicSongsMedia,SIGNAL(signalShowMediaLrc(QString)),
             m_musicLyrcWidget,SLOT(slotAnalyseMedia(QString)));
+    connect(m_musicSongsMedia,SIGNAL(signalShowPicture(QString)),
+            this,SIGNAL(signalShowPicture(QString)));
+
 
     connect(m_musicSongsMedia2,SIGNAL(signalPlayMediaMusic(QString)),
             this,SIGNAL(signalPlayMediaMusic(QString)));
@@ -117,6 +120,9 @@ void Contentwidget::initConnect()
             m_musicSongsMedia2,SLOT(slotAddItem(QString,QString,QString)));
     connect(this,SIGNAL(signalMediaPinYin(QString,QString)),
             m_musicSongsMedia2,SLOT(slotSaveMusicInfo(QString,QString)));
+    connect(m_musicSongsMedia2,SIGNAL(signalShowPicture(QString)),
+            this,SIGNAL(signalShowPicture(QString)));
+
     /***************分类列表向客户端发送数据**********************/
     connect(m_classifyList,SIGNAL(signalSendData(QString,QString)),
             this,SIGNAL(signalSendData(QString,QString)));

@@ -25,8 +25,11 @@ public slots:
     void newSingerConnect();
     void receiveCategory();
     void sendIdentity(QString identity, QString name);
-    void receivePlaylist();
+    void receivePlaylist();//推荐列表json文件
+    void showData();
     void showString();
+    void sendPictureName(QString name);
+    void showPicture();
     void sendData(QString data);
     void sendLoginData(QString user,QString name,QString password);//发送登录信息
     void sendRegisterData(QString user,QString name,QString password);//发送注册信息

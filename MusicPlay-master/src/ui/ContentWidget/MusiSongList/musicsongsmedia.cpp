@@ -8,7 +8,7 @@
 #include <QContextMenuEvent>
 #include <QActionGroup>
 //#define MusicPath "rtsp://10.253.241.175/mp3/"
-#define MusicPath "rtsp://192.168.0.104/"
+#define MusicPath "rtsp://192.168.0.14/mp3/"
 
 
 MusicSongsMedia::MusicSongsMedia(QWidget *parent)
@@ -122,6 +122,7 @@ void MusicSongsMedia::slotCellDoubleClicked(int row, int cloumn)
     QString songPinYin = getMusicPinYin(songName);
     emit signalShowMediaLrc(songPinYin);
     emit signalPlayMediaMusic(MusicPath + songPinYin + ".mp3");
+    emit signalShowPicture(songName);
 }
 
 void MusicSongsMedia::contextMenuEvent(QContextMenuEvent *event)

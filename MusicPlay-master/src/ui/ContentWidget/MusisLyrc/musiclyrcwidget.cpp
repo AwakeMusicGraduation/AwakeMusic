@@ -114,7 +114,7 @@ void MusicLyrcWidget::slotReceiveCurrentPlayTime(qint64 time)
 
 void MusicLyrcWidget::slotAnalyseMedia(QString name)
 {
-    QString lrcName = "/root/MusicPlay-master/Lrc/" + name + ".lrc";
+    QString lrcName = "/root/AwakeMusic/MusicPlay-master/Lrc/" + name + ".lrc";
     QFile file(lrcName);
 
     if (!file.open(QFile::ReadOnly | QIODevice::Text))
