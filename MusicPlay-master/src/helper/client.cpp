@@ -440,30 +440,50 @@ void Client::showString()
     //显示接收到的数据
     qDebug()<<name << pinyin << singer <<album;
     blockSize = blockSize - name.size() - pinyin.size() - singer.size()-album.size();
+    blockSize = 0;
+    tcpSocket->close();
+}
 
-    //    while(tcpSocket->bytesAvailable()>0)
-    //    {
-    //        if(blockSize==0){
-    //            if(tcpSocket->bytesAvailable()<sizeof(quint32))
-    //                return;
-    //            in>>blockSize;
-    //        }
-    // if(tcpSocket->bytesAvailable()<blockSize) return;
+void Client::sendSongName(QString name)
+{
+    newConnect();
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    QString identity = "picture";
 
-    //    QByteArray array = tcpSocket->read(blockSize);
-    //    QBuffer buffer(&array);
-    //    buffer.open(QIODevice::ReadOnly);
+    out.setVersion(QDataStream::Qt_5_10);
+    out << quint32(identity.size() + name.size());
 
-    //    QImageReader reader(&buffer,"JPG");
-    //    QImage image = reader.read();
-    //    if(!image.isNull())
-    //    {
-    //        QString filename = "/root/image/test.jpg";
-    //        image.save(filename);
-    //        // tcpSocket->close();
-    //        emit signalShowImage(image);
-    //    }
+    out << identity << name;
+    tcpSocket->write(block);
+    block.resize(0);
+    connect(tcpSocket,&QIODevice::readyRead,this,&Client::showPictureandLrc);
+}
 
+void Client::showPictureandLrc()
+{
+    QDataStream in(tcpSocket);
+    in.setVersion(QDataStream::Qt_5_10);
+
+    if(blockSize==0){
+        if(tcpSocket->bytesAvailable() < (int)sizeof(quint32)) return;
+        in >> blockSize;
+    }
+    if(tcpSocket->bytesAvailable()<blockSize) return;
+
+    QByteArray array = tcpSocket->read(blockSize);
+    QBuffer buffer(&array);
+    buffer.open(QIODevice::ReadOnly);
+
+    QImageReader reader(&buffer,"JPG");
+    QImage image = reader.read();
+    if(!image.isNull())
+    {
+        QString filename = "/root/image/test.jpg";
+        image.save(filename);
+        // tcpSocket->close();
+        emit signalShowImage(image);
+    }
     if(bytesReceived <= sizeof(qint32)*2)
     {
         if(tcpSocket->bytesAvailable() >= sizeof(qint32)*2)
@@ -476,7 +496,6 @@ void Client::showString()
         if(tcpSocket->bytesAvailable() >= fileNameSize && (fileNameSize != 0))
         {
             in >> fileName;
-            //fileName = "music";
             qDebug() << "readd";
             bytesReceived += fileNameSize;
             QString name = "/root/AwakeMusic/MusicPlay-master/Lrc/" + fileName;
@@ -502,60 +521,14 @@ void Client::showString()
         inBlock.resize(0);
     }
     if(bytesReceived == totalBytes){
-
-        localFile->close();
-        tcpSocket->close();
         qDebug() << "accept success";
-
     }
+    localFile->close();
+    tcpSocket->close();
     blockSize = 0;
     bytesReceived = 0;
     totalBytes= 0;
     fileNameSize = 0;
-}
-
-void Client::sendPictureName(QString name)
-{
-    newConnect();
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    QString identity = "picture";
-
-    out.setVersion(QDataStream::Qt_5_10);
-    out << quint32(identity.size() + name.size());
-
-    out << identity << name;
-    tcpSocket->write(block);
-    block.resize(0);
-    connect(tcpSocket,&QIODevice::readyRead,this,&Client::showPicture);
-}
-
-void Client::showPicture()
-{
-    QDataStream in(tcpSocket);
-    in.setVersion(QDataStream::Qt_5_10);
-
-    if(blockSize==0){
-        if(tcpSocket->bytesAvailable() < (int)sizeof(quint32)) return;
-        in >> blockSize;
-    }
-    if(tcpSocket->bytesAvailable()<blockSize) return;
-
-    QByteArray array = tcpSocket->read(blockSize);
-    QBuffer buffer(&array);
-    buffer.open(QIODevice::ReadOnly);
-
-    QImageReader reader(&buffer,"JPG");
-    QImage image = reader.read();
-    if(!image.isNull())
-    {
-        qDebug() << "是我啊";
-        QString filename = "/root/image/test.jpg";
-        image.save(filename);
-        // tcpSocket->close();
-        emit signalShowImage(image);
-    }
-    blockSize = 0;
 }
 
 void Client::acceptUserMessage()

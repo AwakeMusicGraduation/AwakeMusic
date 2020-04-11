@@ -222,7 +222,7 @@ void MusicMainWidget::initConnect()
             m_client,&Client::slotLoadMusicFromList);
     //刷新播放列表
     connect(m_contentWidget,SIGNAL(signalSendSongsListWidget(QList<QStringList> &)),this,SLOT(slotFlushPlayList(QList<QStringList>&)));
-    connect(m_contentWidget,SIGNAL(signalShowPicture(QString)),m_client,SLOT(sendPictureName(QString)));
+    connect(m_contentWidget,SIGNAL(signalShowPicture(QString)),m_client,SLOT(sendSongName(QString)));
 }
 
 void MusicMainWidget::initPlayList()
