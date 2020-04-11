@@ -15,7 +15,7 @@ MyMediaPlayList::MyMediaPlayList(QWidget *parent) :
     ui(new Ui::MyMediaPlayList)
 {
     ui->setupUi(this);
-
+    
     initWidget();
     initForm();
     initMenu();
@@ -41,7 +41,7 @@ void MyMediaPlayList::initWidget()
     m_tab->addTab(m_table1, tr("播放列表"));
     m_table2 = new QTableWidget(this);
     m_tab->addTab(m_table2, tr("历史记录"));
-
+    
     this->setWidget(m_tab);
 }
 
@@ -61,16 +61,16 @@ void MyMediaPlayList::initForm()
     m_table1->verticalHeader()->setDefaultSectionSize(25);
     m_table1->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);    //设置不可滑动
     m_table1->setContextMenuPolicy(Qt::CustomContextMenu);//允许m_table1接收QWidget::customContextMenuRequested()信号。
-
-
+    
+    
     //进行“列设置”
-//    m_table1->setSelectionBehavior(QAbstractItemView::SelectColumns);
+    //    m_table1->setSelectionBehavior(QAbstractItemView::SelectColumns);
     m_table1->setColumnWidth(0,250);
-
+    
     QHeaderView *headerview = m_table1->horizontalHeader();
     headerview->setVisible(false);
     m_table1->verticalHeader()->setVisible(false);
-
+    
     //鼠标右键初始化
     //    m_menu = new MusicListMenu(this);
 }
@@ -79,17 +79,17 @@ void MyMediaPlayList::initMenu()
 {
     qDebug()<<"初始化菜单";
     m_menu = new QMenu(m_table1);
-
+    
     QAction *actionpPlayMusic = new QAction("播放",this);
     QAction *actionAddMusicToList = new QAction("收藏到歌单",this);
     QAction *actionDeleteFromPlayList = new QAction("从列表中删除",this);
-
+    
     m_menu->addAction(actionpPlayMusic);
     m_menu->addSeparator();
     m_menu->addAction(actionAddMusicToList);
     m_menu->addSeparator();
     m_menu->addAction(actionDeleteFromPlayList);
-
+    
     connect(m_table1, SIGNAL(customContextMenuRequested(QPoint)),this, SLOT(slotShowQmenu(QPoint)));
 }
 
@@ -127,10 +127,10 @@ void MyMediaPlayList::slotReceiveList1(QList<QString>  &musicname)
 void MyMediaPlayList::slotShowQmenu(QPoint pos)
 {
     qDebug() << "接收到菜单信号";
-QModelIndex index = m_table1->indexAt(pos);
-if(index.row()>=0){
-    m_menu->exec(QCursor::pos());
-}
+    QModelIndex index = m_table1->indexAt(pos);
+    if(index.row()>=0){
+        m_menu->exec(QCursor::pos());
+    }
 }
 
 

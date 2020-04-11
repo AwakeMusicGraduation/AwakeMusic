@@ -6,7 +6,7 @@
 MusicCenterWidget::MusicCenterWidget()
 {
     initForm();
-    initMusic();
+//    initMusic();
 }
 
 void MusicCenterWidget::initForm()
@@ -48,18 +48,18 @@ void MusicCenterWidget::slotFlushWidget(QList<QStringList> &m)
 }
 
 
-void MusicCenterWidget::initMusic()
-{
-    qDebug()<<"在中心界面添加音乐信息1";
-    MusicSongsListWidget *m = new MusicSongsListWidget(this);
-    m->hide();
-    QList<QStringList> music = m->returnMusicInfo();
-    qDebug()<<music.size();
-    for(int i=0; i<music.size(); i++){
+//void MusicCenterWidget::initMusic()
+//{
+//    qDebug()<<"在中心界面添加音乐信息1";
+//    MusicSongsListWidget *m = new MusicSongsListWidget(this);
+//    m->hide();
+//    QList<QStringList> music = m->returnMusicInfo();
+//    qDebug()<<music.size();
+//    for(int i=0; i<music.size(); i++){
 
-        addContenItem(music.at(i));
-    }
-}
+//        addContenItem(music.at(i));
+//    }
+//}
 
 
 

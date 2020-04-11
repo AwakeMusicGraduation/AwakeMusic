@@ -152,7 +152,7 @@ void Contentwidget::initConnect()
     connect(m_musicSongsMedia,&MusicSongsMedia::signalAddMusicToList,this,&Contentwidget::signalAddMusicToList);
     connect(m_musicSongsMedia2,&MusicSongsMedia::signalAddMusicToList,this,&Contentwidget::signalAddMusicToList);
 
-    connect(m_musicSongList.at(m_currentwidget), SIGNAL(signalSendToPlayList(QList<QStringList> &)),this,SLOT(slotSendSonsListWidget(QList<QStringList>  &)));
+    connect(m_musicSongList.at(m_currentwidget), SIGNAL(signalSendToPlayList(QList<QString> &)),this,SLOT(slotSendSonsListWidget(QList<QString>  &)));
 }
 
 void Contentwidget::connectMusicList(int index)
@@ -315,7 +315,7 @@ void Contentwidget::slotSetName(QString name)
     m_musicSongsLists->user = name;
 }
 
-void Contentwidget::slotSendSonsListWidget(QList<QStringList> &m)
+void Contentwidget::slotSendSonsListWidget(QList<QString> &m)
 {
     emit signalSendSongsListWidget(m);
 }

@@ -21,6 +21,7 @@ public:
     void Play ();                           // 播放
     void Pause();                           // 暂停
     void Stop ();                           // 停止
+    QStringList Resolution(QString);               //解析本地音乐
 
 
     void Volume(int nVol);                  // 音量设置为nVol

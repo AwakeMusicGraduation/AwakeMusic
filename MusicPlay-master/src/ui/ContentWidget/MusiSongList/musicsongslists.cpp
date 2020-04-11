@@ -41,6 +41,9 @@ void MusicSongsLists::addItemContent(QString content)
     layout->addWidget(label3);
     widget->setFixedWidth(180);
     widget->setLayout(layout);
+    //QLayoutItem *item = layout->layout()->takeAt(1);
+    //QLabel *l = qobject_cast<QLabel*>(item->widget());
+    //qDebug() << l->text() << "test";
     //    item->setTextAlignment(Qt::AlignLeft |Qt::AlignVCenter);
     //    label->setAlignment(Qt::AlignCenter);
     int rowIndex = rowCount();
@@ -53,6 +56,9 @@ void MusicSongsLists::addItemContent(QString content)
         //        setItem(rowIndex,1,item);
         setCellWidget(rowIndex,0,widget);
     }
+    //QLayoutItem *item = layout->layout()->takeAt(1);
+    //QLabel *l = (QLabel *)item->widget();
+    //qDebug() << l->text() << "test";
 }
 
 void MusicSongsLists::initForm()
@@ -88,6 +94,7 @@ void MusicSongsLists::initWidget()
     this->addItemContent("本地音乐");
     this->addItemContent("推荐列表");
     this->addItemContent("分类列表");
+    listName.clear();
     //this->addItemContent("我喜欢");
 }
 
@@ -104,7 +111,15 @@ void MusicSongsLists::initConnect()
 
 void MusicSongsLists::slotCellClicked(int row, int column)
 {
-    QString list = listName[row];
+    QString list;
+    if(row > 2)
+    {
+         list = listName[row-3];
+    }
+    else
+    {
+         list = "";
+    }
     emit signalShowList(row,list);
 }
 
@@ -150,12 +165,12 @@ void MusicSongsLists::slotObtainListName()
         emit signalSendListName(listName);
     }
     else{
-        for(int i = 3; i < total; i++)
+       /* for(int i = 3; i < total; i++)
         {
             QString m = this->item(i,1)->text();
             qDebug() << m;
             listname.push_back(m);
-        }
+        }*/
         emit signalSendListName(listName);
     }
 
@@ -171,6 +186,7 @@ void MusicSongsLists::slotUpdateList(std::vector<QString> userMessage)
         total--;
         i--;
     }
+    listName.clear();
     for(auto l:userMessage)
     {
         this->addItemContent(l);
@@ -179,15 +195,28 @@ void MusicSongsLists::slotUpdateList(std::vector<QString> userMessage)
 
 void MusicSongsLists::slotDeletePlayList()
 {
-
+    QString name;
     int rowIndex = currentRow();
-    QString name = listName.at(rowIndex);
     QString label = "deletelist";
-    if (rowIndex != 0)
+    if (rowIndex != 0 && rowIndex >2)
     {
+        name = listName.at(rowIndex-3);
+        std::vector<QString>::iterator m = listName.begin();
+        while(m != listName.end())
+        {
+            if(*m == name)
+                m = listName.erase(m);
+            else
+                m++;
+        }
+        //listName.at(rowIndex-3).clear();
         removeRow(rowIndex);
         emit signalDeleteList(rowIndex);
         emit signalDeleteListFromServer(label,user,name);
+    }
+    else
+    {
+        qDebug() << "无法删除";
     }
 }
 

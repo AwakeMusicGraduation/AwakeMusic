@@ -73,7 +73,7 @@ Q_SIGNALS:
     void signalAddMusicToList(QString label,QString list,QString name,QString singer,QString album);//将歌曲加入到对应的列表并传到服务器
     void signalLoadMusicFromList(QString label,QString list);//加载用户创建的列表里面的内容
 
-    void signalSendSongsListWidget(QList<QStringList>&);
+    void signalSendSongsListWidget(QList<QString>&);
     
 public slots:
     //接收bottombar发送过来的播放命令
@@ -87,7 +87,7 @@ public slots:
     void slotShowMediaSongs();
     void slotSetName(QString name);
 
-    void slotSendSonsListWidget(QList<QStringList> &m);
+    void slotSendSonsListWidget(QList<QString> &m);
 
 private:
 //    MusicSongsSummarizied *m_songsSummarizied;

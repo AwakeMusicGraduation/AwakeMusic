@@ -14,7 +14,7 @@ public:
     ~MusicSongsListWidget();
 
     //向tablewidget中添加一条记录
-    void addItemContent(QString content /*,int row, int column = 0*/);
+    void addItemContent(QStringList );
     //删除鼠标选中的行
     void removeItem();
     //删除某个列表中的所有歌曲
@@ -23,16 +23,15 @@ public:
     QString getSelectContent();
     //添加文件中的mp3
     void addMusicFold(QString path);
-    QList<QStringList> returnMusicInfo();
     //保存歌曲信息
-    void saveMusicInfo(const QString &name,const QString &path);
+//    void saveMusicInfo(const QString &name,const QString &path);
     //获取歌曲路径
-    QString getMusicPath(const QString& name);
+//    QString getMusicPath(const QString& name);
 
     //返回tablewidget是否为空
     bool tableWidgetIsEmpty();
     void importMusicSongsName(const QStringList &file_name_list);
-    void PlayMusic(const QString name);
+    void PlayMusics(const QString name);
 
 Q_SIGNALS:
     void signalPlayMusic();
@@ -55,8 +54,8 @@ Q_SIGNALS:
     //向下发送所请求的播放歌曲
     void signalSendPlayCmdMusicInfo(const QString &);
 
-    //将列表中的所有歌曲显示到播放列表中
-    void signalSendToPlayList(QList<QStringList> &);
+    //将本地音乐的文件地址发送到播放列表中以便显示和播放
+    void signalSendToPlayList(QList<QString> &);
 
     //QMenu的信号
     void signalQmenuPlayMusic();
@@ -94,8 +93,9 @@ protected:
 
 private:
     QMenu *m_menu;
-    QMap<QString,QString> m_musicInfo;           //歌曲信息
-    QList<QStringList> m_music;
+//    QMap<QString,QString> m_musicInfo;           //歌曲信息
+    QList<QString> m_musicpath;                    //保存歌曲路径
+//    QList<QStringList> m_music;                    //保存歌曲信息，歌名专辑歌手信息
 };
 
 #endif // MUSICSONGSLISTWIDGET_H

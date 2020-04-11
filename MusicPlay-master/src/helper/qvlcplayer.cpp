@@ -45,7 +45,7 @@ bool QVlcPlayer::Play(QString strPath)
     m_filePath = strPath.replace("/","\\",Qt::CaseSensitive);
 #elif defined(Q_OS_LINUX)
     m_filePath = strPath;
-//    m_filePath = "rtsp://192.168.30.145/song.mp3";
+    //    m_filePath = "rtsp://192.168.30.145/song.mp3";
 #endif
     //将文件路径进行编码转换(不转换的话不能识别中文,进而会出现错误)
     m_filePath = UnicodeToUTF8(m_filePath);
@@ -91,7 +91,7 @@ bool QVlcPlayer::PlayMeida(QString strPath)
 #endif
     //将文件路径进行编码转换(不转换的话不能识别中文,进而会出现错误)
     m_filePath = UnicodeToUTF8(m_filePath);
-//    std::string str = m_filePath.toStdString();
+    //    std::string str = m_filePath.toStdString();
 
     m = libvlc_media_new_location(m_pVLC_Inst,m_filePath.toLocal8Bit());
     if (m)
@@ -137,6 +137,39 @@ void QVlcPlayer::Stop()
         libvlc_media_player_release(m_pVLC_Player); /*Free the media_player*/
         m_pVLC_Player = NULL;
     }
+}
+
+QStringList QVlcPlayer::Resolution(QString strPath)
+{
+    m_pVLC_Inst = libvlc_new(0,NULL);
+    QStringList message;
+    libvlc_media_t *m;
+
+#if defined(Q_OS_WIN)
+    m_filePath = strPath.replace("/","\\",Qt::CaseSensitive);
+#elif defined(Q_OS_LINUX)
+    m_filePath = strPath;
+    //    m_filePath = "rtsp://192.168.30.145/song.mp3";
+#endif
+    //将文件路径进行编码转换(不转换的话不能识别中文,进而会出现错误)
+    m_filePath = UnicodeToUTF8(m_filePath);
+
+    m = libvlc_media_new_path(m_pVLC_Inst,m_filePath.toLocal8Bit()/*toAscii()*/);
+    if (m)
+    {
+        //        m_pVLC_Player = libvlc_media_player_new_from_media(m);
+        //        if (m_pVLC_Player)
+        //        {
+        libvlc_media_parse(m);
+        //            libvlc_media_player_play(m_pVLC_Player);
+        char *message1  = libvlc_media_get_meta(m,libvlc_meta_Title);
+        char *message2 = libvlc_media_get_meta(m,libvlc_meta_Album);
+        char *message3 = libvlc_media_get_meta(m,libvlc_meta_Artist);
+        message <<message1<< message2 << message3;
+        //        }
+        libvlc_media_release(m);
+    }
+    return message;
 }
 
 void QVlcPlayer::Volume(int nVol)

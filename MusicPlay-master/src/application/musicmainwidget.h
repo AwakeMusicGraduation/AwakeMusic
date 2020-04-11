@@ -47,7 +47,7 @@ private Q_SLOTS:
 
     void slotTest(const QString &);
 
-    void slotFlushPlayList(QList<QStringList> &m);   //刷新播放列表
+    void slotFlushPlayList(QList<QString> &m);   //刷新播放列表
 
 protected :
     virtual void mousePressEvent(QMouseEvent *);

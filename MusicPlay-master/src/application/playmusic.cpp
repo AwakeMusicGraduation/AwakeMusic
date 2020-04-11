@@ -18,6 +18,11 @@ PlayMusic::~PlayMusic()
     m_player = NULL;
 }
 
+QStringList PlayMusic::ResolutionMusicPath(QString m)
+{
+    return m_player->Resolution(m);
+}
+
 //打开音乐
 void PlayMusic::slotOpenMusic(QString name)
 {

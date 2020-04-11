@@ -8,7 +8,7 @@
 #include <QContextMenuEvent>
 #include <QActionGroup>
 //#define MusicPath "rtsp://10.253.241.175/mp3/"
-#define MusicPath "rtsp://192.168.0.14/mp3/"
+#define MusicPath "rtsp://192.168.0.105/"
 
 
 MusicSongsMedia::MusicSongsMedia(QWidget *parent)

@@ -14,6 +14,7 @@ class PlayMusic : public QObject
 public:
     explicit PlayMusic(QObject *parent = 0);
     ~PlayMusic();
+    QStringList ResolutionMusicPath(QString);
 
 Q_SIGNALS:
     void signalPlayStatue(int);                 //当前播放状态

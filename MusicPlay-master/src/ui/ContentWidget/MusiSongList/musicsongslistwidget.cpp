@@ -9,6 +9,7 @@
 #include "controlvalues.h"
 #include "client.h"
 #include "myhelper.h"
+#include "playmusic.h"
 
 MusicSongsListWidget::MusicSongsListWidget(QWidget *parent)
     :QTableWidget(parent)
@@ -27,17 +28,29 @@ MusicSongsListWidget::~MusicSongsListWidget()
 /*向表格中添加数据
  * 输入参数：要添加的你内容，行，列(默认列为0)
  */
-void MusicSongsListWidget::addItemContent(QString content)
+void MusicSongsListWidget::addItemContent(QStringList content)
 {
-    QTableWidgetItem *item = new QTableWidgetItem (content);
-    item->setTextAlignment(Qt::AlignLeft |Qt::AlignVCenter);
+    //    QTableWidgetItem *item = new QTableWidgetItem (content);
+    //    item->setTextAlignment(Qt::AlignLeft |Qt::AlignVCenter);
+    //    int rowIndex = rowCount();
+    //    if (rowIndex >= 0)
+    //    {
+    //        //总函数加1
+    //        setRowCount(rowIndex + 1);
+    //        //添加一条记录到表格中来
+    //        setItem(rowIndex,i,item);
+    //    }
     int rowIndex = rowCount();
-    if (rowIndex >= 0)
-    {
-        //总函数加1
-        setRowCount(rowIndex + 1);
-        //添加一条记录到表格中来
-        setItem(rowIndex,0,item);
+    for(int i=0; i<content.size(); i++){
+        QTableWidgetItem *item = new QTableWidgetItem (content.at(i));
+        item->setTextAlignment(Qt::AlignLeft |Qt::AlignVCenter);
+        if (rowIndex >= 0)
+        {
+            //总函数加1
+            setRowCount(rowIndex + 1);
+            //添加一条记录到表格中来
+            setItem(rowIndex,i,item);
+        }
     }
 }
 
@@ -109,22 +122,22 @@ void MusicSongsListWidget::addMusicFold(QString path)
     importMusicSongsName(stringlist_song);
 }
 
-QList<QStringList> MusicSongsListWidget::returnMusicInfo()
-{
-    return m_music;
-}
+//QList<QStringList> MusicSongsListWidget::returnMusicInfo()
+//{
+//    return m_music;
+//}
 
 //保存歌曲信息
-void MusicSongsListWidget::saveMusicInfo(const QString &name, const QString &path)
-{
-    m_musicInfo[name] = path;
-}
+//void MusicSongsListWidget::saveMusicInfo(const QString &name, const QString &path)
+//{
+//    m_musicInfo[name] = path;
+//}
 
 //获取歌曲路径
-QString MusicSongsListWidget::getMusicPath(const QString &name)
-{
-    return m_musicInfo.value(name);
-}
+//QString MusicSongsListWidget::getMusicPath(const QString &name)
+//{
+//    return m_musicInfo.value(name);
+//}
 
 bool MusicSongsListWidget::tableWidgetIsEmpty()
 {
@@ -135,6 +148,7 @@ bool MusicSongsListWidget::tableWidgetIsEmpty()
 
 void MusicSongsListWidget::importMusicSongsName(const QStringList &file_name_list)
 {
+    PlayMusic playmusic;
     //获取当前列表索引
     //    int index = currentIndex();
     QFileInfo finfo;
@@ -155,14 +169,12 @@ void MusicSongsListWidget::importMusicSongsName(const QStringList &file_name_lis
     //插入多条歌曲到列表中
     for (int i = 0; i <fileNameList.count(); i++)
     {
-        //将歌曲名称插入到列表中
-        this->addItemContent(fileNameList.at(i));
-        //保存歌曲信息，以便进行歌曲播放
         QStringList s;
-        s << fileNameList.at(i) << "" << "";
-        m_music.append(s);
-
-        this->saveMusicInfo(fileNameList.at(i),filePath.at(i));
+        s = playmusic.ResolutionMusicPath(filePath.at(i));  //解析歌曲并显示
+        //将歌曲名称插入到列表中
+        addItemContent(s);
+        m_musicpath.append(filePath.at(i));
+//        this->saveMusicInfo(fileNameList.at(i),filePath.at(i));
     }
 }
 
@@ -174,9 +186,9 @@ void MusicSongsListWidget::slotCellDoubleClicked(int row, int column)
     //    Client *client = new Client();
     //    client->sendData(s.remove(s.right(4)));
     emit signalShowLyric();
-    emit signalSendToPlayList(m_music);
+    emit signalSendToPlayList(m_musicpath);
     //    emit signalPlayMusic(songName);
-    PlayMusic(songName);
+    PlayMusics(songName);
 }
 
 void MusicSongsListWidget::slotGetNextMusic()
@@ -214,7 +226,7 @@ void MusicSongsListWidget::slotGetNextMusic()
         //设置焦点在第一行
         setCurrentCell(0,0,QItemSelectionModel::Select);
     }
-    emit signalSendNextMusic(getMusicPath(str));
+    emit signalSendNextMusic(m_musicpath.at(rowIndex));
 }
 
 void MusicSongsListWidget::slotGetPreviouseMusic()
@@ -239,7 +251,7 @@ void MusicSongsListWidget::slotGetPreviouseMusic()
         //设置焦点在第一行
         setCurrentCell(0,0,QItemSelectionModel::Select);
     }
-    emit signalSendPreviousMusic(getMusicPath(str));
+    emit signalSendPreviousMusic(m_musicpath.at(rowIndex));
 }
 
 void MusicSongsListWidget::slotAddMusic()
@@ -274,19 +286,20 @@ void MusicSongsListWidget::slotRemoveItem()
 void MusicSongsListWidget::slotPlayMusic()
 {
     QString songName = getSelectContent();
-    emit signalSendToPlayList(m_music);
-    PlayMusic(songName);
+    emit signalSendToPlayList(m_musicpath);
+    PlayMusics(songName);
 }
 
-void MusicSongsListWidget::PlayMusic(const QString name)
+void MusicSongsListWidget::PlayMusics(const QString name)
 {
     //    int index = currentIndex();
     QString musicPath = "";
+    int rowIndex = currentRow();
     if (this->tableWidgetIsEmpty())
     {
         return;
     }else{
-        musicPath = this->getMusicPath(name);
+        musicPath = m_musicpath.at(rowIndex);
     }
 #if QDEBUG_OUT
     qDebug()<<"要播放的歌曲为：";
@@ -301,6 +314,7 @@ void MusicSongsListWidget::PlayMusic(const QString name)
 */
 void MusicSongsListWidget::slotGetFirstPlayMusic()
 {
+    int rowIndex;
     QString music = "";
     if (tableWidgetIsEmpty()){
         music = "";
@@ -309,7 +323,7 @@ void MusicSongsListWidget::slotGetFirstPlayMusic()
     {
         /*判断当前鼠标是否有选中的歌曲，若有则发送选中的，若没有则发送第一首歌曲*/
         //获取当前行
-        int rowIndex = currentIndex().row();
+        rowIndex = currentIndex().row();
         if (rowIndex >= 0)
         {
 #if QDEBUG_OUT
@@ -326,7 +340,7 @@ void MusicSongsListWidget::slotGetFirstPlayMusic()
             music = item(0,0)->text();
         }
     }
-    emit signalSendFirstPlayMusic(getMusicPath(music));
+    emit signalSendFirstPlayMusic(m_musicpath.at(rowIndex));
 }
 
 void MusicSongsListWidget::slotSendPlayCmd(int mode)
@@ -338,7 +352,8 @@ void MusicSongsListWidget::slotSendPlayCmd(int mode)
         slotGetNextMusic();
         break;
     case SINGLE_CIRCUAL:        //单曲循环
-        emit signalSendPlayCmdMusicInfo(getMusicPath(getSelectContent()));
+//        emit signalSendPlayCmdMusicInfo(getMusicPath(getSelectContent()));
+        emit signalSendPlayCmdMusicInfo(m_musicpath.at(0));
         break;
     case SINGLE_PLAY:           //单曲播放
         emit signalSendPlayCmdMusicInfo("");
@@ -450,13 +465,19 @@ void MusicSongsListWidget::setRadomPlayMusic()
     str = item(playIndex,0)->text();
     qDebug()<<"随机播放";
 
-    emit signalSendNextMusic(getMusicPath(str));
+    emit signalSendNextMusic(m_musicpath.at(playIndex));
 }
 
 void MusicSongsListWidget::contextMenuEvent(QContextMenuEvent *event)
 {
+    qDebug() << "接收到菜单信号";
     //右键显示菜单
+    QPoint p = event->pos();
+    QModelIndex index = this->indexAt(p);
+    qDebug() << index.row();
+    if(index.row()>=0){
     m_menu->exec(QCursor::pos());
+    }
     //窗口关闭
     event->accept();
 }

@@ -11,7 +11,7 @@ public:
 
 private:
     void initForm();
-    void initMusic();    //界面初始化内容
+//    void initMusic();    //界面初始化内容
     void addContenItem(QStringList);
 
 public slots:

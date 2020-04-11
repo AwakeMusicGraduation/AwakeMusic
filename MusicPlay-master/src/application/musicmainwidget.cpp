@@ -221,7 +221,7 @@ void MusicMainWidget::initConnect()
     connect(m_contentWidget,&Contentwidget::signalLoadMusicFromList,
             m_client,&Client::slotLoadMusicFromList);
     //刷新播放列表
-    connect(m_contentWidget,SIGNAL(signalSendSongsListWidget(QList<QStringList> &)),this,SLOT(slotFlushPlayList(QList<QStringList>&)));
+    connect(m_contentWidget,SIGNAL(signalSendSongsListWidget(QList<QString> &)),this,SLOT(slotFlushPlayList(QList<QString>&)));
     connect(m_contentWidget,SIGNAL(signalShowPicture(QString)),m_client,SLOT(sendSongName(QString)));
 }
 
@@ -395,7 +395,7 @@ void MusicMainWidget::slotTest(const QString &name)
     qDebug()<<"请求回来的歌曲为:"<<name;
 }
 
-void MusicMainWidget::slotFlushPlayList(QList<QStringList> &m)
+void MusicMainWidget::slotFlushPlayList(QList<QString> &m)
 {
     m_playlist->slotReceiveList1(m);
 }
