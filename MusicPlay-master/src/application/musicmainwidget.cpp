@@ -6,6 +6,8 @@
 #include <QVBoxLayout>
 #include <QBitmap>
 #include <QPainter>
+#include <QTimer>
+#include <QPalette>
 #include <QDebug>
 #include <QStackedWidget>
 #include "controlvalues.h"
@@ -217,12 +219,21 @@ void MusicMainWidget::initConnect()
     //将歌曲加入到对应的列表并传到服务器
     connect(m_contentWidget,&Contentwidget::signalAddMusicToList,m_client,&Client::slotAddMusicToList);
 
+
     //加载列表里面的歌曲
     connect(m_contentWidget,&Contentwidget::signalLoadMusicFromList,
             m_client,&Client::slotLoadMusicFromList);
     //刷新播放列表
     connect(m_contentWidget,SIGNAL(signalSendSongsListWidget(QList<QString> &)),this,SLOT(slotFlushPlayList(QList<QString>&)));
     connect(m_contentWidget,SIGNAL(signalShowPicture(QString)),m_client,SLOT(sendSongName(QString)));
+    //在播放列表中添加下一首播放
+    connect(m_contentWidget,SIGNAL(signalSendNextMusic(QString&)),m_playlist, SLOT(slotAddNextPlayMusic(QString&)));
+    //播放“播放列表”里面的歌曲
+    connect(m_playlist,SIGNAL(signalPlayMusic(QString)),
+            m_player,SLOT(slotOpenMusic(QString)));
+    //发送该歌曲重复信号
+    connect(m_playlist,SIGNAL(signalReatMusic()), this, SLOT(slotShowRepeatMessage()));
+
 }
 
 void MusicMainWidget::initPlayList()
@@ -332,6 +343,20 @@ void MusicMainWidget::slotClose()
 {
     //    this->close();
     qApp->exit(0);
+}
+
+void MusicMainWidget::slotShowRepeatMessage()
+{
+    QPalette palette;
+    palette.setColor(QPalette::Background, QColor(137, 190, 178));
+    QLabel *msg = new QLabel(this);
+    msg->setAutoFillBackground(true);
+    msg->setGeometry(350,200,200,50);
+    msg->setAlignment(Qt::AlignCenter);
+    msg->setPalette(palette);
+    msg->setText("列表已存在相同歌曲");
+    QTimer::singleShot(1500,msg,SLOT(close()));
+    msg->show();
 }
 
 void MusicMainWidget::slotPreviousMusic(const QString &name)

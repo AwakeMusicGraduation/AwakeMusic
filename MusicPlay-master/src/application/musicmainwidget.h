@@ -37,6 +37,7 @@ private Q_SLOTS:
     void slotShowSkinWidget();                  //显示皮肤界面
     void slotShowMin();                         //最小化
     void slotClose();                           //关闭
+        void slotShowRepeatMessage();
 
     void slotPreviousMusic(const QString &);    //上一首
     void slotPlayOrPause(int);                  //音乐播放或者暂停状态控制

@@ -74,6 +74,8 @@ Q_SIGNALS:
     void signalLoadMusicFromList(QString label,QString list);//加载用户创建的列表里面的内容
 
     void signalSendSongsListWidget(QList<QString>&);
+
+    void signalSendNextMusic(QString&);
     
 public slots:
     //接收bottombar发送过来的播放命令
@@ -86,8 +88,6 @@ public slots:
     void slotShowOrHide();
     void slotShowMediaSongs();
     void slotSetName(QString name);
-
-    void slotSendSonsListWidget(QList<QString> &m);
 
 private:
 //    MusicSongsSummarizied *m_songsSummarizied;

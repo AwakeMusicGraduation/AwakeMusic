@@ -290,6 +290,13 @@ void MusicSongsListWidget::slotPlayMusic()
     PlayMusics(songName);
 }
 
+void MusicSongsListWidget::slotSendNextMusic()
+{
+    int rowIndex = currentRow();
+    QString s=m_musicpath.at(rowIndex);
+    emit signalSendNextMusicToList(s);
+}
+
 void MusicSongsListWidget::PlayMusics(const QString name)
 {
     //    int index = currentIndex();
@@ -415,9 +422,11 @@ void MusicSongsListWidget::initConnect()
 
 void MusicSongsListWidget::initMenu()
 {
-    QAction *actionPlayMusic = new QAction("播放音乐",this);
+    QAction *actionPlayMusic = new QAction("播放",this);
 
     QAction *actionAddMusic = new QAction("添加歌曲",this);
+
+    QAction *actionNextMusic = new QAction("下一首播放", this);
 
     QAction *actionDeleteMusic = new QAction(QIcon(":/image/contextMenu/context_delete.png"),
                                              "删除音乐",this);
@@ -428,6 +437,7 @@ void MusicSongsListWidget::initMenu()
     m_menu->addSeparator();
     m_menu->addAction(actionPlayMusic);
     m_menu->addAction(actionAddMusic);
+    m_menu->addAction(actionNextMusic);
 
     //    addAction(m_actionAddMusicFolder);
     m_menu->addSeparator();
@@ -447,6 +457,7 @@ void MusicSongsListWidget::initMenu()
             this,SLOT(slotRemoveItem()));
     connect(actionDeleteAll,SIGNAL(triggered(bool)),
             this,SLOT(slotRemoveAllItem()));
+    connect(actionNextMusic, SIGNAL(triggered(bool)), this, SLOT(slotSendNextMusic()));
 }
 
 void MusicSongsListWidget::setRadomPlayMusic()

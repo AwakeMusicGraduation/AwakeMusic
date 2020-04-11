@@ -34,15 +34,13 @@ public:
     void PlayMusics(const QString name);
 
 Q_SIGNALS:
-    void signalPlayMusic();
     void signalAddMusic();
     void signalAddMusicFolder();
     void signalDeleteMusic();
     void signalDeleteAllMusic();
     void signalShowLyric();
     void signalPlayMusicPath(QString path);
-
-    void signalPlayMusic(const QString &musicName);
+    void signalSendNextMusicToList(QString&);
 
     //向下发送所要请求的歌曲信息
     void signalSendNextMusic(const QString &name);
@@ -72,6 +70,7 @@ public Q_SLOTS:
     void slotRemoveAllItem();
     void slotRemoveItem();
     void slotPlayMusic();
+    void slotSendNextMusic();                        //向播放列表发送下一首播放歌曲
 
 
     /*程序启动后，若按下底部控制按钮，播放歌曲，则要先判断列表中是否有歌曲，
