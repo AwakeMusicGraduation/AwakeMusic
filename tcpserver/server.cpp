@@ -387,7 +387,6 @@ void Server::sendMessage()
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     QBuffer buffer;
-    //    identity = "music";
 
     out.setVersion(QDataStream::Qt_5_10);
     //m = new Music();
@@ -399,7 +398,6 @@ void Server::sendMessage()
         out << qint32(error.size());
         out << error;
         clientConnection->write(block);
-        clientConnection->disconnectFromHost();
         ui->label->setText("歌曲不存在！");
     }
     else{
@@ -414,15 +412,51 @@ void Server::sendMessage()
         message2 = a.at(1);//歌手
         message3 = a.at(2);//专辑
 
-        //albumFilePath = a.at(3) + ".JPG";
-        //qDebug() << albumFilePath;
-        //a.clear();
-        //QPixmap(albumFilePath).save(&buffer,"JPG");
 
-        out << quint32(message1.size() +message2.size()+message3.size() +message4.size() +identity.size() /*+ buffer.data().size()*/);
+        out << quint32(message1.size() +message2.size()+message3.size() +message4.size());
         out << message1 << message4 << message2 << message3;
 
-        //block.append(buffer.data());
+
+        connect(clientConnection, &QAbstractSocket::disconnected,
+                clientConnection, &QObject::deleteLater);
+
+        clientConnection->write(block);
+
+        block.resize(0);
+    }
+    clientConnection->disconnectFromHost();
+    ui->label->setText("发送歌曲成功");
+    a.clear();
+}
+
+void Server::sendPicture()
+{
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    QBuffer buffer;
+
+    out.setVersion(QDataStream::Qt_5_10);
+    musicBroker = new MusicBroker();
+    m = musicBroker->findByName(name);
+    if(m == nullptr){
+        QString error = "亲，我们暂时没有权限哟！";
+        qDebug() << error;
+        out << qint32(error.size());
+        out << error;
+        clientConnection->write(block);
+        ui->label->setText("歌曲不存在！");
+    }
+    else{
+        a = m->getInformation(a);
+        delete m;
+        m = nullptr;
+        albumFilePath = a.at(3) + ".JPG";
+        qDebug() << albumFilePath;
+        QPixmap(albumFilePath).save(&buffer,"JPG");
+
+        out << quint32(buffer.data().size());
+        block.append(buffer.data());
+
 
         connect(clientConnection, &QAbstractSocket::disconnected,
                 clientConnection, &QObject::deleteLater);
@@ -440,91 +474,33 @@ void Server::sendMessage()
         qDebug() << localFile->exists();
         if(!localFile->open(QFile::ReadOnly)){
             qDebug() << "client:open file error";
-            return;
         }
-        qDebug() << "start to write";
-        totalBytes = localFile->size();
-        qDebug() << totalBytes;
-        //QDataStream sendOut(&outBlock,QIODevice::WriteOnly);
-        // sendOut.setVersion(QDataStream::Qt_5_10);
-        QString currenFileName = fileName.right(fileName.size()-fileName.lastIndexOf('/')-1);
-        out << qint32(0) << qint32(0) << currenFileName;
-        qDebug() << currenFileName.size();
-        totalBytes += block.size();
-        qDebug() << totalBytes;
+        else{
+            qDebug() << "start to write";
+            totalBytes = localFile->size();
+            QString currenFileName = fileName.right(fileName.size()-fileName.lastIndexOf('/')-1);
+            //        out << qint32(0) << qint32(0) << currenFileName;
+            qDebug() << currenFileName.size();
+            totalBytes += block.size();
+            qDebug() << totalBytes;
 
-        //sendOut << qint64(0) << qint64(0) << currenFileName;
-        out.device()->seek(0);
-        out << totalBytes << qint32((block.size()-sizeof(qint32)*2));
-        //totalBytes += outBlock.size();
-        //outBlock.resize(0);
-        bytesToWrite = totalBytes-clientConnection->write(block);
-        qDebug() << bytesToWrite;
-        block.resize(0);
-
-        //connect(clientConnection,&QIODevice::readyRead,this,&Server::update);
-        while(bytesToWrite){
-            block = localFile->read(qMin(bytesToWrite,payloadSize));
-            //qDebug() << s;
-            qDebug() << "read";
-            //tcpSocket->write(outBlock);
-            //qDebug() << outBlock;
-            bytesToWrite -= (int)clientConnection->write(block);
+            //        out.device()->seek(0);
+            out << totalBytes << qint32((block.size()-sizeof(qint32)*2)) << currenFileName;
+            bytesToWrite = totalBytes-clientConnection->write(block);
+            qDebug() << bytesToWrite;
             block.resize(0);
+
+            while(bytesToWrite){
+                block = localFile->read(qMin(bytesToWrite,payloadSize));
+                qDebug() << "read";
+                bytesToWrite -= (int)clientConnection->write(block);
+                block.resize(0);
+                qDebug() << "传输歌词成功";
+            }
+            localFile->close();
         }
-
-        localFile->close();
-
-        clientConnection->disconnectFromHost();
-        qDebug() << "传输歌词成功";
     }
-    ui->label->setText("发送歌曲成功");
     a.clear();
-}
-
-void Server::sendPicture()
-{
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    QBuffer buffer;
-    //    identity = "picture";
-
-    out.setVersion(QDataStream::Qt_5_10);
-    musicBroker = new MusicBroker();
-    m = musicBroker->findByName(name);
-    if(m == nullptr){
-        QString error = "亲，我们暂时没有权限哟！";
-        qDebug() << error;
-        out << qint32(error.size());
-        out << error;
-        clientConnection->write(block);
-        ui->label->setText("歌曲不存在！");
-    }
-    else{
-        //        out << identity;
-        a = m->getInformation(a);
-        delete m;
-        m = nullptr;
-        albumFilePath = a.at(3) + ".JPG";
-        qDebug() << albumFilePath;
-        a.clear();
-        QPixmap(albumFilePath).save(&buffer,"JPG");
-
-        out << quint32(buffer.data().size());
-        block.append(buffer.data());
-
-        connect(clientConnection, &QAbstractSocket::disconnected,
-                clientConnection, &QObject::deleteLater);
-
-        clientConnection->write(block);
-
-        ui->label->setText("发送图片成功");
-    }
-    block.resize(0);
-
-    clientConnection->reset();
-    out.device()->seek(0);
-
     clientConnection->disconnectFromHost();
 }
 

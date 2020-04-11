@@ -28,6 +28,7 @@ public:
 
 public:
     Sqltable();
+    ~Sqltable();
 
 public:
     void insertParmeter(int id, QString name, QString singer, QString lyric, QString album, QString audiopath);

@@ -29,7 +29,7 @@ private slots:
     void acceptFileConnection();
     void acceptSingerConnection();
     void receiveCategoryData();
-    void sendPlaylist();
+    void sendPlaylist();//发送推荐列表
     void sendSinger();
     void sendAlbum();
     void sendMusic();
