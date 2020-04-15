@@ -30,6 +30,7 @@ public Q_SLOTS:
 private:
     QLabel *m_labelLyrc;
     QTextEdit *m_lrcText;
+    QTextEdit *m_lrcText1;
     QPushButton *m_hideLrc;
 };
 
