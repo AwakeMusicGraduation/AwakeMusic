@@ -6,7 +6,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
-#include "database.h"
+
 
 class QVBoxLayout;
 class QHBoxLayout;
@@ -30,7 +30,6 @@ Q_SIGNALS:
     void signalUpdateName(QString name);//显示登录进去的用户
     void signalRegisterClicked(QString user,QString name,QString password);//向服务端注册用户名和密码
 private:
-    DataBase d;
     QLabel *userNameLbl;
     //QLabel *pwdLbl;
     QLineEdit *userNameLEd;

@@ -12,6 +12,7 @@ class MusicSongsListWidget;
 class MusicSongsMedia;
 class classifyList;
 class DisplaySearchContent;
+class HomePage;
 
 class Contentwidget : public QWidget
 {
@@ -100,6 +101,8 @@ private:
     DisplaySearchContent *m_searchContent;
     int m_currentwidget;
     bool m_showOrHide;
+
+    HomePage *m_home;
 
     QHBoxLayout *m_mainLayout;
     

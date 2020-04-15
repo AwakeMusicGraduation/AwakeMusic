@@ -1,7 +1,6 @@
 #include "loginform_test.h"
 #include <QMessageBox>
 #include <QSqlQuery>
-#include <database.h>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGridLayout>

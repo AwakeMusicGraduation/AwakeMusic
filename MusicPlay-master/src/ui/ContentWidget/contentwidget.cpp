@@ -10,6 +10,7 @@
 #include <QDebug>
 #include "app.h"
 #include "MusiSongList/musicsongsmedia.h"
+#include "MusiSongList/homepage.h"
 
 Contentwidget::Contentwidget(QWidget *parent) :
     QWidget(parent)
@@ -50,6 +51,7 @@ void Contentwidget::initWidget()
     m_classifyList = new classifyList(this);
     MusicSongsListWidget *widget = new MusicSongsListWidget(this);
     m_musicSongList.append(widget);
+    m_home = new HomePage(this);
     //    widget->addMusicFold("/root/CloudMusic/");
 }
 
@@ -63,6 +65,7 @@ void Contentwidget::initLayout()
     m_mainLayout->addWidget(m_musicSongsMedia,Qt::AlignRight);      //推荐列表
     m_mainLayout->addWidget(m_musicSongsMedia2,Qt::AlignRight);
     m_mainLayout->addWidget(m_classifyList,Qt::AlignRight);
+    m_mainLayout->addWidget(m_home,Qt::AlignRight);
 
     m_mainLayout->setSpacing(5);
 
@@ -72,9 +75,11 @@ void Contentwidget::initLayout()
     setLayout(m_mainLayout);
     m_musicLyrcWidget->hide();
     m_musicSongsMedia->hide();
-    m_musicSongsMedia2->show();
+    m_musicSongsMedia2->hide();
     m_classifyList->hide();
     m_musicSongList.at(m_currentwidget)->hide();
+    m_home->show();
+
 
     //m_searchContent->setVisible(true);
     m_showOrHide = false;
@@ -155,6 +160,10 @@ void Contentwidget::initConnect()
     connect(m_musicSongList.at(m_currentwidget), SIGNAL(signalSendToPlayList(QList<QString> &)),this,SIGNAL(signalSendSongsListWidget(QList<QString>  &)));
     //添加下一首播放
     connect(m_musicSongList.at(m_currentwidget), SIGNAL(signalSendNextMusicToList(QString&)),this,SIGNAL(signalSendNextMusic(QString&)));
+
+    //默认列表获取所创建的列表名
+    connect(m_musicSongList.at(m_currentwidget),&MusicSongsListWidget::signalObtainListName,m_musicSongsLists,&MusicSongsLists::slotObtainListName);
+    connect(m_musicSongsLists,&MusicSongsLists::signalSendListName,m_musicSongList.at(m_currentwidget),&MusicSongsListWidget::slotReceiveListName);
 }
 
 void Contentwidget::connectMusicList(int index)

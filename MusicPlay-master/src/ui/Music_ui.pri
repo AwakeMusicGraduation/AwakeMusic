@@ -14,7 +14,9 @@ HEADERS += \
     $$PWD/BottomBar/playmodemenu.h \
     $$PWD/ContentWidget/MusiSongList/musicsongslists.h \
     $$PWD/ContentWidget/MusiSongList/musicsongsmedia.h \
-    $$PWD/ContentWidget/MusiSongList/classifylist.h
+    $$PWD/ContentWidget/MusiSongList/classifylist.h \
+    $$PWD/ContentWidget/MusiSongList/animatedwallwg.h \
+    $$PWD/ContentWidget/MusiSongList/homepage.h
 
 SOURCES += \
     $$PWD/ContentWidget/MusiSongList/musiccenterwidget.cpp \
@@ -32,7 +34,9 @@ SOURCES += \
     $$PWD/BottomBar/playmodemenu.cpp \
     $$PWD/ContentWidget/MusiSongList/musicsongslists.cpp \
     $$PWD/ContentWidget/MusiSongList/musicsongsmedia.cpp \
-    $$PWD/ContentWidget/MusiSongList/classifylist.cpp
+    $$PWD/ContentWidget/MusiSongList/classifylist.cpp \
+    $$PWD/ContentWidget/MusiSongList/animatedwallwg.cpp \
+    $$PWD/ContentWidget/MusiSongList/homepage.cpp
 
 FORMS += \
     $$PWD/ContentWidget/MusiSongList/mymediaplaylist.ui

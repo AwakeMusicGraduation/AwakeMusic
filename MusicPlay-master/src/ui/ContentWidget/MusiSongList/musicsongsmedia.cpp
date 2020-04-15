@@ -14,6 +14,7 @@
 MusicSongsMedia::MusicSongsMedia(QWidget *parent)
 :QTableWidget(parent)
 {
+    initMenu();
     initForm();
     initConnect();
 //    slotAddItem("消愁","毛不易","消愁");
@@ -71,11 +72,6 @@ void MusicSongsMedia::initForm()
     verticalHeader()->setVisible(false);
     QVBoxLayout *mainLayout = new QVBoxLayout;
     setLayout(mainLayout);
-
-    menu = new QMenu();
-    action = new QAction("加入列表",this);
-    menu->addAction(action);
-    group = new QActionGroup(this);
 }
 
 void MusicSongsMedia::initConnect()
@@ -83,10 +79,25 @@ void MusicSongsMedia::initConnect()
     connect(this,SIGNAL(cellDoubleClicked(int,int)),
             this,SLOT(slotCellDoubleClicked(int,int)));
 
-    connect(action,&QAction::triggered,this,&MusicSongsMedia::slot);
     //connect(action,SIGNAL(triggered()),this,SIGNAL(signalObtainListName()));
-    connect(group,&QActionGroup::triggered,this,&MusicSongsMedia::slotResponse);
 
+}
+
+void MusicSongsMedia::initMenu()
+{
+    m_menu = new QMenu();
+    //        slot();
+    QAction *actionPlayMusic = new QAction("播放", this);
+    QAction *actionNextPlay = new QAction("下一首播放", this);
+    m_menu->addAction(actionPlayMusic);
+    m_menu->addAction(actionNextPlay);
+    m_menu->addSeparator();
+
+    m_furtherMenu = new QMenu("加入播放列表");
+
+    m_menu->addMenu(m_furtherMenu);
+
+    connect(actionPlayMusic, &QAction::triggered,this,&MusicSongsMedia::slotPlayMusic);
 }
 
 void MusicSongsMedia::slot()
@@ -125,46 +136,50 @@ void MusicSongsMedia::slotCellDoubleClicked(int row, int cloumn)
     emit signalShowPicture(songName);
 }
 
+void MusicSongsMedia::slotPlayMusic()
+{
+    qDebug()<<"播放音乐";
+    int row = currentRow();
+    QString songName = item(row,0)->text();
+    QString songPinYin = getMusicPinYin(songName);
+    qDebug() << row << songName << songPinYin;
+    emit signalShowMediaLrc(songPinYin);
+    emit signalPlayMediaMusic(MusicPath + songPinYin + ".mp3");
+    emit signalShowPicture(songName);
+}
+
 void MusicSongsMedia::contextMenuEvent(QContextMenuEvent *event)
 {
-    //menu = new QMenu();
-    //furtherMenu = new QMenu();
-    //右键显示菜单
-    //action = new QAction("加入列表",this);
-    //QAction *action_1 = new QAction("我喜欢",this);
-    //menu->addAction(action);
-    //furtherMenu->addAction(action_1);
-    menu->exec(QCursor::pos());
-    furtherMenu->exec(QCursor::pos());
-    //furtherMenu->exec(QCursor::pos());
-    //connect(action,SIGNAL(triggered()),this,SIGNAL(signalObtainListName()));
-    //窗口关闭
+    emit signalObtainListName();
+    QPoint p = event->pos();
+    QModelIndex index = this->indexAt(p);
+    qDebug() << index.row();
+    if(index.row()>=0){
+    m_menu->exec(QCursor::pos());
+    }
     event->accept();
 }
 
 
 void MusicSongsMedia::slotReceiveListName(std::vector<QString> listname)
 {
-    qDebug() << "accept";
-    furtherMenu = new QMenu();
-    //QActionGroup *group = new QActionGroup(this);
+    qDebug() << "初始化二级菜单";
     QAction *action1;
-    qDebug() << "hello";
-    //action1 = new QAction("hhh",this);
-    for(auto l:listname)
-    {
-        qDebug() << l << "listnamename";
-        //group->addAction(action1);
-        action1 = new QAction(l,this);
-        //action1->setText(l);
-        furtherMenu->addAction(action1);
-        group->addAction(action1);
-        furtherMenu->addSeparator();
-        //connect(action1,&QAction::triggered,furtherMenu,&QMenu::clear);
-        //action1 = NULL;
+    if(!listname.empty()){
+        m_furtherMenu->clear();
+        for(auto l:listname)
+        {
+            qDebug() <<"接收到列表名" << l << "listnamename";
+            action1 = new QAction(l,this);
+            m_furtherMenu->addAction(action1);
+            m_furtherMenu->addSeparator();
+        }
     }
-    //action->destroyed();
-   // furtherMenu->exec(QCursor::pos());
+    else {
+        m_furtherMenu->clear();
+        action1 = new QAction("无列表，请新增列表");
+        m_furtherMenu->addAction(action1);
+    }
 }
 
 void MusicSongsMedia::slotResponse(QAction *action)

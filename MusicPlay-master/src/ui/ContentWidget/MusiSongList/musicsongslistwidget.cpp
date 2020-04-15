@@ -373,6 +373,27 @@ void MusicSongsListWidget::slotSendPlayCmd(int mode)
     }
 }
 
+void MusicSongsListWidget::slotReceiveListName(std::vector<QString> listname)
+{
+    qDebug() << "初始化二级菜单";
+    QAction *action1;
+    if(!listname.empty()){
+        m_furthermenu->clear();
+        for(auto l:listname)
+        {
+            qDebug() <<"接收到列表名" << l << "listnamename";
+            action1 = new QAction(l,this);
+            m_furthermenu->addAction(action1);
+            m_furthermenu->addSeparator();
+        }
+    }
+    else {
+        m_furthermenu->clear();
+        action1 = new QAction("无列表，请新增列表");
+        m_furthermenu->addAction(action1);
+    }
+}
+
 void MusicSongsListWidget::initForm()
 {
     //    setAttribute(Qt::WA_TranslucentBackground, true);
@@ -401,8 +422,7 @@ void MusicSongsListWidget::initForm()
     setColumnWidth(1,150);
     setColumnWidth(2,150);
 
-    //鼠标右键初始化
-    m_menu = new QMenu(this);
+
 }
 
 //鼠标右键信号和槽的关联
@@ -422,6 +442,9 @@ void MusicSongsListWidget::initConnect()
 
 void MusicSongsListWidget::initMenu()
 {
+    //鼠标右键初始化
+    m_menu = new QMenu(this);
+    m_furthermenu = new QMenu("加入播放列表");
     QAction *actionPlayMusic = new QAction("播放",this);
 
     QAction *actionAddMusic = new QAction("添加歌曲",this);
@@ -443,6 +466,9 @@ void MusicSongsListWidget::initMenu()
     m_menu->addSeparator();
     m_menu->addAction(actionDeleteMusic);
     m_menu->addAction(actionDeleteAll);
+
+    m_menu->addSeparator();
+    m_menu->addMenu(m_furthermenu);
 
     //关联menu
     connect(actionPlayMusic,SIGNAL(triggered(bool)),
@@ -481,6 +507,7 @@ void MusicSongsListWidget::setRadomPlayMusic()
 
 void MusicSongsListWidget::contextMenuEvent(QContextMenuEvent *event)
 {
+    emit signalObtainListName();
     qDebug() << "接收到菜单信号";
     //右键显示菜单
     QPoint p = event->pos();

@@ -20,6 +20,8 @@ protected:
 private:
     void initForm();
     void initConnect();
+    void initMenu();
+
 Q_SIGNALS:
     void signalPlayMediaMusic(QString path);
     void signalShowMediaLrc(QString songPinYin);
@@ -35,13 +37,11 @@ public Q_SLOTS:
     void slot();
 private Q_SLOTS:
     void slotCellDoubleClicked(int row,int cloumn);
+    void slotPlayMusic();
 private:
     QMap<QString,QString>m_musicInfo;
-    QAction *action;
-    //QAction *action1;
-    QMenu *menu;
-    QMenu *furtherMenu;
-    QActionGroup *group;
+    QMenu *m_menu;
+    QMenu *m_furtherMenu;
 };
 
 #endif // MUSICSONGSMEDIA_H

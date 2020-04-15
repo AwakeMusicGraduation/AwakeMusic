@@ -59,6 +59,8 @@ Q_SIGNALS:
     void signalQmenuPlayMusic();
     void signalQmenuDeleteAllMusic();
 
+    void signalObtainListName();      //获取列表姓名
+
 private Q_SLOTS:
     void slotCellDoubleClicked(int,int);
 
@@ -80,6 +82,8 @@ public Q_SLOTS:
 
     //根据播放模式，发送不同的歌曲信息
     void slotSendPlayCmd(int);
+    //接收列表名
+    void slotReceiveListName(std::vector<QString> listname);
 private:
     void initForm();
     void initConnect();
@@ -92,9 +96,9 @@ protected:
 
 private:
     QMenu *m_menu;
-//    QMap<QString,QString> m_musicInfo;           //歌曲信息
-    QList<QString> m_musicpath;                    //保存歌曲路径
-//    QList<QStringList> m_music;                    //保存歌曲信息，歌名专辑歌手信息
+    QMenu *m_furthermenu;
+    //保存本地歌曲播放路径
+    QList<QString> m_musicpath;
 };
 
 #endif // MUSICSONGSLISTWIDGET_H
