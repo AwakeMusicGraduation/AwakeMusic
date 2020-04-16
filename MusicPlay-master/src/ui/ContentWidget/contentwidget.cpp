@@ -167,6 +167,10 @@ void Contentwidget::initConnect()
     connect(m_home,&HomePage::signalObtainAlbums,this,&Contentwidget::signalObtainAlbums);
     //传回图片和专辑到首页
     connect(this,&Contentwidget::signalAlbumAndImage,m_home,&HomePage::slotAddMusicTip);
+    //显示点击推荐的歌单后的界面
+    connect(m_home,&HomePage::signalShowWidget,this,&Contentwidget::slotShowTip);
+    //获取推荐歌单里面的歌曲
+    connect(m_home,&HomePage::signalShowMusicsFromTip,this,&Contentwidget::signalLoadTipMusics);
 
 }
 
@@ -303,6 +307,19 @@ void Contentwidget::slotShowList(int row,QString list)
             //this->connectMusicList(m_currentwidget-2);
         }
     }
+}
+
+void Contentwidget::slotShowTip()
+{
+    m_musicLyrcWidget->hide();
+    m_showOrHide = false;
+    m_musicSongList.at(m_currentwidget)->hide();
+    this->disConnectMusicList(m_currentwidget);
+    m_classifyList->hide();
+    m_musicSongsMedia2->hide();
+    m_home->close();
+    m_musicSongsMedia->removeAllItem();
+    m_musicSongsMedia->show();
 }
 
 void Contentwidget::slotAddNewList()

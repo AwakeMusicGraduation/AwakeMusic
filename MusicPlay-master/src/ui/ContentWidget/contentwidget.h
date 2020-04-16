@@ -84,6 +84,7 @@ Q_SIGNALS:
 
     void signalObtainAlbums();//获取首页的推荐歌单
     void signalAlbumAndImage(QString album,QImage image);//传回图片和专辑到首页
+    void signalLoadTipMusics(QString tip);//获取推荐歌单的歌曲
     
 public slots:
     //接收bottombar发送过来的播放命令
@@ -96,6 +97,7 @@ public slots:
     void slotShowOrHide();
     void slotShowMediaSongs();
     void slotSetName(QString name);
+    void slotShowTip();//显示推荐歌单的列表
 
 private:
 //    MusicSongsSummarizied *m_songsSummarizied;

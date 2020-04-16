@@ -241,6 +241,8 @@ void MusicMainWidget::initConnect()
     connect(m_contentWidget,&Contentwidget::signalObtainAlbums,m_client,&Client::slotObtainAlbums);
     //传回专辑和图片到首页的推荐歌单
     connect(m_client,&Client::signalAlbumAndImage,m_contentWidget,&Contentwidget::signalAlbumAndImage);
+    //获取推荐歌单的歌曲
+    connect(m_contentWidget,&Contentwidget::signalLoadTipMusics,m_client,&Client::slotLoadTipMusics);
 
 }
 

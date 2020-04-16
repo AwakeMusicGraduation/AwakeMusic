@@ -6,6 +6,8 @@
 #include "animatedwallwg.h"
 #include <QHeaderView>
 #include <QPushButton>
+#include <QDebug>
+#include <QPushButton>
 
 HomePage::HomePage(QWidget *parent):QTableWidget (parent)
 {
@@ -17,7 +19,8 @@ void HomePage::initform()
 {
     m_mainlayout = new QVBoxLayout(this);
 
-    m_home = new QLabel("首页",this);
+    m_home = new QPushButton(this);
+    m_home->setText("首页");
     //m_home->setFont(QFont(5));
     //m_home->setFixedSize(700,10);
     m_home->move(300,1);
@@ -79,8 +82,10 @@ void HomePage::initform()
 
 void HomePage::initconnect()
 {
-    connect(this,SIGNAL(show()),this,SIGNAL(signalObtainAlbums()));
-    connect(table,&QTableWidget::cellClicked,this,&HomePage::signalObtainAlbums);
+    //connect(this,SIGNAL(show()),this,SIGNAL(signalObtainAlbums()));
+    connect(table,&QTableWidget::cellClicked,this,&HomePage::slotShowMusicsFromTip);
+    connect(m_home,SIGNAL(clicked()),this,SIGNAL(signalObtainAlbums()));
+
 }
 
 void HomePage::slotAddMusicTip(QString album,QImage image)
@@ -127,6 +132,18 @@ void HomePage::slotAddMusicTip(QString album,QImage image)
     }
     else
         column++;
+}
+
+void HomePage::slotShowMusicsFromTip()
+{
+    int row1 = table->currentRow();
+    int column1 = table->currentColumn();
+    int sum = row1*4 + column1;
+    qDebug() <<  row1 << column1 << sum << "应该查询的表";
+    QString tip = m_albumsName.at(sum);
+    //tip = "初学者";
+    emit signalShowWidget();
+    emit signalShowMusicsFromTip(tip);
 }
 
 void HomePage::slotShowMusics()

@@ -42,10 +42,12 @@ public slots:
     void acceptDeleteList();//删除列表
     void slotAddMusicToList(QString label,QString list,QString name,QString singer,QString album);//将歌曲加入到对应的列表并传到服务器
     void slotLoadMusicFromList(QString label,QString list);//从服务端加载音乐列表里面的歌曲到客户端
-    void acceptMusicFromList();//接收服务端传会的列表中的音乐
+    void acceptMusicFromList();//接收服务端传回的列表中的音乐
     void acceptMusicInsertList();//是否插入成功
     void slotObtainAlbums();//获取首页的推荐歌单
     void acceptMusicTips();//接收首页的推荐歌单
+    void slotLoadTipMusics(QString tip);//获取推荐歌单的音乐
+    void acceptTipMusics();//接收推荐歌单的歌曲
 
 
 Q_SIGNALS:

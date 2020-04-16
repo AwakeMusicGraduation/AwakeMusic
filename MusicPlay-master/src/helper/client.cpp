@@ -183,6 +183,52 @@ void Client::slotObtainAlbums()
     connect(tcpSocket,&QIODevice::readyRead,this,&Client::acceptMusicTips);
 }
 
+void Client::slotLoadTipMusics(QString tip)
+{
+    newConnect();
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+
+    out.setVersion(QDataStream::Qt_5_10);
+    QString label = "tip";
+    out << quint32(label.size() + tip.size());
+
+    out << label << tip;
+    tcpSocket->write(block);
+    qDebug() << "获取歌单的歌曲到列表中";
+    block.resize(0);
+    connect(tcpSocket,&QIODevice::readyRead,this,&Client::acceptTipMusics);
+}
+
+void Client::acceptTipMusics()
+{
+    QDataStream in(tcpSocket);
+    //设置数据流版本，这里要和服务器端相同。
+    in.setVersion(QDataStream::Qt_5_10);
+
+    //如果这是刚开始接受数据
+    if(blockSize==0){
+        //判断接收数据是否大于两字节，也就是文件的大小信息所占的空间
+        //如果时则保存到blockSize变量中，否则直接返回，继续接受数据
+        if(tcpSocket->bytesAvailable() < (int)sizeof(quint32)) return;
+        in >> blockSize;
+    }
+    //如果没有得到全部的数据，则返回，继续接收数据
+    if(tcpSocket->bytesAvailable()<blockSize) return;
+    while(tcpSocket->bytesAvailable())
+    {
+        QString name,singer,album,spell;
+        in >> name;
+        in >> singer;
+        in >> album;
+        in >> spell;
+        emit signalSendInfo(name,singer,album);
+        emit signalSendPinYin(name,spell);
+    }
+    blockSize = 0;
+    tcpSocket->close();
+}
+
 void Client::acceptCreateList()
 {
     QDataStream in(tcpSocket);
