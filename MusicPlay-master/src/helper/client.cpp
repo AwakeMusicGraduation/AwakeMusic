@@ -165,6 +165,24 @@ void Client::slotLoadMusicFromList(QString label,QString list)
 
 }
 
+void Client::slotObtainAlbums()
+{
+    qDebug() << "获取专辑和图片到首页的推荐列表";
+    newConnect();
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+
+    out.setVersion(QDataStream::Qt_5_10);
+    QString label = "musictips";
+    out << quint32(label.size());
+
+    out << label;
+    tcpSocket->write(block);
+    qDebug() << "获取歌单";
+    block.resize(0);
+    connect(tcpSocket,&QIODevice::readyRead,this,&Client::acceptMusicTips);
+}
+
 void Client::acceptCreateList()
 {
     QDataStream in(tcpSocket);
@@ -262,7 +280,7 @@ void Client::newConnect()
     blockSize = 0;
     tcpSocket = new QTcpSocket();
     //tcpSocket->abort();
-    tcpSocket->connectToHost("192.168.0.104", 6668);
+    tcpSocket->connectToHost("192.168.0.105", 6668);
     //connect(tcpSocket, &QIODevice::readyRead,this,&Client::showPicture);
 }
 
@@ -270,7 +288,7 @@ void Client::newFileConnect()
 {
     blockSize = 0;
     fileSocket->abort();
-    fileSocket->connectToHost("192.168.0.104", 8888);
+    fileSocket->connectToHost("192.168.0.105", 8888);
     connect(fileSocket, &QIODevice::readyRead, this, &Client::receivePlaylist);
 }
 
@@ -278,7 +296,7 @@ void Client::newSingerConnect()
 {
     blockSize = 0;
     singerSocket->abort();
-    singerSocket->connectToHost("192.168.0.104", 2222);
+    singerSocket->connectToHost("192.168.0.105", 2222);
 
     qDebug() << "连接成功";
     connect(singerSocket, &QIODevice::readyRead, this, &Client::receiveCategory);
@@ -529,6 +547,41 @@ void Client::showPictureandLrc()
     bytesReceived = 0;
     totalBytes= 0;
     fileNameSize = 0;
+}
+
+void Client::acceptMusicTips()
+{
+    QDataStream in(tcpSocket);
+    in.setVersion(QDataStream::Qt_5_10);
+    QString album;
+    //qint32 total;
+    if(total == 0)
+    {
+         if(tcpSocket->bytesAvailable() < sizeof(qint32)) return;
+         in >> total;
+    }
+    qDebug() << total << "总的字节数";
+    if(tcpSocket->bytesAvailable() < total) return;
+
+    for(int i = 0; i < 8;i++)
+    {
+        qDebug() << "正在接收歌单";
+        in >> blockSize;
+        in >> fileNameSize;
+        in >> album;
+
+        QByteArray array = tcpSocket->read(blockSize);
+        QBuffer buffer(&array);
+        buffer.open(QIODevice::ReadOnly);
+        QImageReader reader(&buffer,"JPG");
+        QImage image = reader.read();
+        emit signalAlbumAndImage(album,image);
+        qDebug() << "完成一次传输";
+    }
+    blockSize = 0;
+    fileNameSize = 0;
+    total = 0;
+    tcpSocket->close();
 }
 
 void Client::acceptUserMessage()

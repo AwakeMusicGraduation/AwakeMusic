@@ -81,6 +81,9 @@ Q_SIGNALS:
     void signalSendNextMusic2(QStringList&);
 
     void signalSendList2ToPlay(QList<QStringList>&);
+
+    void signalObtainAlbums();//获取首页的推荐歌单
+    void signalAlbumAndImage(QString album,QImage image);//传回图片和专辑到首页
     
 public slots:
     //接收bottombar发送过来的播放命令

@@ -75,41 +75,55 @@ void HomePage::initform()
     table->move(0,230);
     table->setFixedSize(700,280);
 
-    QTableWidgetItem *l = new QTableWidgetItem("hello");
-    QTableWidgetItem *m = new QTableWidgetItem("Micheal");
-
-    table->setItem(0,0,l);
-    table->setItem(0,1,m);
-    table->show();
-
-
 }
 
 void HomePage::initconnect()
 {
-
+    connect(this,SIGNAL(show()),this,SIGNAL(signalObtainAlbums()));
+    connect(table,&QTableWidget::cellClicked,this,&HomePage::signalObtainAlbums);
 }
 
 void HomePage::slotAddMusicTip(QString album,QImage image)
 {
+    if(row == 2 && column == 0)
+    {
+        row = 0;
+        column = 0;
+    }
     QWidget *widget = new QWidget;
     QLabel *label = new QLabel(album);
+    label->setFont(QFont("Black",10,25));
+    label->setAlignment(Qt::AlignCenter);
+    label->setFixedSize(175,30);
     QPushButton *picture = new QPushButton;
     QPixmap pix = QPixmap::fromImage(image,Qt::AutoColor);
+    QSize sz(195,110);
+    pix.scaled(sz,Qt::KeepAspectRatio);
     QIcon icon;
     icon.addPixmap(pix);
+    //picture->setPixmap(pix);
     picture->setIcon(icon);
+    picture->setIconSize(sz);
+    picture->setFixedSize(175,110);
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(picture);
+    layout->addWidget(picture,Qt::AlignTop);
     layout->addWidget(label);
-    widget->setFixedSize(175,140);
+    widget->setFixedSize(175,150);
     widget->setLayout(layout);
     table->setCellWidget(row,column,widget);
     m_albumsName.push_back(album);
+
     if(column == 3)
     {
         column = 0;
         row++;
+    }
+    else if(row == 2)
+    {
+        row = 0;
+        column = 0;
+        m_albumsName.clear();
+        table->clear();
     }
     else
         column++;

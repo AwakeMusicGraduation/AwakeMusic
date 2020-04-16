@@ -163,6 +163,11 @@ void Contentwidget::initConnect()
     //发送在线列表到播放列表
     connect(m_musicSongsMedia2, &MusicSongsMedia::signalSendPlayList2,this, &Contentwidget::signalSendList2ToPlay);
 
+    //获取首页的推荐歌单
+    connect(m_home,&HomePage::signalObtainAlbums,this,&Contentwidget::signalObtainAlbums);
+    //传回图片和专辑到首页
+    connect(this,&Contentwidget::signalAlbumAndImage,m_home,&HomePage::slotAddMusicTip);
+
 }
 
 void Contentwidget::connectMusicList(int index)

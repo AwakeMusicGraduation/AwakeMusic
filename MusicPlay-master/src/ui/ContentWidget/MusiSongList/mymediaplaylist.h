@@ -32,21 +32,19 @@ private:
     void initMenu();
     void initConnect();
     void addContenItem(QStringList,int);
+    void removeAllItem();//在添加一个新列表前先删除播放列表的内容
     bool checkRepeatMusic(QString&);//查看是否有重复的歌曲
 
 
 Q_SIGNALS:
     void signalShowLyric();
-    void signalPlayMusic(QString path);//播放本地歌曲
-    void signalPlayMediaMusic(QString);
+    void signalPlayMusic(QString path);
     void signalReatMusic();
 
 private Q_SLOTS:
     void slotCellDoubleClicked(int,int);
     void slotPlayMusic();
     void slotAddNextLocalPlayMusic(QString&);//添加本地歌曲
-    void slotRemoveAllItem();//在添加一个新列表前先删除播放列表的内容
-    void slotDeleFromPlayList();
 
 public slots:
     //将默认列表显示到播放列表中
@@ -63,7 +61,6 @@ private:
     QTableWidget *m_table2;
     QMenu *m_menu;
     QList<playInfo> m_musicpath;//用于保存播放的路径（包括在线的和本地的）便于播放---根据列表的行号来保存
-    int m_currentplay;//用于保存现在正在播放的音乐的行数
 };
 
 #endif // MYMEDIAPLAYLIST_H

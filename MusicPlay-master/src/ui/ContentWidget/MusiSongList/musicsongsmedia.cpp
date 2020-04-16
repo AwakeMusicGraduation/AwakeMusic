@@ -159,8 +159,6 @@ void MusicSongsMedia::slotPlayMusic()
     emit signalShowMediaLrc(songPinYin);
     emit signalPlayMediaMusic(MusicPath + songPinYin + ".mp3");
     emit signalShowPicture(songName);
-    saveMusicInfo();
-    emit signalSendPlayList2(m_music);
 }
 
 void MusicSongsMedia::slotSendNextMusic()

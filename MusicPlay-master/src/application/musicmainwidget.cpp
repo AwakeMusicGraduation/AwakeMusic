@@ -234,9 +234,13 @@ void MusicMainWidget::initConnect()
     //播放“播放列表”里面的歌曲
     connect(m_playlist,SIGNAL(signalPlayMusic(QString)),
             m_player,SLOT(slotOpenMusic(QString)));
-    connect(m_playlist,SIGNAL(signalPlayMediaMusic(QString)),m_player,SLOT(slotOpenMediaMusic(QString)));
     //发送该歌曲重复信号
     connect(m_playlist,SIGNAL(signalReatMusic()), this, SLOT(slotShowRepeatMessage()));
+
+    //获取首页的推荐歌单
+    connect(m_contentWidget,&Contentwidget::signalObtainAlbums,m_client,&Client::slotObtainAlbums);
+    //传回专辑和图片到首页的推荐歌单
+    connect(m_client,&Client::signalAlbumAndImage,m_contentWidget,&Contentwidget::signalAlbumAndImage);
 
 }
 

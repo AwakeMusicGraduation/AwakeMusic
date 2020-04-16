@@ -21,8 +21,10 @@ public:
 private:
     void initform();
     void initconnect();
+signals:
+    void signalObtainAlbums();//获取推荐歌单
 public slots:
-    void slotAddMusicTip(QString album,QImage image);
+    void slotAddMusicTip(QString album,QImage image);//推荐歌单接收图片和专辑名
 private:
     QVBoxLayout *m_mainlayout;
     QLabel *m_home;

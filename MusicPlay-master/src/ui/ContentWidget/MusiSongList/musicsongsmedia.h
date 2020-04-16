@@ -29,9 +29,9 @@ Q_SIGNALS:
     void signalShowPicture(QString name);
     void signalObtainListName();//获取列表名
     void signalAddMusicToList(QString label,QString list,QString name,QString singer,QString album);//将歌曲加入到对应的列表并传到服务器
-    void signalSendNextMusicToList2(QStringList&);//下一首播放
-
-    void signalSendPlayList2(QList<QStringList> &);//将该列表的内容传送到播放列表中
+    void signalSendNextMusicToList2(QStringList&);
+    //将该列表的内容传送到播放列表中
+    void signalSendPlayList2(QList<QStringList> &);
 
 public Q_SLOTS:
     void slotAddItem(QString title,QString singer,QString album);
