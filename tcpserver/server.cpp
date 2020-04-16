@@ -264,6 +264,10 @@ void Server::receiveData()
         in >> name;
         sendPicture();
     }
+    else if(data == "musictips")
+    {
+        sendMusicTips();
+    }
     else{
 
         if(!data.isNull())
@@ -505,6 +509,69 @@ void Server::sendPicture()
 }
 
 
+void Server::sendMusicTips()
+{
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_10);
+    //QBuffer buffer;
+    std::vector<QString> albums;
+    std::vector<QString> picturepaths;
+    QString album;
+    QString path;
+
+    musicBroker = new MusicBroker();
+    albums = musicBroker->findAlbums2();
+    picturepaths = musicBroker->findPicturesForAlbum(albums);
+    qint32 total = 0;
+    for(int i = 0; i < albums.size() ; i++)
+    {   QByteArray block2;
+        qDebug() << "正首页";
+        QBuffer buffer;
+        album = albums.at(i);
+        qint32 m = album.size();
+        total += album.size();
+        total += m;
+        qDebug() << total;
+        path = picturepaths.at(i) + ".JPG";
+        QPixmap(path).save(&buffer,"JPG");
+        total += buffer.data().size();
+        block2.append(buffer.data());
+        total += block.size();
+        //block2.clear();
+        qDebug() << total;
+        qDebug() << album << path <<"this is tips";
+
+    }
+    //total += sizeof(qint32)*16;
+    out << total;
+    //clientConnection->write(block);
+    for(int i = 0; i < albums.size() ; i++)
+    {
+        qDebug() << albums.size() << picturepaths.size() << "总数";
+        qDebug() << "正在传输专辑和图片到首页";
+        QBuffer buffer;
+        //qDebug() << buffer.data().size() << "this is size";
+        album = albums.at(i);
+        path = picturepaths.at(i) + ".JPG";
+        //path = "/root/薛之谦/yiwai.JPG";
+        QPixmap(path).save(&buffer,"JPG");
+        qDebug() << album << path <<"this is tips";
+        out << qint32(buffer.data().size()) << qint32(album.size()) << album;
+        block.append(buffer.data());
+        //buffer.seek(0);
+        clientConnection->write(block);
+        block.resize(0);
+        clientConnection->reset();
+        out.device()->seek(0);
+
+     }
+    //clientConnection->write(block);
+    albums.clear();
+    picturepaths.clear();
+    clientConnection->disconnectFromHost();
+
+}
 
 void Server::sendPlaylist()
 {

@@ -24,6 +24,8 @@ public:
     QString addMusicToList(QString list, QString name, QString singer,QString album);//添加歌曲到列表
     std::vector<QString> findMusicFromList(QString list);//从列表查询音乐
     //Music findBySinger(QString singer);
+    std::vector<QString> findAlbums2();//找到随机选取的专辑
+    std::vector<QString> findPicturesForAlbum(std::vector<QString> albums);//根据选取的album找到对应的图片
 
 private:
     Sqltable *sqltable;

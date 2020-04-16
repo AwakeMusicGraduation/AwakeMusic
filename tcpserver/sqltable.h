@@ -59,6 +59,8 @@ public:
     QString deleteMusicList(QString list);//用户删除特定歌单
     void search(QString content);//根据搜素内容搜素
     std::vector<QString> loadMusicFromList(QString list);//根据列表搜素对应的音乐
+    std::vector<QString> randomSelectAlbum();//随机从专辑中选出8个专辑作为推荐歌单
+    std::vector<QString> albumsToPictures(std::vector<QString> albums);//根据专辑得出图片的路径
 };
 
 

@@ -924,6 +924,67 @@ std::vector<QString> Sqltable::loadMusicFromList(QString list)
     return allmusics;
 }
 
+std::vector<QString> Sqltable::randomSelectAlbum()
+{
+    db.open();
+
+    QString select_album_sql = "select name from album order by random() limit 8";
+    QSqlQuery sql_query;
+    std::vector<QString> albums;
+
+    sql_query.prepare(select_album_sql);
+
+    if(!sql_query.exec())
+    {
+        qDebug()<<sql_query.lastError();
+    }
+    else
+    {
+        while(sql_query.next())
+        {
+            QString name = sql_query.value(0).toString();
+            albums.push_back(name);
+            qDebug()<<"checked";
+            qDebug()<< QString("album:%1").arg(name);
+        }
+    }
+    db.close();
+    return albums;
+}
+
+std::vector<QString> Sqltable::albumsToPictures(std::vector<QString> albums)
+{
+    db.open();
+    QString album;
+    std::vector<QString> picturepaths;
+    QSqlQuery sql_query;
+    for(auto l:albums)
+    {
+        album = l;
+        QString select_picture_sql = "select audiopath from music where album = '" + album +"'";
+        sql_query.prepare(select_picture_sql);
+
+        if(!sql_query.exec())
+        {
+
+            qDebug()<<sql_query.lastError();
+        }
+        else
+        {
+           if(sql_query.next())
+           {
+               QString path = sql_query.value(0).toString();
+               picturepaths.push_back(path);
+               qDebug()<<"checked";
+               qDebug()<< QString("path:%1").arg(path);
+           }
+           else
+               picturepaths.push_back("root/薛之谦/yiwai");
+        }
+    }
+    db.close();
+    return picturepaths;
+}
 
 
 

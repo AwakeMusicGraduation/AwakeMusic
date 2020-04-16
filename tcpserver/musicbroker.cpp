@@ -91,3 +91,13 @@ std::vector<QString> MusicBroker::findMusicFromList(QString list)
     return sqltable->loadMusicFromList(list);
 }
 
+std::vector<QString> MusicBroker::findAlbums2()
+{
+    return sqltable->randomSelectAlbum();
+}
+
+std::vector<QString> MusicBroker::findPicturesForAlbum(std::vector<QString> albums)
+{
+    return sqltable->albumsToPictures(albums);
+}
+

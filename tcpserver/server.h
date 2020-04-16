@@ -39,6 +39,7 @@ private slots:
     void sendDeleteSongsList();//删除列表
     void sendAddMusicToList(QString list,QString name,QString singer,QString album);//音乐插入到对应列表
     void sendMusicFromList(QString list);//向客服端传输查询列表的音乐
+    void sendMusicTips();//接收推荐歌单
 
     void displayError(QAbstractSocket::SocketError socketError);
 signals:
