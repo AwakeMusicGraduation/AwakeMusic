@@ -24,9 +24,9 @@ public:
     //添加文件中的mp3
     void addMusicFold(QString path);
     //保存歌曲信息
-//    void saveMusicInfo(const QString &name,const QString &path);
+    //    void saveMusicInfo(const QString &name,const QString &path);
     //获取歌曲路径
-//    QString getMusicPath(const QString& name);
+    //    QString getMusicPath(const QString& name);
 
     //返回tablewidget是否为空
     bool tableWidgetIsEmpty();
@@ -60,9 +60,11 @@ Q_SIGNALS:
     void signalQmenuDeleteAllMusic();
 
     void signalObtainListName();      //获取列表姓名
+    void signalAddMusicToList(QString label,QString list,QString name,QString singer,QString album);//将歌曲加入到对应的列表并传到服务器
 
 private Q_SLOTS:
     void slotCellDoubleClicked(int,int);
+
 
 public Q_SLOTS:
     //获取上一首
@@ -84,6 +86,8 @@ public Q_SLOTS:
     void slotSendPlayCmd(int);
     //接收列表名
     void slotReceiveListName(std::vector<QString> listname);
+    //QAction槽
+    void slotResponse(QAction*);
 private:
     void initForm();
     void initConnect();

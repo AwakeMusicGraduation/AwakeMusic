@@ -77,6 +77,10 @@ Q_SIGNALS:
     void signalSendSongsListWidget(QList<QString>&);
 
     void signalSendNextMusic(QString&);
+
+    void signalSendNextMusic2(QStringList&);
+
+    void signalSendList2ToPlay(QList<QStringList>&);
     
 public slots:
     //接收bottombar发送过来的播放命令

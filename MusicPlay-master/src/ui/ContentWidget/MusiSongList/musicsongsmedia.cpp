@@ -7,20 +7,17 @@
 #include <QAction>
 #include <QContextMenuEvent>
 #include <QActionGroup>
+#include <QMouseEvent>
 //#define MusicPath "rtsp://10.253.241.175/mp3/"
-#define MusicPath "rtsp://192.168.0.14/mp3"
+#define MusicPath "rtsp://192.168.0.104/mp3/"
 
 
 MusicSongsMedia::MusicSongsMedia(QWidget *parent)
-:QTableWidget(parent)
+    :QTableWidget(parent)
 {
     initMenu();
     initForm();
     initConnect();
-//    slotAddItem("消愁","毛不易","消愁");
-//    slotAddItem("song","","");
-//    slotSaveMusicInfo("消愁","xiaochou");
-//    slotSaveMusicInfo("song","song");
 }
 
 void MusicSongsMedia::slotSaveMusicInfo(QString name, QString pinyin)
@@ -57,7 +54,7 @@ void MusicSongsMedia::initForm()
     setEditTriggers(QAbstractItemView::NoEditTriggers);     //设置表格不能编辑
     setSelectionBehavior(QAbstractItemView::SelectRows);    //设置整行选中
     setSelectionMode(QAbstractItemView::SingleSelection);
-//    horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+    //    horizontalHeader()->setResizeMode(QHeaderView::Stretch);
     verticalHeader()->setDefaultSectionSize(45);
 
     QHeaderView *headerview = horizontalHeader();
@@ -85,6 +82,7 @@ void MusicSongsMedia::initConnect()
 
 void MusicSongsMedia::initMenu()
 {
+    this->setMouseTracking(true);
     m_menu = new QMenu();
     //        slot();
     QAction *actionPlayMusic = new QAction("播放", this);
@@ -98,6 +96,19 @@ void MusicSongsMedia::initMenu()
     m_menu->addMenu(m_furtherMenu);
 
     connect(actionPlayMusic, &QAction::triggered,this,&MusicSongsMedia::slotPlayMusic);
+    connect(actionNextPlay, &QAction::triggered,this, &MusicSongsMedia::slotSendNextMusic);
+}
+
+void MusicSongsMedia::saveMusicInfo()
+{
+    m_music.clear();
+    int row = this->rowCount();
+    for(int i=0; i<row; i++){
+        QStringList s;
+        s << item(i,0)->text() << item(i,1)->text() << item(i,2)->text();
+        s << MusicPath+getMusicPinYin(item(i,0)->text())+".mp3";
+        m_music.append(s);
+    }
 }
 
 void MusicSongsMedia::slot()
@@ -134,6 +145,8 @@ void MusicSongsMedia::slotCellDoubleClicked(int row, int cloumn)
     emit signalShowMediaLrc(songPinYin);
     emit signalPlayMediaMusic(MusicPath + songPinYin + ".mp3");
     emit signalShowPicture(songName);
+    saveMusicInfo();//发送信息前总是先刷新保存列表中的歌曲信息
+    emit signalSendPlayList2(m_music);
 }
 
 void MusicSongsMedia::slotPlayMusic()
@@ -146,6 +159,18 @@ void MusicSongsMedia::slotPlayMusic()
     emit signalShowMediaLrc(songPinYin);
     emit signalPlayMediaMusic(MusicPath + songPinYin + ".mp3");
     emit signalShowPicture(songName);
+    saveMusicInfo();
+    emit signalSendPlayList2(m_music);
+}
+
+void MusicSongsMedia::slotSendNextMusic()
+{
+
+    saveMusicInfo();
+    int row = currentRow();
+    QStringList s = m_music.at(row);
+    qDebug()<<"action 触发" << s;
+    emit signalSendNextMusicToList2(s);
 }
 
 void MusicSongsMedia::contextMenuEvent(QContextMenuEvent *event)
@@ -155,7 +180,7 @@ void MusicSongsMedia::contextMenuEvent(QContextMenuEvent *event)
     QModelIndex index = this->indexAt(p);
     qDebug() << index.row();
     if(index.row()>=0){
-    m_menu->exec(QCursor::pos());
+        m_menu->exec(QCursor::pos());
     }
     event->accept();
 }
@@ -164,28 +189,30 @@ void MusicSongsMedia::contextMenuEvent(QContextMenuEvent *event)
 void MusicSongsMedia::slotReceiveListName(std::vector<QString> listname)
 {
     qDebug() << "初始化二级菜单";
-    QAction *action1;
     if(!listname.empty()){
         m_furtherMenu->clear();
         for(auto l:listname)
         {
+            QAction *action1;
             qDebug() <<"接收到列表名" << l << "listnamename";
-            action1 = new QAction(l,this);
+            action1 = new QAction(l,m_furtherMenu);
             m_furtherMenu->addAction(action1);
             m_furtherMenu->addSeparator();
         }
     }
     else {
+        QAction *action1;
         m_furtherMenu->clear();
         action1 = new QAction("无列表，请新增列表");
+
         m_furtherMenu->addAction(action1);
     }
+    connect(m_furtherMenu,SIGNAL(triggered(QAction*)),SLOT(slotResponse(QAction*)));
 }
 
 void MusicSongsMedia::slotResponse(QAction *action)
 {
     QString list = action->text();
-    //furtherMenu->
     qDebug() << "like the name" << list;
     int row = currentRow();
     QString label = "addmusictolist";

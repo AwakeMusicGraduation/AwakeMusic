@@ -165,7 +165,7 @@ QStringList QVlcPlayer::Resolution(QString strPath)
         char *message1  = libvlc_media_get_meta(m,libvlc_meta_Title);
         char *message2 = libvlc_media_get_meta(m,libvlc_meta_Album);
         char *message3 = libvlc_media_get_meta(m,libvlc_meta_Artist);
-        message <<message1<< message2 << message3;
+        message <<message1<< message3 << message2;
         //        }
         libvlc_media_release(m);
     }

@@ -227,10 +227,14 @@ void MusicMainWidget::initConnect()
     connect(m_contentWidget,SIGNAL(signalSendSongsListWidget(QList<QString> &)),this,SLOT(slotFlushPlayList(QList<QString>&)));
     connect(m_contentWidget,SIGNAL(signalShowPicture(QString)),m_client,SLOT(sendSongName(QString)));
     //在播放列表中添加下一首播放
-    connect(m_contentWidget,SIGNAL(signalSendNextMusic(QString&)),m_playlist, SLOT(slotAddNextPlayMusic(QString&)));
+    connect(m_contentWidget,SIGNAL(signalSendNextMusic(QString&)),m_playlist, SLOT(slotAddNextLocalPlayMusic(QString&)));
+    connect(m_contentWidget,SIGNAL(signalSendNextMusic2(QStringList&)), m_playlist,SLOT(slotAddNextOnlinePlayMusic(QStringList&)));
+    //将推荐列表发送到播放列表
+    connect(m_contentWidget, SIGNAL(signalSendList2ToPlay(QList<QStringList>&)),m_playlist,SLOT(slotReceiveList2(QList<QStringList>&)));
     //播放“播放列表”里面的歌曲
     connect(m_playlist,SIGNAL(signalPlayMusic(QString)),
             m_player,SLOT(slotOpenMusic(QString)));
+    connect(m_playlist,SIGNAL(signalPlayMediaMusic(QString)),m_player,SLOT(slotOpenMediaMusic(QString)));
     //发送该歌曲重复信号
     connect(m_playlist,SIGNAL(signalReatMusic()), this, SLOT(slotShowRepeatMessage()));
 

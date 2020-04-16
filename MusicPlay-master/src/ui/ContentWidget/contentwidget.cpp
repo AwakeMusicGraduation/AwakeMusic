@@ -156,14 +156,13 @@ void Contentwidget::initConnect()
     //将歌曲加入到对应列表并传到服务器
     connect(m_musicSongsMedia,&MusicSongsMedia::signalAddMusicToList,this,&Contentwidget::signalAddMusicToList);
     connect(m_musicSongsMedia2,&MusicSongsMedia::signalAddMusicToList,this,&Contentwidget::signalAddMusicToList);
-
-    connect(m_musicSongList.at(m_currentwidget), SIGNAL(signalSendToPlayList(QList<QString> &)),this,SIGNAL(signalSendSongsListWidget(QList<QString>  &)));
     //添加下一首播放
-    connect(m_musicSongList.at(m_currentwidget), SIGNAL(signalSendNextMusicToList(QString&)),this,SIGNAL(signalSendNextMusic(QString&)));
+    connect(m_musicSongsMedia, &MusicSongsMedia::signalSendNextMusicToList2, this, &Contentwidget::signalSendNextMusic2);
+    connect(m_musicSongsMedia2, &MusicSongsMedia::signalSendNextMusicToList2, this, &Contentwidget::signalSendNextMusic2);
 
-    //默认列表获取所创建的列表名
-    connect(m_musicSongList.at(m_currentwidget),&MusicSongsListWidget::signalObtainListName,m_musicSongsLists,&MusicSongsLists::slotObtainListName);
-    connect(m_musicSongsLists,&MusicSongsLists::signalSendListName,m_musicSongList.at(m_currentwidget),&MusicSongsListWidget::slotReceiveListName);
+    //发送在线列表到播放列表
+    connect(m_musicSongsMedia2, &MusicSongsMedia::signalSendPlayList2,this, &Contentwidget::signalSendList2ToPlay);
+
 }
 
 void Contentwidget::connectMusicList(int index)
@@ -173,21 +172,28 @@ void Contentwidget::connectMusicList(int index)
     connect(m_musicSongList.at(index),SIGNAL(signalSendFirstPlayMusic(QString)),
             this,SIGNAL(signalSendFirstPlayMusic(QString)));
     connect(this,SIGNAL(signalSendPlayPreviouse()),
-            m_musicSongList.at(m_currentwidget),SLOT(slotGetPreviouseMusic()));
+            m_musicSongList.at(index),SLOT(slotGetPreviouseMusic()));
     connect(this,SIGNAL(signalSendPlayNext()),
-            m_musicSongList.at(m_currentwidget),SLOT(slotGetNextMusic()));
-    connect(m_musicSongList.at(m_currentwidget),SIGNAL(signalSendPreviousMusic(QString)),
+            m_musicSongList.at(index),SLOT(slotGetNextMusic()));
+    connect(m_musicSongList.at(index),SIGNAL(signalSendPreviousMusic(QString)),
             this,SIGNAL(signalSendPlayPreviouseMusic(QString)));
-    connect(m_musicSongList.at(m_currentwidget),SIGNAL(signalSendNextMusic(QString)),
+    connect(m_musicSongList.at(index),SIGNAL(signalSendNextMusic(QString)),
             this,SIGNAL(signalSendPlayNextMusic(QString)));
-    connect(m_musicSongList.at(m_currentwidget),SIGNAL(signalPlayMusicPath(QString)),
+    connect(m_musicSongList.at(index),SIGNAL(signalPlayMusicPath(QString)),
             this,SIGNAL(signalPlayMusic(QString)));
-    connect(m_musicSongList.at(m_currentwidget),SIGNAL(signalShowLyric()),
+    connect(m_musicSongList.at(index),SIGNAL(signalShowLyric()),
             this,SLOT(slotShowLrc()));
     connect(this,SIGNAL(signalRequestPlayCmd(int)),
-            m_musicSongList.at(m_currentwidget),SLOT(slotSendPlayCmd(int)));
-    connect(m_musicSongList.at(m_currentwidget),SIGNAL(signalSendPlayCmdMusicInfo(QString)),
+            m_musicSongList.at(index),SLOT(slotSendPlayCmd(int)));
+    connect(m_musicSongList.at(index),SIGNAL(signalSendPlayCmdMusicInfo(QString)),
             this,SIGNAL(signalSendPlayCmdMusic(QString)));
+    connect(m_musicSongList.at(index), SIGNAL(signalSendToPlayList(QList<QString> &)),this,SIGNAL(signalSendSongsListWidget(QList<QString>  &)));
+    //添加下一首播放
+    connect(m_musicSongList.at(index), SIGNAL(signalSendNextMusicToList(QString&)),this,SIGNAL(signalSendNextMusic(QString&)));
+    connect(m_musicSongList.at(index),&MusicSongsListWidget::signalAddMusicToList,this,&Contentwidget::signalAddMusicToList);
+    //默认列表获取所创建的列表名
+    connect(m_musicSongList.at(index),&MusicSongsListWidget::signalObtainListName,m_musicSongsLists,&MusicSongsLists::slotObtainListName);
+    connect(m_musicSongsLists,&MusicSongsLists::signalSendListName,m_musicSongList.at(index),&MusicSongsListWidget::slotReceiveListName);
 
 }
 
@@ -213,6 +219,13 @@ void Contentwidget::disConnectMusicList(int index)
                m_musicSongList.at(m_currentwidget),SLOT(slotSendPlayCmd(int)));
     disconnect(m_musicSongList.at(m_currentwidget),SIGNAL(signalSendPlayCmdMusicInfo(QString)),
                this,SIGNAL(signalSendPlayCmdMusic(QString)));
+    disconnect(m_musicSongList.at(m_currentwidget), SIGNAL(signalSendToPlayList(QList<QString> &)),this,SIGNAL(signalSendSongsListWidget(QList<QString>  &)));
+    //添加下一首播放
+    disconnect(m_musicSongList.at(m_currentwidget), SIGNAL(signalSendNextMusicToList(QString&)),this,SIGNAL(signalSendNextMusic(QString&)));
+    disconnect(m_musicSongList.at(m_currentwidget),&MusicSongsListWidget::signalAddMusicToList,this,&Contentwidget::signalAddMusicToList);
+    //默认列表获取所创建的列表名
+    disconnect(m_musicSongList.at(m_currentwidget),&MusicSongsListWidget::signalObtainListName,m_musicSongsLists,&MusicSongsLists::slotObtainListName);
+    disconnect(m_musicSongsLists,&MusicSongsLists::signalSendListName,m_musicSongList.at(m_currentwidget),&MusicSongsListWidget::slotReceiveListName);
 }
 
 

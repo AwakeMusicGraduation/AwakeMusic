@@ -392,6 +392,20 @@ void MusicSongsListWidget::slotReceiveListName(std::vector<QString> listname)
         action1 = new QAction("无列表，请新增列表");
         m_furthermenu->addAction(action1);
     }
+    connect(m_furthermenu,SIGNAL(triggered(QAction*)),SLOT(slotResponse(QAction*)));
+}
+
+void MusicSongsListWidget::slotResponse(QAction *action)
+{
+    QString list = action->text();
+    qDebug() << "like the name" << list;
+    int row = currentRow();
+    QString label = "addmusictolist";
+    QString name = this->item(row,0)->text();
+    QString singer = this->item(row,1)->text();
+    QString album = this->item(row,2)->text();
+    qDebug() << name << singer << album;
+    emit signalAddMusicToList(label,list,name,singer,album);
 }
 
 void MusicSongsListWidget::initForm()

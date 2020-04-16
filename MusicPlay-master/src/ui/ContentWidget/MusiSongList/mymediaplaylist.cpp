@@ -23,14 +23,6 @@ MyMediaPlayList::MyMediaPlayList(QWidget *parent) :
     initForm();
     initMenu();
     initConnect();
-    //    slotReceiveList1(m);
-    //    QTableWidgetItem *item = new QTableWidgetItem("i.value()");
-    //    item->setTextAlignment(Qt::AlignLeft|Qt::AlignVCenter);
-    //    int rowIndex=m_table1->rowCount();
-    //    if(rowIndex>=0){
-    //        m_table1->setRowCount(rowIndex+1);
-    //        m_table1->setItem(rowIndex,0,item);
-    //    }
 }
 
 MyMediaPlayList::~MyMediaPlayList()
@@ -87,15 +79,20 @@ void MyMediaPlayList::initMenu()
     QAction *actionpPlayMusic = new QAction("播放",this);
     QAction *actionAddMusicToList = new QAction("收藏到歌单",this);
     QAction *actionDeleteFromPlayList = new QAction("从列表中删除",this);
+    QAction *actionDeleteAll = new QAction("清空",this);
 
     m_menu->addAction(actionpPlayMusic);
     m_menu->addSeparator();
     m_menu->addAction(actionAddMusicToList);
     m_menu->addSeparator();
     m_menu->addAction(actionDeleteFromPlayList);
+    m_menu->addSeparator();
+    m_menu->addAction(actionDeleteAll);
 
     connect(m_table1, SIGNAL(customContextMenuRequested(QPoint)),this, SLOT(slotShowQmenu(QPoint)));
     connect(actionpPlayMusic,SIGNAL(triggered(bool)),this,SLOT(slotPlayMusic()));
+    connect(actionDeleteAll,SIGNAL(triggered(bool)),this,SLOT(slotRemoveAllItem()));
+    connect(actionDeleteFromPlayList,SIGNAL(triggered(bool)), this, SLOT(slotDeleFromPlayList()));
 }
 
 void MyMediaPlayList::initConnect()
@@ -117,46 +114,82 @@ void MyMediaPlayList::addContenItem(QStringList m,int i)
 
 }
 
-void MyMediaPlayList::removeAllItem()
+void MyMediaPlayList::slotRemoveAllItem()
 {
     m_table1->setRowCount(0);
     m_table1->clearContents();
+    m_musicpath.clear();
+}
+
+void MyMediaPlayList::slotDeleFromPlayList()
+{
+    int row = m_table1->currentRow();
+    m_musicpath.removeAt(row);
+    m_table1->removeRow(row);
 }
 
 bool MyMediaPlayList::checkRepeatMusic(QString &path)
 {
-    for(int i=0; i<m_musicpath.size(); i++){
-        if(m_musicpath.at(i)==path)
+    for(int i=0; i<m_musicpath.size(); i++)
+        if(m_musicpath.at(i).path==path)
             return false;
-    }
     return true;
 }
 
 void MyMediaPlayList::slotCellDoubleClicked(int row, int column)
 {
-    qDebug() << "接收到播放列表信号";
-    QString musicPath = m_musicpath.at(row);
+//    qDebug() << "接收到播放列表信号";
+    QString musicPath = m_musicpath.at(row).path;
     qDebug()<<"路径"<<musicPath;
     emit signalShowLyric();//显示歌词界面
+    if(m_musicpath.at(row).i==0){
     emit signalPlayMusic(musicPath);
+    }
+    else {
+        emit signalPlayMediaMusic(musicPath);
+    }
 }
 
 void MyMediaPlayList::slotPlayMusic()
 {
     int rowIndex = m_table1->currentRow();
-    QString musicPath = m_musicpath.at(rowIndex);
+    QString musicPath = m_musicpath.at(rowIndex).path;
     emit signalShowLyric();//显示歌词界面
+    if(m_musicpath.at(rowIndex).i==0){
     emit signalPlayMusic(musicPath);
+    }
+    else {
+        emit signalPlayMediaMusic(musicPath);
+    }
 }
 
-void MyMediaPlayList::slotAddNextPlayMusic(QString& path)
+void MyMediaPlayList::slotAddNextLocalPlayMusic(QString& path)
 {
     PlayMusic playmusic;
     if(checkRepeatMusic(path)){
-    int rowIdenx = m_table1->currentRow();
-    m_musicpath.insert(rowIdenx,path);
+    int rowIndex = m_table1->currentRow();
+    playInfo playinfo = {0,path};
+    m_musicpath.insert(rowIndex, playinfo);
     QStringList s = playmusic.ResolutionMusicPath(path);
-    addContenItem(s, rowIdenx+1 );
+    addContenItem(s, rowIndex+1 );
+    }
+    else {
+        //弹出提示框
+        emit signalReatMusic();
+    }
+}
+
+void MyMediaPlayList::slotAddNextOnlinePlayMusic(QStringList &musicinfo)
+{
+    qDebug() << "接受到在线歌曲";
+    QString s = musicinfo.at(3);
+    if(checkRepeatMusic(s)){
+        int rowIndex = m_table1->currentRow();
+        playInfo playinfo = {1,s};
+        m_musicpath.insert(rowIndex, playinfo);
+        QStringList m ;
+        m << musicinfo.at(0) << musicinfo.at(1) << musicinfo.at(2);
+        addContenItem(m, rowIndex+1 );
     }
     else {
         //弹出提示框
@@ -169,14 +202,29 @@ void MyMediaPlayList::slotReceiveList1(QList<QString>  &musicname)
 {
     PlayMusic playmusic;
     qDebug()<<"接收到默认播放列表";
-    removeAllItem();
+    slotRemoveAllItem();
     for(int i=0; i<musicname.size(); i++){
         QStringList s;
         s=playmusic.ResolutionMusicPath(musicname.at(i));
-        m_musicpath.append(musicname.at(i));
+        playInfo playinfo={0,musicname.at(i)};
+        m_musicpath.append(playinfo);
         addContenItem(s,i);
     }
     //        addContenItem(musicname.at(i));
+}
+
+void MyMediaPlayList::slotReceiveList2(QList<QStringList> &musicinfo)
+{
+    slotRemoveAllItem();
+    m_musicpath.clear();
+    for(int i=0; i<musicinfo.size(); i++){
+        QStringList s = musicinfo.at(i);
+        QStringList m;
+        m << s.at(0) << s.at(1) << s.at(2);
+        playInfo playinfo = {1, s.at(3)};
+        m_musicpath.append(playinfo);
+        addContenItem(m,i);
+    }
 }
 
 void MyMediaPlayList::slotShowQmenu(QPoint pos)
