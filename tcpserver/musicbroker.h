@@ -26,6 +26,7 @@ public:
     //Music findBySinger(QString singer);
     std::vector<QString> findAlbums2();//找到随机选取的专辑
     std::vector<QString> findPicturesForAlbum(std::vector<QString> albums);//根据选取的album找到对应的图片
+    std::vector<QString> findMusicsForTip(QString tip);//根据歌单查询音乐
 
 private:
     Sqltable *sqltable;

@@ -101,3 +101,8 @@ std::vector<QString> MusicBroker::findPicturesForAlbum(std::vector<QString> albu
     return sqltable->albumsToPictures(albums);
 }
 
+std::vector<QString> MusicBroker::findMusicsForTip(QString tip)
+{
+    return sqltable->searchMusicsForTip(tip);
+}
+

@@ -40,6 +40,7 @@ private slots:
     void sendAddMusicToList(QString list,QString name,QString singer,QString album);//音乐插入到对应列表
     void sendMusicFromList(QString list);//向客服端传输查询列表的音乐
     void sendMusicTips();//接收推荐歌单
+    void sendTipMusics(QString tip);//根据推荐歌单搜素歌曲
 
     void displayError(QAbstractSocket::SocketError socketError);
 signals:

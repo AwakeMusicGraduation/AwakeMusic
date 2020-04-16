@@ -207,14 +207,6 @@ void Server::receiveData()
     in >> data;
     qDebug()<< data << "what";
 
-    //        if(data1 == "music"){
-    //            sendMessage();
-    //        }
-    //        if(data1 == "singer"){
-
-    //        }
-
-
     if(data == "user")
     {
         in >> name;
@@ -267,6 +259,12 @@ void Server::receiveData()
     else if(data == "musictips")
     {
         sendMusicTips();
+    }
+    else if(data == "tip")
+    {
+        QString tip;
+        in >> tip;
+        sendTipMusics(tip);
     }
     else{
 
@@ -514,7 +512,6 @@ void Server::sendMusicTips()
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_10);
-    //QBuffer buffer;
     std::vector<QString> albums;
     std::vector<QString> picturepaths;
     QString album;
@@ -569,6 +566,29 @@ void Server::sendMusicTips()
     //clientConnection->write(block);
     albums.clear();
     picturepaths.clear();
+    clientConnection->disconnectFromHost();
+
+}
+
+void Server::sendTipMusics(QString tip)
+{
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_10);
+    musicBroker = new MusicBroker();
+    std::vector<QString> musics = musicBroker->findMusicsForTip(tip);
+    qint32 total = 0;
+    for(auto l:musics)
+    {
+        total += l.size();
+    }
+    out << total;
+    for(auto l : musics)
+    {
+        out << l;
+    }
+    //musics.clear();
+    clientConnection->write(block);
     clientConnection->disconnectFromHost();
 
 }
