@@ -29,6 +29,12 @@ public slots:
     void slotAddMusicTip(QString album,QImage image);//推荐歌单接收图片和专辑名
     void slotShowMusicsFromTip();//获取歌单中的音乐
     void slotShowMusics();//点击歌单显示歌曲
+    void slotShowSongs();//图片切换显示歌曲
+    void slotShowSongs1();//图片切换显示歌曲
+    void slotShowSongs2();//图片切换显示歌曲
+    void slotShowSongs3();//图片切换显示歌曲
+    void slotShowSongs4();//图片切换显示歌曲
+    void slotShowSongs5();//图片切换显示歌曲
 private:
     QVBoxLayout *m_mainlayout;
     QPushButton *m_home;
@@ -37,6 +43,7 @@ private:
     QTableWidget *table;
     //QPushButton *m_albums[8];
     std::vector<QString> m_albumsName;
+    //std::vector<QString> m_exchange;
     int row = 0,column = 0;
 };
 

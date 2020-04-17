@@ -24,6 +24,12 @@ AnimatedWallWG::AnimatedWallWG(QWidget *parent) :
 
     //2. 开启定时器8秒轮换一次
     m_idTimer = startTimer(8000);
+    connect(m_pWall[0],&ClickableLabel::clicked,this,&AnimatedWallWG::signalObtainSongs);
+    connect(m_pWall[1],&ClickableLabel::clicked,this,&AnimatedWallWG::signalObtainSongs1);
+    connect(m_pWall[2],&ClickableLabel::clicked,this,&AnimatedWallWG::signalObtainSongs2);
+    connect(m_pWall[3],&ClickableLabel::clicked,this,&AnimatedWallWG::signalObtainSongs3);
+    connect(m_pWall[4],&ClickableLabel::clicked,this,&AnimatedWallWG::signalObtainSongs4);
+    connect(m_pWall[5],&ClickableLabel::clicked,this,&AnimatedWallWG::signalObtainSongs5);
 
     //3. 安装事件过滤器捕获窗口大小改变事件
     this->installEventFilter(this);
@@ -54,7 +60,7 @@ void AnimatedWallWG::initWallpaper()
     //创建COUNT个Wall并且设置背景图
     for (int i = 0; i < COUNT; i++)
     {
-        m_pWall[i] = new QLabel(this);
+        m_pWall[i] = new ClickableLabel("",this);
         setWallpaper(m_pWall[i], i);
     }
 

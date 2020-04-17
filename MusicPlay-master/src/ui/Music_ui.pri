@@ -16,7 +16,8 @@ HEADERS += \
     $$PWD/ContentWidget/MusiSongList/musicsongsmedia.h \
     $$PWD/ContentWidget/MusiSongList/classifylist.h \
     $$PWD/ContentWidget/MusiSongList/animatedwallwg.h \
-    $$PWD/ContentWidget/MusiSongList/homepage.h
+    $$PWD/ContentWidget/MusiSongList/homepage.h \
+    $$PWD/TitleBar/clickablelabel.h
 
 SOURCES += \
     $$PWD/ContentWidget/MusiSongList/musiccenterwidget.cpp \

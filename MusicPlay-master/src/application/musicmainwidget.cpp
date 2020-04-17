@@ -71,6 +71,7 @@ void MusicMainWidget::initWidget()
     m_player = new PlayMusic(this);
     m_desktopLrc = new MusicDesktopLrcManage;
     m_client = new Client();
+
 //    m_client->newConnect();
 }
 
@@ -134,13 +135,13 @@ void MusicMainWidget::initConnect()
             this,SLOT(slotShowOrHideDesktopLrc(int)));
     connect(m_bottomWidget,SIGNAL(signalHidOrShowPlayList()),this,SLOT(slotShowOrHideCornorList()));
     connect(m_bottomWidget,SIGNAL(signalPreviousMusic()),
-            m_contentWidget,SIGNAL(signalSendPlayPreviouse()));
+            m_playlist,SLOT(slotGetPreviouseMusic()));
 
     connect(m_bottomWidget,SIGNAL(signalPlayOrPause(int)),
             this,SLOT(slotPlayOrPause(int)));
 
     connect(m_bottomWidget,SIGNAL(signalNextMusic()),
-            m_contentWidget,SIGNAL(signalSendPlayNext()));
+            m_playlist,SLOT(slotGetNextMusic()));
     connect(m_bottomWidget,SIGNAL(signalPlayProgressChange(int)),
             this,SLOT(slotPlayProgressChange(int)));
     /*****************请求第一次播放时的歌曲信息******************/
@@ -152,10 +153,10 @@ void MusicMainWidget::initConnect()
     connect(m_contentWidget,SIGNAL(signalSendFirstPlayMusic(QString)),
             m_player,SLOT(slotOpenMusic(QString)));
     //关联请求回来的数据
-    connect(m_contentWidget,SIGNAL(signalSendPlayNextMusic(QString)),
-            this,SLOT(slotNextMusic(QString)));
-    connect(m_contentWidget,SIGNAL(signalSendPlayPreviouseMusic(QString)),
-            this,SLOT(slotPreviousMusic(QString)));
+    connect(m_playlist,SIGNAL(signalSendPlayNextMusic(QString,int)),
+            this,SLOT(slotNextMusic(QString,int)));
+    connect(m_playlist,SIGNAL(signalSendPreviousMusic(QString,int)),
+            this,SLOT(slotPreviousMusic(QString,int)));
     //删除用户创建的音乐列表
     connect(m_contentWidget,SIGNAL(signalDeleteListFromServer(QString,QString,QString)),
             m_client,SLOT(sendDeleteListFromServer(QString,QString,QString)));
@@ -173,12 +174,12 @@ void MusicMainWidget::initConnect()
             m_desktopLrc,SLOT(slotReceiveCurrentPlayTime(qint64)));
 
     /******************根据播放模式，发送播放命令**********************/
-//    connect(m_player,SIGNAL(signalSendPlayNextMusic(int)),
-//            m_contentWidget,SIGNAL(signalRequestPlayCmd(int)));
+    connect(m_player,SIGNAL(signalSendPlayNextMusic(int)),
+            m_playlist,SLOT(slotSendPlayCmd(int)));
     connect(m_bottomWidget,SIGNAL(signalPlayCmd(int)),
-            m_contentWidget,SIGNAL(signalRequestPlayCmd(int)));
-    connect(m_contentWidget,SIGNAL(signalSendPlayCmdMusic(QString)),
-            m_player,SLOT(slotReceivePlayCmdMusic(QString)));//signalCategoryClicked;
+            m_playlist,SLOT(slotSendPlayCmd(int)));
+//    connect(m_playlist,SIGNAL(signalSendPlayCmdMusic(QString)),
+//            m_player,SLOT(slotReceivePlayCmdMusic(QString)));//signalCategoryClicked;
     /******************获取从服务器发过来的消息**********************/
     connect(m_client,SIGNAL(signalShowImage(QImage)),
             m_bottomWidget,SLOT(slotShowImage(QImage)));
@@ -224,16 +225,17 @@ void MusicMainWidget::initConnect()
     connect(m_contentWidget,&Contentwidget::signalLoadMusicFromList,
             m_client,&Client::slotLoadMusicFromList);
     //刷新播放列表
-    connect(m_contentWidget,SIGNAL(signalSendSongsListWidget(QList<QString> &)),this,SLOT(slotFlushPlayList(QList<QString>&)));
+    connect(m_contentWidget,SIGNAL(signalSendSongsListWidget(QList<QString> &,int)),m_playlist,SLOT(slotReceiveList1(QList<QString>&,int)));
     connect(m_contentWidget,SIGNAL(signalShowPicture(QString)),m_client,SLOT(sendSongName(QString)));
     //在播放列表中添加下一首播放
     connect(m_contentWidget,SIGNAL(signalSendNextMusic(QString&)),m_playlist, SLOT(slotAddNextLocalPlayMusic(QString&)));
     connect(m_contentWidget,SIGNAL(signalSendNextMusic2(QStringList&)), m_playlist,SLOT(slotAddNextOnlinePlayMusic(QStringList&)));
     //将推荐列表发送到播放列表
-    connect(m_contentWidget, SIGNAL(signalSendList2ToPlay(QList<QStringList>&)),m_playlist,SLOT(slotReceiveList2(QList<QStringList>&)));
+    connect(m_contentWidget, SIGNAL(signalSendList2ToPlay(QList<QStringList>&,int)),m_playlist,SLOT(slotReceiveList2(QList<QStringList>&, int)));
     //播放“播放列表”里面的歌曲
     connect(m_playlist,SIGNAL(signalPlayMusic(QString)),
             m_player,SLOT(slotOpenMusic(QString)));
+    connect(m_playlist,SIGNAL(signalPlayMediaMusic(QString)),m_player,SLOT(slotOpenMediaMusic(QString)));
     //发送该歌曲重复信号
     connect(m_playlist,SIGNAL(signalReatMusic()), this, SLOT(slotShowRepeatMessage()));
 
@@ -243,6 +245,8 @@ void MusicMainWidget::initConnect()
     connect(m_client,&Client::signalAlbumAndImage,m_contentWidget,&Contentwidget::signalAlbumAndImage);
     //获取推荐歌单的歌曲
     connect(m_contentWidget,&Contentwidget::signalLoadTipMusics,m_client,&Client::slotLoadTipMusics);
+    //显示首页
+    connect(m_titleWidget,&TitleWidget::signalShowHomePage,m_contentWidget,&Contentwidget::slotShowHomePage);
 
 }
 
@@ -369,12 +373,17 @@ void MusicMainWidget::slotShowRepeatMessage()
     msg->show();
 }
 
-void MusicMainWidget::slotPreviousMusic(const QString &name)
+void MusicMainWidget::slotPreviousMusic(const QString &name,int i)
 {
 #if QDEBUG_OUT
     qDebug()<<"播放上一首音乐"<<name;
 #endif
-    m_player->slotOpenMusic(name);
+    if(i==0){
+        m_player->slotOpenMusic(name);
+    }
+    else {
+        m_player->slotOpenMediaMusic(name);
+    }
 }
 
 void MusicMainWidget::slotPlayOrPause(int state)
@@ -390,12 +399,17 @@ void MusicMainWidget::slotPlayOrPause(int state)
     }
 }
 
-void MusicMainWidget::slotNextMusic(const QString &name)
+void MusicMainWidget::slotNextMusic(const QString &name,int i)
 {
 #if QDEBUG_OUT
     qDebug()<<"播放下一首音乐"<<name;
 #endif
-    m_player->slotOpenMusic(name);
+    if(i==0){
+        m_player->slotOpenMusic(name);
+    }
+    else {
+        m_player->slotOpenMediaMusic(name);
+    }
 }
 
 void MusicMainWidget::slotPlayProgressChange(int value)
@@ -428,9 +442,4 @@ void MusicMainWidget::slotShowOrHideCornorList()
 void MusicMainWidget::slotTest(const QString &name)
 {
     qDebug()<<"请求回来的歌曲为:"<<name;
-}
-
-void MusicMainWidget::slotFlushPlayList(QList<QString> &m)
-{
-    m_playlist->slotReceiveList1(m);
 }

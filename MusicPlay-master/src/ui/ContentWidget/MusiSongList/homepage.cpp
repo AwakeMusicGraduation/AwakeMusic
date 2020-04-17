@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <QRect>
 #include "animatedwallwg.h"
+#include "controlvalues.h"
 #include <QHeaderView>
 #include <QPushButton>
 #include <QDebug>
@@ -17,6 +18,7 @@ HomePage::HomePage(QWidget *parent):QTableWidget (parent)
 
 void HomePage::initform()
 {
+//    setFixedWidth(CENTERWIDGET_RIGHT);
     m_mainlayout = new QVBoxLayout(this);
 
     m_home = new QPushButton(this);
@@ -85,7 +87,56 @@ void HomePage::initconnect()
     //connect(this,SIGNAL(show()),this,SIGNAL(signalObtainAlbums()));
     connect(table,&QTableWidget::cellClicked,this,&HomePage::slotShowMusicsFromTip);
     connect(m_home,SIGNAL(clicked()),this,SIGNAL(signalObtainAlbums()));
+    //对应点击切换图片后显示的歌曲
+    connect(m_wall,&AnimatedWallWG::signalObtainSongs,this,&HomePage::slotShowSongs);
+    connect(m_wall,&AnimatedWallWG::signalObtainSongs1,this,&HomePage::slotShowSongs1);
+    connect(m_wall,&AnimatedWallWG::signalObtainSongs2,this,&HomePage::slotShowSongs2);
+    connect(m_wall,&AnimatedWallWG::signalObtainSongs3,this,&HomePage::slotShowSongs3);
+    connect(m_wall,&AnimatedWallWG::signalObtainSongs4,this,&HomePage::slotShowSongs4);
+    connect(m_wall,&AnimatedWallWG::signalObtainSongs5,this,&HomePage::slotShowSongs5);
 
+}
+
+void HomePage::slotShowSongs()
+{
+    QString tip = "初学者";
+    emit signalShowWidget();
+    emit signalShowMusicsFromTip(tip);
+}
+
+void HomePage::slotShowSongs1()
+{
+    QString tip = "一半";
+    emit signalShowWidget();
+    emit signalShowMusicsFromTip(tip);
+}
+
+void HomePage::slotShowSongs2()
+{
+    QString tip = "怪咖";
+    emit signalShowWidget();
+    emit signalShowMusicsFromTip(tip);
+}
+
+void HomePage::slotShowSongs3()
+{
+    QString tip = "绅士";
+    emit signalShowWidget();
+    emit signalShowMusicsFromTip(tip);
+}
+
+void HomePage::slotShowSongs4()
+{
+    QString tip = "几个薛之谦";
+    emit signalShowWidget();
+    emit signalShowMusicsFromTip(tip);
+}
+
+void HomePage::slotShowSongs5()
+{
+    QString tip = "渡";
+    emit signalShowWidget();
+    emit signalShowMusicsFromTip(tip);
 }
 
 void HomePage::slotAddMusicTip(QString album,QImage image)

@@ -180,23 +180,13 @@ void Contentwidget::connectMusicList(int index)
             m_musicSongList.at(index),SLOT(slotGetFirstPlayMusic()));
     connect(m_musicSongList.at(index),SIGNAL(signalSendFirstPlayMusic(QString)),
             this,SIGNAL(signalSendFirstPlayMusic(QString)));
-    connect(this,SIGNAL(signalSendPlayPreviouse()),
-            m_musicSongList.at(index),SLOT(slotGetPreviouseMusic()));
-    connect(this,SIGNAL(signalSendPlayNext()),
-            m_musicSongList.at(index),SLOT(slotGetNextMusic()));
-    connect(m_musicSongList.at(index),SIGNAL(signalSendPreviousMusic(QString)),
-            this,SIGNAL(signalSendPlayPreviouseMusic(QString)));
-    connect(m_musicSongList.at(index),SIGNAL(signalSendNextMusic(QString)),
-            this,SIGNAL(signalSendPlayNextMusic(QString)));
     connect(m_musicSongList.at(index),SIGNAL(signalPlayMusicPath(QString)),
             this,SIGNAL(signalPlayMusic(QString)));
     connect(m_musicSongList.at(index),SIGNAL(signalShowLyric()),
             this,SLOT(slotShowLrc()));
-    connect(this,SIGNAL(signalRequestPlayCmd(int)),
-            m_musicSongList.at(index),SLOT(slotSendPlayCmd(int)));
     connect(m_musicSongList.at(index),SIGNAL(signalSendPlayCmdMusicInfo(QString)),
             this,SIGNAL(signalSendPlayCmdMusic(QString)));
-    connect(m_musicSongList.at(index), SIGNAL(signalSendToPlayList(QList<QString> &)),this,SIGNAL(signalSendSongsListWidget(QList<QString>  &)));
+    connect(m_musicSongList.at(index), SIGNAL(signalSendToPlayList(QList<QString> &,int)),this,SIGNAL(signalSendSongsListWidget(QList<QString>  &,int)));
     //添加下一首播放
     connect(m_musicSongList.at(index), SIGNAL(signalSendNextMusicToList(QString&)),this,SIGNAL(signalSendNextMusic(QString&)));
     connect(m_musicSongList.at(index),&MusicSongsListWidget::signalAddMusicToList,this,&Contentwidget::signalAddMusicToList);
@@ -212,23 +202,12 @@ void Contentwidget::disConnectMusicList(int index)
                m_musicSongList.at(index),SLOT(slotGetFirstPlayMusic()));
     disconnect(m_musicSongList.at(index),SIGNAL(signalSendFirstPlayMusic(QString)),
                this,SIGNAL(signalSendFirstPlayMusic(QString)));
-    disconnect(this,SIGNAL(signalSendPlayPreviouse()),
-               m_musicSongList.at(m_currentwidget),SLOT(slotGetPreviouseMusic()));
-    disconnect(this,SIGNAL(signalSendPlayNext()),
-               m_musicSongList.at(m_currentwidget),SLOT(slotGetNextMusic()));
-    disconnect(m_musicSongList.at(m_currentwidget),SIGNAL(signalSendPreviousMusic(QString)),
-               this,SIGNAL(signalSendPlayPreviouseMusic(QString)));
-    disconnect(m_musicSongList.at(m_currentwidget),SIGNAL(signalSendNextMusic(QString)),
-               this,SIGNAL(signalSendPlayNextMusic(QString)));
+
     disconnect(m_musicSongList.at(m_currentwidget),SIGNAL(signalPlayMusicPath(QString)),
                this,SIGNAL(signalPlayMusic(QString)));
     disconnect(m_musicSongList.at(m_currentwidget),SIGNAL(signalShowLyric()),
                this,SLOT(slotShowLrc()));
-    disconnect(this,SIGNAL(signalRequestPlayCmd(int)),
-               m_musicSongList.at(m_currentwidget),SLOT(slotSendPlayCmd(int)));
-    disconnect(m_musicSongList.at(m_currentwidget),SIGNAL(signalSendPlayCmdMusicInfo(QString)),
-               this,SIGNAL(signalSendPlayCmdMusic(QString)));
-    disconnect(m_musicSongList.at(m_currentwidget), SIGNAL(signalSendToPlayList(QList<QString> &)),this,SIGNAL(signalSendSongsListWidget(QList<QString>  &)));
+    disconnect(m_musicSongList.at(m_currentwidget), SIGNAL(signalSendToPlayList(QList<QString> &,int)),this,SIGNAL(signalSendSongsListWidget(QList<QString>  &,int)));
     //添加下一首播放
     disconnect(m_musicSongList.at(m_currentwidget), SIGNAL(signalSendNextMusicToList(QString&)),this,SIGNAL(signalSendNextMusic(QString&)));
     disconnect(m_musicSongList.at(m_currentwidget),&MusicSongsListWidget::signalAddMusicToList,this,&Contentwidget::signalAddMusicToList);
@@ -258,6 +237,7 @@ void Contentwidget::slotShowLrc()
     m_musicSongsMedia->hide();
     m_musicSongsMedia2->hide();
     m_classifyList->hide();
+    m_home->hide();
     m_musicSongList.at(m_currentwidget)->hide();
     m_showOrHide = true;
 }
@@ -267,6 +247,7 @@ void Contentwidget::slotHideLrc()
     m_musicLyrcWidget->hide();
     m_musicSongsMedia2->hide();
     m_classifyList->hide();
+    m_home->hide();
     m_musicSongList.at(m_currentwidget)->show();
     m_showOrHide = false;
 }
@@ -278,6 +259,7 @@ void Contentwidget::slotShowList(int row,QString list)
     m_showOrHide = false;
     m_musicSongList.at(m_currentwidget)->hide();
     m_musicSongsMedia->hide();
+    m_home->hide();
     this->disConnectMusicList(m_currentwidget);
     if(row == 1){
         m_classifyList->hide();
@@ -291,6 +273,7 @@ void Contentwidget::slotShowList(int row,QString list)
             this->connectMusicList(m_currentwidget);
         }
         else if(row == 2){
+            m_home->hide();
             m_classifyList->initCurrent();
             m_classifyList->show();
 
@@ -320,6 +303,18 @@ void Contentwidget::slotShowTip()
     m_home->close();
     m_musicSongsMedia->removeAllItem();
     m_musicSongsMedia->show();
+}
+
+void Contentwidget::slotShowHomePage()
+{
+    m_musicLyrcWidget->hide();
+    m_showOrHide = false;
+    m_musicSongList.at(m_currentwidget)->hide();
+    this->disConnectMusicList(m_currentwidget);
+    m_classifyList->hide();
+    m_musicSongsMedia2->hide();
+    m_musicSongsMedia->hide();
+    m_home->show();
 }
 
 void Contentwidget::slotAddNewList()

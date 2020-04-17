@@ -33,7 +33,7 @@ typedef enum PlayMode{
     ORDER_PLAY = 0,   //顺序播放
     LIST_CIRCUAL,     //列表循环
     SINGLE_CIRCUAL,   //单曲循环
-    SINGLE_PLAY,      //单曲播放
+//    SINGLE_PLAY,      //单曲播放
     RADOM_PLAY        //随机播放
 }PlayMode;
 #define DEFAULT_PLAY_MODE ORDER_PLAY        //默认顺序播放

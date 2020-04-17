@@ -5,6 +5,7 @@
 #include "controlvalues.h"
 #include "searchlineedit.h"
 #include <QDebug>
+#include "clickablelabel.h"
 //#include "iconhelper.h"
 
 //构造函数
@@ -42,9 +43,9 @@ void TitleWidget::initWidget()
     m_labelIcon = new QLabel(this);
     //IconHelper::Instance()->SetIcoMain(m_labelIcon);
     //程序标题
-    m_labelTitle  = new QLabel(this);
+    m_labelTitle  = new ClickableLabel("AwakeMusic",this);
 //    m_labelTitle->setPixmap(QPixmap(":/image/MusicTitle.png"));
-    m_labelTitle->setText("AwakeMusic");
+   // m_labelTitle->setText("AwakeMusic");
     QPalette pe;
     pe.setColor(QPalette::WindowText,Qt::white);
     m_labelTitle->setPalette(pe);
@@ -123,6 +124,7 @@ void TitleWidget::initConnect()
             this,SIGNAL(signalSearchContent(QString)));
     connect(m_search,SIGNAL(signalSearchClicked()),
             this,SIGNAL(signalSearchClicked()));
+    connect(m_labelTitle,&ClickableLabel::clicked,this,&TitleWidget::signalShowHomePage);
 }
 
 void TitleWidget::slotUpdateName(QString name)

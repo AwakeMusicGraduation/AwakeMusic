@@ -6,6 +6,7 @@
 #include <QVariant>
 #include <QPushButton>
 #include <QTableWidget>
+#include "TitleBar/clickablelabel.h"
 
 #define LRWIDTH     35     //左右两个点击按钮的宽度
 #define SCALE       0.86   //旁边两个小Label占中间大Label的比例
@@ -39,6 +40,13 @@ public:
         }
         return m_pInstance;
     }
+signals:
+    void signalObtainSongs();//获取图片对应的歌曲
+    void signalObtainSongs1();//获取图片对应的歌曲
+    void signalObtainSongs2();//获取图片对应的歌曲
+    void signalObtainSongs3();//获取图片对应的歌曲
+    void signalObtainSongs4();//获取图片对应的歌曲
+    void signalObtainSongs5();//获取图片对应的歌曲
 
 protected slots:
     void moveToLeft();
@@ -63,7 +71,7 @@ private:
     bool m_bAnimation;      //是否可以轮换
 
     //QLabel
-    QLabel *m_pWall[COUNT];
+    ClickableLabel *m_pWall[COUNT];
     QRect m_rtWall[3];      //没变化前的状态
     QRect m_rtLChange[5];   //从左到右变化过程中的状态
     QRect m_rtRChange[6];   //从右到左变化过程中的状态

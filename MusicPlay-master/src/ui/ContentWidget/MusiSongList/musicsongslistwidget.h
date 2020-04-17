@@ -42,22 +42,14 @@ Q_SIGNALS:
     void signalPlayMusicPath(QString path);
     void signalSendNextMusicToList(QString&);
 
-    //向下发送所要请求的歌曲信息
-    void signalSendNextMusic(const QString &name);
-    void signalSendPreviousMusic(const QString &name);
-
     //向bottombar发送开始要播放的歌曲
     void signalSendFirstPlayMusic(const QString &);
 
     //向下发送所请求的播放歌曲
     void signalSendPlayCmdMusicInfo(const QString &);
 
-    //将本地音乐的文件地址发送到播放列表中以便显示和播放
-    void signalSendToPlayList(QList<QString> &);
-
-    //QMenu的信号
-    void signalQmenuPlayMusic();
-    void signalQmenuDeleteAllMusic();
+    //将本地音乐的文件地址发送到播放列表中以便显示和播放,并发送当前播放歌曲的行数
+    void signalSendToPlayList(QList<QString> &,int);
 
     void signalObtainListName();      //获取列表姓名
     void signalAddMusicToList(QString label,QString list,QString name,QString singer,QString album);//将歌曲加入到对应的列表并传到服务器
@@ -67,9 +59,6 @@ private Q_SLOTS:
 
 
 public Q_SLOTS:
-    //获取上一首
-    void slotGetNextMusic();
-    void slotGetPreviouseMusic();
     void slotAddMusic();                            //添加歌曲
     void slotRemoveAllItem();
     void slotRemoveItem();
@@ -82,8 +71,6 @@ public Q_SLOTS:
     */
     void slotGetFirstPlayMusic();
 
-    //根据播放模式，发送不同的歌曲信息
-    void slotSendPlayCmd(int);
     //接收列表名
     void slotReceiveListName(std::vector<QString> listname);
     //QAction槽
@@ -92,8 +79,6 @@ private:
     void initForm();
     void initConnect();
     void initMenu();
-
-    void setRadomPlayMusic();       //设置随机播放
 
 protected:
     virtual void contextMenuEvent(QContextMenuEvent *event);

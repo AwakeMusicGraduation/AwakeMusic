@@ -4,7 +4,7 @@
 #include <QHeaderView>
 
 classifyList::classifyList(QWidget *parent)
-:QTableWidget(parent)
+    :QTableWidget(parent)
 {
     initForm();
     initConnect();
@@ -42,17 +42,19 @@ void classifyList::initCurrent()
 
 void classifyList::initForm()
 {
-        this->setStyleSheet("selection-background-color:lightblue;");
+    setFixedWidth(CENTERWIDGET_RIGHT);
+    this->setStyleSheet("selection-background-color:lightblue;");
     setAlternatingRowColors(true);
     setFixedWidth(CENTERWIDGET_RIGHT);
     setFocusPolicy(Qt::NoFocus);
     setColumnCount(1);
+    setColumnWidth(0,CENTERWIDGET_RIGHT);
     setRowCount(0);
-    setShowGrid(true);//display the grid
+    setShowGrid(false);//display the grid
     setEditTriggers(QAbstractItemView::NoEditTriggers);     //设置表格不能编辑
     setSelectionBehavior(QAbstractItemView::SelectRows);    //设置整行选中
     setSelectionMode(QAbstractItemView::SingleSelection);
-//    horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+    //    horizontalHeader()->setResizeMode(QHeaderView::Stretch);
     verticalHeader()->setDefaultSectionSize(45);
 
     QHeaderView *headerview = horizontalHeader();

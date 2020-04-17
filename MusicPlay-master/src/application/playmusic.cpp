@@ -87,18 +87,18 @@ void PlayMusic::slotSetPlayPostion(qint64 pos)
     m_player->SetPlayTime(pos);
 }
 
-void PlayMusic::slotReceivePlayCmdMusic(const QString & name)
-{
-    if (!name.isEmpty()){
+//void PlayMusic::slotReceivePlayCmdMusic(const QString & name)
+//{
+//    if (!name.isEmpty()){
 
-        m_player->Play(name);
-        this->setPlayMusic();
-    }
-    else
-    {
-        m_player->Pause();
-    }
-}
+//        m_player->Play(name);
+//        this->setPlayMusic();
+//    }
+//    else
+//    {
+//        m_player->Pause();
+//    }
+//}
 
 void PlayMusic::slotUpdateInterface()
 {

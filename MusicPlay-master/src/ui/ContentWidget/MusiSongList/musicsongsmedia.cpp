@@ -9,7 +9,7 @@
 #include <QActionGroup>
 #include <QMouseEvent>
 //#define MusicPath "rtsp://10.253.241.175/mp3/"
-#define MusicPath "rtsp://192.168.0.104/mp3/"
+#define MusicPath "rtsp://192.168.43.46/mp3/"
 
 
 MusicSongsMedia::MusicSongsMedia(QWidget *parent)
@@ -146,7 +146,7 @@ void MusicSongsMedia::slotCellDoubleClicked(int row, int cloumn)
     emit signalPlayMediaMusic(MusicPath + songPinYin + ".mp3");
     emit signalShowPicture(songName);
     saveMusicInfo();//发送信息前总是先刷新保存列表中的歌曲信息
-    emit signalSendPlayList2(m_music);
+    emit signalSendPlayList2(m_music,row);
 }
 
 void MusicSongsMedia::slotPlayMusic()
