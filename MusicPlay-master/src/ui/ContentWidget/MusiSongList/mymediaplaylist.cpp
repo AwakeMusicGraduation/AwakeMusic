@@ -79,15 +79,20 @@ void MyMediaPlayList::initMenu()
     QAction *actionpPlayMusic = new QAction("播放",this);
     QAction *actionAddMusicToList = new QAction("收藏到歌单",this);
     QAction *actionDeleteFromPlayList = new QAction("从列表中删除",this);
+    QAction *actionDeleteAll = new QAction("清空",this);
 
     m_menu->addAction(actionpPlayMusic);
     m_menu->addSeparator();
     m_menu->addAction(actionAddMusicToList);
     m_menu->addSeparator();
     m_menu->addAction(actionDeleteFromPlayList);
+    m_menu->addSeparator();
+    m_menu->addAction(actionDeleteAll);
 
     connect(m_table1, SIGNAL(customContextMenuRequested(QPoint)),this, SLOT(slotShowQmenu(QPoint)));
     connect(actionpPlayMusic,SIGNAL(triggered(bool)),this,SLOT(slotPlayMusic()));
+    connect(actionDeleteAll,SIGNAL(triggered(bool)),this,SLOT(slotRemoveAllItem()));
+    connect(actionDeleteFromPlayList,SIGNAL(triggered(bool)), this, SLOT(slotDeleFromPlayList()));
 }
 
 void MyMediaPlayList::initConnect()
@@ -109,10 +114,18 @@ void MyMediaPlayList::addContenItem(QStringList m,int i)
 
 }
 
-void MyMediaPlayList::removeAllItem()
+void MyMediaPlayList::slotRemoveAllItem()
 {
     m_table1->setRowCount(0);
     m_table1->clearContents();
+    m_musicpath.clear();
+}
+
+void MyMediaPlayList::slotDeleFromPlayList()
+{
+    int row = m_table1->currentRow();
+    m_musicpath.removeAt(row);
+    m_table1->removeRow(row);
 }
 
 bool MyMediaPlayList::checkRepeatMusic(QString &path)
@@ -123,32 +136,88 @@ bool MyMediaPlayList::checkRepeatMusic(QString &path)
     return true;
 }
 
+void MyMediaPlayList::playMusicByOrder()
+{
+    //判断当前列表是否为空
+    if (m_table1->rowCount()<0)
+        return;
+    //获取当前行
+    int rowIndex = m_currentplay;
+    int totalRow = m_table1->rowCount();
+    qDebug()<<"rowIndex:"<<rowIndex;
+    QString str = "";
+    //到到歌曲列表末尾时，从第一首开始播放
+    if (rowIndex < totalRow - 1)
+    {
+        qDebug()<<"rowIndex:"<<rowIndex;
+        str = m_table1->item(rowIndex + 1,0)->text();
+        //设置焦点，若不设置焦点，会总是从第一首个播放
+        m_table1->setCurrentCell(0,0,QItemSelectionModel::Clear);
+        m_table1->setCurrentCell(rowIndex + 1,0,QItemSelectionModel::SelectCurrent);
+        m_currentplay++;
+            emit signalSendPlayNextMusic(m_musicpath.at(m_currentplay).path,m_musicpath.at(m_currentplay).i);
+    }
+    else {
+        //播放到最后一首歌曲时停止播放
+        m_currentplay=0;
+        //发送改变底部播放按钮的信号
+    }
+#if QDEBUG_OUT
+    qDebug()<<"获取下一首歌曲"<<str;
+#endif
+}
+
+void MyMediaPlayList::playMusicByDisorder()
+{
+    //判断当前列表是否为空
+    if (m_table1->rowCount()<0)
+        return;
+    int totalRow = m_table1->rowCount();
+    int m_currentplay =  qrand()%totalRow;
+    qDebug()<<"playIndex:"<<m_currentplay;
+    m_table1->setCurrentCell(m_currentplay,0,QItemSelectionModel::SelectCurrent);
+
+    emit signalSendPlayNextMusic(m_musicpath.at(m_currentplay).path,m_musicpath.at(m_currentplay).i);
+}
+
 void MyMediaPlayList::slotCellDoubleClicked(int row, int column)
 {
-    qDebug() << "接收到播放列表信号";
+    //    qDebug() << "接收到播放列表信号";
+    m_currentplay = row;
     QString musicPath = m_musicpath.at(row).path;
     qDebug()<<"路径"<<musicPath;
     emit signalShowLyric();//显示歌词界面
-    emit signalPlayMusic(musicPath);
+    if(m_musicpath.at(row).i==0){
+        emit signalPlayMusic(musicPath);
+    }
+    else {
+        emit signalPlayMediaMusic(musicPath);
+    }
 }
 
 void MyMediaPlayList::slotPlayMusic()
 {
     int rowIndex = m_table1->currentRow();
+    m_currentplay = rowIndex;
     QString musicPath = m_musicpath.at(rowIndex).path;
     emit signalShowLyric();//显示歌词界面
-    emit signalPlayMusic(musicPath);
+    if(m_musicpath.at(rowIndex).i==0){
+        emit signalPlayMusic(musicPath);
+    }
+    else {
+        emit signalPlayMediaMusic(musicPath);
+    }
 }
 
 void MyMediaPlayList::slotAddNextLocalPlayMusic(QString& path)
 {
     PlayMusic playmusic;
     if(checkRepeatMusic(path)){
-    int rowIndex = m_table1->currentRow();
-    playInfo playinfo = {0,path};
-    m_musicpath.insert(rowIndex, playinfo);
-    QStringList s = playmusic.ResolutionMusicPath(path);
-    addContenItem(s, rowIndex+1 );
+        int rowIndex = m_table1->currentRow();
+        playInfo playinfo = {0,path};
+        m_musicpath.insert(rowIndex, playinfo);
+        QStringList s = playmusic.ResolutionMusicPath(path);
+        addContenItem(s, rowIndex+1 );
     }
     else {
         //弹出提示框
@@ -162,7 +231,7 @@ void MyMediaPlayList::slotAddNextOnlinePlayMusic(QStringList &musicinfo)
     QString s = musicinfo.at(3);
     if(checkRepeatMusic(s)){
         int rowIndex = m_table1->currentRow();
-        playInfo playinfo = {0,s};
+        playInfo playinfo = {1,s};
         m_musicpath.insert(rowIndex, playinfo);
         QStringList m ;
         m << musicinfo.at(0) << musicinfo.at(1) << musicinfo.at(2);
@@ -175,11 +244,11 @@ void MyMediaPlayList::slotAddNextOnlinePlayMusic(QStringList &musicinfo)
 }
 
 //接收并显示本地音乐
-void MyMediaPlayList::slotReceiveList1(QList<QString>  &musicname)
+void MyMediaPlayList::slotReceiveList1(QList<QString>  &musicname,int row)
 {
     PlayMusic playmusic;
     qDebug()<<"接收到默认播放列表";
-    removeAllItem();
+    slotRemoveAllItem();
     for(int i=0; i<musicname.size(); i++){
         QStringList s;
         s=playmusic.ResolutionMusicPath(musicname.at(i));
@@ -187,12 +256,13 @@ void MyMediaPlayList::slotReceiveList1(QList<QString>  &musicname)
         m_musicpath.append(playinfo);
         addContenItem(s,i);
     }
-    //        addContenItem(musicname.at(i));
+    m_currentplay=row;//设置当前播放的歌曲的行数
+    m_table1->setCurrentCell(m_currentplay,0,QItemSelectionModel::SelectCurrent);
 }
 
-void MyMediaPlayList::slotReceiveList2(QList<QStringList> &musicinfo)
+void MyMediaPlayList::slotReceiveList2(QList<QStringList> &musicinfo, int row)
 {
-    removeAllItem();
+    slotRemoveAllItem();
     m_musicpath.clear();
     for(int i=0; i<musicinfo.size(); i++){
         QStringList s = musicinfo.at(i);
@@ -202,6 +272,8 @@ void MyMediaPlayList::slotReceiveList2(QList<QStringList> &musicinfo)
         m_musicpath.append(playinfo);
         addContenItem(m,i);
     }
+    m_currentplay=row;//设置当前播放的歌曲的行数
+    m_table1->setCurrentCell(m_currentplay,0,QItemSelectionModel::SelectCurrent);
 }
 
 void MyMediaPlayList::slotShowQmenu(QPoint pos)
@@ -213,5 +285,102 @@ void MyMediaPlayList::slotShowQmenu(QPoint pos)
     }
 }
 
+void MyMediaPlayList::slotGetNextMusic()
+{
+    //判断当前列表是否为空
+    if (m_table1->rowCount()<0)
+        return;
+    //获取当前行
+    int rowIndex = m_currentplay;
+    int totalRow = m_table1->rowCount();
+    qDebug()<<"rowIndex:"<<rowIndex;
+    QString str = "";
+    if (rowIndex >= 0)
+    {
+        //到到歌曲列表末尾时，从第一首开始播放
+        if (rowIndex < totalRow - 1)
+        {
+            qDebug()<<"rowIndex:"<<rowIndex;
+            str = m_table1->item(rowIndex + 1,0)->text();
+            //设置焦点，若不设置焦点，会总是从第一首个播放
+            m_table1->setCurrentCell(0,0,QItemSelectionModel::Clear);
+            m_table1->setCurrentCell(rowIndex + 1,0,QItemSelectionModel::SelectCurrent);
+            m_currentplay++;
+        }
+        else {
+            str = m_table1->item(0,0)->text();
+            //设置焦点，若不设置焦点，会总是从第一首个播放
+            m_table1->setCurrentCell(totalRow,0,QItemSelectionModel::Clear);
+            m_table1->setCurrentCell(0,0,QItemSelectionModel::Select);
+            m_currentplay=0;
+        }
+#if QDEBUG_OUT
+        qDebug()<<"获取下一首歌曲"<<str;
+#endif
+    }else
+    {
+        str = m_table1->item(0,0)->text();
+        //设置焦点在第一行
+        m_table1->setCurrentCell(0,0,QItemSelectionModel::Select);
+    }
+
+    emit signalSendPlayNextMusic(m_musicpath.at(m_currentplay).path,m_musicpath.at(m_currentplay).i);
+}
+
+void MyMediaPlayList::slotGetPreviouseMusic()
+{
+    //判断当前列表是否为空
+    if (m_table1->rowCount()<0)
+        return;
+    //获取当前行
+    int rowIndex = m_currentplay;
+    QString str = "";
+    if (rowIndex >= 1)
+    {
+        str = m_table1->item(rowIndex - 1,0)->text();
+        //设置焦点，若不设置焦点，会总是从第一首个播放
+        m_table1->setCurrentCell(rowIndex - 1,0,QItemSelectionModel::SelectCurrent);
+        m_currentplay--;
+#if QDEBUG_OUT
+        qDebug()<<"获取上一首歌曲"<<str;
+#endif
+    }else
+    {
+        //        str = m_table1->item(0,0)->text();
+        //设置焦点在最后一行
+        m_table1->setCurrentCell(0,0,QItemSelectionModel::Clear);
+        //        m_table1->setCurrentCell(0,0,QItemSelectionModel::Select);
+        m_table1->setCurrentCell(m_table1->rowCount()-1,0,QItemSelectionModel::Select);
+        m_currentplay=m_table1->rowCount()-1;
+    }
+
+    emit signalSendPreviousMusic(m_musicpath.at(m_currentplay).path,m_musicpath.at(m_currentplay).i);
+}
+
+void MyMediaPlayList::slotGetFirstPlayMusic()
+{
+
+}
+
+void MyMediaPlayList::slotSendPlayCmd(int mode)
+{
+    switch(mode)
+    {
+    case ORDER_PLAY:            //顺序循环
+        playMusicByOrder();
+        break;
+    case LIST_CIRCUAL:          //列表循环
+        slotGetNextMusic();
+        break;
+    case SINGLE_CIRCUAL:        //单曲循环
+        emit signalSendPlayNextMusic(m_musicpath.at(m_currentplay).path,m_musicpath.at(m_currentplay).i);
+        break;
+    case RADOM_PLAY:            //随机播放
+        playMusicByDisorder();
+        break;
+    default:
+        break;
+    }
+}
 
 

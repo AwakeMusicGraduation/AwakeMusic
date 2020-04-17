@@ -67,7 +67,7 @@ void BottomWidget::slotReceivePlayPostion(qint64 postion)
 void BottomWidget::slotShowImage(QImage image)
 {
     QPixmap pix = QPixmap::fromImage(image,Qt::AutoColor);
-//    m_showOrHide->setIcon(QIcon(":/image/hide"));
+    //    m_showOrHide->setIcon(QIcon(":/image/hide"));
     QIcon icon;
     icon.addPixmap(pix);
     m_showOrHide->setIcon(icon);
@@ -156,12 +156,6 @@ void BottomWidget::slotChangePlayModeIcon(int mode)
     {
         m_pbnPlayMode->setIcon(QIcon(":/image/playControl/single_play.png"));
         m_pbnPlayMode->setToolTip("单曲循环");
-        break;
-    }
-    case SINGLE_PLAY:
-    {
-        m_pbnPlayMode->setIcon(QIcon(":/image/playControl/signal.png"));
-        m_pbnPlayMode->setToolTip("单曲播放");
         break;
     }
     case RADOM_PLAY:
@@ -345,13 +339,14 @@ void BottomWidget::playMusic()
     case SINGLE_CIRCUAL:
         emit signalPlayCmd(SINGLE_CIRCUAL);
         break;
-    case SINGLE_PLAY:
-        emit signalPlayCmd(SINGLE_PLAY);
-        break;
     case ORDER_PLAY:
         emit signalPlayCmd(ORDER_PLAY);
+        break;
     case RADOM_PLAY:
         emit signalPlayCmd(RADOM_PLAY);
+        break;
+    case LIST_CIRCUAL:
+        emit signalPlayCmd(LIST_CIRCUAL);
         break;
     default:
         break;

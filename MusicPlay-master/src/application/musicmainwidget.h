@@ -39,16 +39,15 @@ private Q_SLOTS:
     void slotClose();                           //关闭
         void slotShowRepeatMessage();
 
-    void slotPreviousMusic(const QString &);    //上一首
+    void slotPreviousMusic(const QString &,int);    //上一首
     void slotPlayOrPause(int);                  //音乐播放或者暂停状态控制
-    void slotNextMusic(const QString &);        //下一首
+    void slotNextMusic(const QString &,int);        //下一首
     void slotPlayProgressChange(int);           //播放进度改变
     void slotShowOrHideDesktopLrc(int);         //显示或者隐藏桌面歌词
     void slotShowOrHideCornorList();         //显示或隐藏播放列表
 
     void slotTest(const QString &);
 
-    void slotFlushPlayList(QList<QString> &m);   //刷新播放列表
 
 protected :
     virtual void mousePressEvent(QMouseEvent *);

@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <QRect>
 #include "animatedwallwg.h"
+#include "controlvalues.h"
 #include <QHeaderView>
 #include <QPushButton>
 #include <QDebug>
@@ -17,6 +18,7 @@ HomePage::HomePage(QWidget *parent):QTableWidget (parent)
 
 void HomePage::initform()
 {
+//    setFixedWidth(CENTERWIDGET_RIGHT);
     m_mainlayout = new QVBoxLayout(this);
 
     m_home = new QPushButton(this);

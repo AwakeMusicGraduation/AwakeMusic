@@ -146,7 +146,7 @@ void MusicSongsMedia::slotCellDoubleClicked(int row, int cloumn)
     emit signalPlayMediaMusic(MusicPath + songPinYin + ".mp3");
     emit signalShowPicture(songName);
     saveMusicInfo();//发送信息前总是先刷新保存列表中的歌曲信息
-    emit signalSendPlayList2(m_music);
+    emit signalSendPlayList2(m_music,row);
 }
 
 void MusicSongsMedia::slotPlayMusic()
@@ -159,6 +159,8 @@ void MusicSongsMedia::slotPlayMusic()
     emit signalShowMediaLrc(songPinYin);
     emit signalPlayMediaMusic(MusicPath + songPinYin + ".mp3");
     emit signalShowPicture(songName);
+    saveMusicInfo();
+    emit signalSendPlayList2(m_music,row);
 }
 
 void MusicSongsMedia::slotSendNextMusic()

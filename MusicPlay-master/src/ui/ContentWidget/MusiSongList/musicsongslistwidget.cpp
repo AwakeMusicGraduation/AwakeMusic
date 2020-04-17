@@ -186,72 +186,9 @@ void MusicSongsListWidget::slotCellDoubleClicked(int row, int column)
     //    Client *client = new Client();
     //    client->sendData(s.remove(s.right(4)));
     emit signalShowLyric();
-    emit signalSendToPlayList(m_musicpath);
+    emit signalSendToPlayList(m_musicpath,row);
     //    emit signalPlayMusic(songName);
     PlayMusics(songName);
-}
-
-void MusicSongsListWidget::slotGetNextMusic()
-{
-    //判断当前列表是否为空
-    if (tableWidgetIsEmpty())
-        return;
-    //获取当前行
-    int rowIndex = currentIndex().row();
-    int totalRow = rowCount();
-    qDebug()<<"rowIndex:"<<rowIndex;
-    QString str = "";
-    if (rowIndex >= 0)
-    {
-        //到到歌曲列表末尾时，从第一首开始播放
-        if (rowIndex < totalRow - 1)
-        {
-            qDebug()<<"rowIndex:"<<rowIndex;
-            str = item(rowIndex + 1,0)->text();
-            //设置焦点，若不设置焦点，会总是从第一首个播放
-            setCurrentCell(0,0,QItemSelectionModel::Clear);
-            setCurrentCell(rowIndex + 1,0,QItemSelectionModel::SelectCurrent);
-        }else {
-            str = item(0,0)->text();
-            //设置焦点，若不设置焦点，会总是从第一首个播放
-            setCurrentCell(totalRow,0,QItemSelectionModel::Clear);
-            setCurrentCell(0,0,QItemSelectionModel::Select);
-        }
-#if QDEBUG_OUT
-        qDebug()<<"获取下一首歌曲"<<str;
-#endif
-    }else
-    {
-        str = item(0,0)->text();
-        //设置焦点在第一行
-        setCurrentCell(0,0,QItemSelectionModel::Select);
-    }
-    emit signalSendNextMusic(m_musicpath.at(rowIndex));
-}
-
-void MusicSongsListWidget::slotGetPreviouseMusic()
-{
-    //判断当前列表是否为空
-    if (tableWidgetIsEmpty())
-        return;
-    //获取当前行
-    int rowIndex = currentIndex().row();
-    QString str = "";
-    if (rowIndex >= 1)
-    {
-        str = item(rowIndex - 1,0)->text();
-        //设置焦点，若不设置焦点，会总是从第一首个播放
-        setCurrentCell(rowIndex - 1,0,QItemSelectionModel::SelectCurrent);
-#if QDEBUG_OUT
-        qDebug()<<"获取上一首歌曲"<<str;
-#endif
-    }else
-    {
-        str = item(0,0)->text();
-        //设置焦点在第一行
-        setCurrentCell(0,0,QItemSelectionModel::Select);
-    }
-    emit signalSendPreviousMusic(m_musicpath.at(rowIndex));
 }
 
 void MusicSongsListWidget::slotAddMusic()
@@ -286,7 +223,7 @@ void MusicSongsListWidget::slotRemoveItem()
 void MusicSongsListWidget::slotPlayMusic()
 {
     QString songName = getSelectContent();
-    emit signalSendToPlayList(m_musicpath);
+    emit signalSendToPlayList(m_musicpath,currentRow());
     PlayMusics(songName);
 }
 
@@ -350,28 +287,6 @@ void MusicSongsListWidget::slotGetFirstPlayMusic()
     emit signalSendFirstPlayMusic(m_musicpath.at(rowIndex));
 }
 
-void MusicSongsListWidget::slotSendPlayCmd(int mode)
-{
-    switch(mode)
-    {
-    case ORDER_PLAY:            //顺序循环
-    case LIST_CIRCUAL:          //列表循环
-        slotGetNextMusic();
-        break;
-    case SINGLE_CIRCUAL:        //单曲循环
-//        emit signalSendPlayCmdMusicInfo(getMusicPath(getSelectContent()));
-        emit signalSendPlayCmdMusicInfo(m_musicpath.at(0));
-        break;
-    case SINGLE_PLAY:           //单曲播放
-        emit signalSendPlayCmdMusicInfo("");
-        break;
-    case RADOM_PLAY:            //随机播放
-        setRadomPlayMusic();
-        break;
-    default:
-        break;
-    }
-}
 
 void MusicSongsListWidget::slotReceiveListName(std::vector<QString> listname)
 {
@@ -500,24 +415,7 @@ void MusicSongsListWidget::initMenu()
     connect(actionNextMusic, SIGNAL(triggered(bool)), this, SLOT(slotSendNextMusic()));
 }
 
-void MusicSongsListWidget::setRadomPlayMusic()
-{
-    //判断当前列表是否为空
-    if (tableWidgetIsEmpty())
-        return;
-    //获取当前行
-    int rowIndex = currentIndex().row();
-    int totalRow = rowCount();
-    int playIndex =  qrand()%totalRow;
-    qDebug()<<"playIndex:"<<playIndex;
-    setCurrentCell(playIndex,0,QItemSelectionModel::SelectCurrent);
-    QString str = "";
 
-    str = item(playIndex,0)->text();
-    qDebug()<<"随机播放";
-
-    emit signalSendNextMusic(m_musicpath.at(playIndex));
-}
 
 void MusicSongsListWidget::contextMenuEvent(QContextMenuEvent *event)
 {

@@ -22,14 +22,13 @@ private Q_SLOTS:
     void slotOrderPlay(bool);
     void slotListCirtual(bool);
     void slotSingleCirtual(bool);
-    void slotSinglePlay(bool);
+//    void slotSinglePlay(bool);
     void slotRadomPlay(bool);
 
 private:
     QAction *m_pOrderPlay;      //顺序播放
     QAction *m_pListCircual;    //列表循环
     QAction *m_pSingleCircual;  //单曲循环
-    QAction *m_pSnglePlay;      //单曲播放
     QAction *m_pRadomPlay;      //随机播放
 };
 

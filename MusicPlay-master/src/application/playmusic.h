@@ -31,7 +31,7 @@ public  Q_SLOTS:
     void slotOpenMediaMusic(QString path);
     void slotSetPlayVolume(int);                    //设置播放音量
     void slotSetPlayPostion(qint64);                //设置播放位置
-    void slotReceivePlayCmdMusic(const QString&);   //接收请求回来的歌曲进行播放
+//    void slotReceivePlayCmdMusic(const QString&);   //接收请求回来的歌曲进行播放
 
 private Q_SLOTS:
     void slotUpdateInterface();                     //更新播放接口信息

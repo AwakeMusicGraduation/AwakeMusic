@@ -34,14 +34,6 @@ Q_SIGNALS:
     void signalPlayMediaMusic(QString path);
     void signalShowPicture(QString songName);
 
-    //向上发送播放上一首、下一首请求，歌曲列表收到该信号后会向下返回要播放的歌曲信息
-    void signalSendPlayNext();
-    void signalSendPlayPreviouse();
-
-    //向下发送请求回来的歌曲信息
-    void signalSendPlayNextMusic(const QString&);
-    void signalSendPlayPreviouseMusic(const QString &);
-
     /*************向上请求第一次要播放的歌曲信息***************/
     void signalRequestFirstPlayMusic();
     //请求成功，向下层发送
@@ -74,13 +66,13 @@ Q_SIGNALS:
     void signalAddMusicToList(QString label,QString list,QString name,QString singer,QString album);//将歌曲加入到对应的列表并传到服务器
     void signalLoadMusicFromList(QString label,QString list);//加载用户创建的列表里面的内容
 
-    void signalSendSongsListWidget(QList<QString>&);
+    void signalSendSongsListWidget(QList<QString>&, int);
 
     void signalSendNextMusic(QString&);
 
     void signalSendNextMusic2(QStringList&);
 
-    void signalSendList2ToPlay(QList<QStringList>&);
+    void signalSendList2ToPlay(QList<QStringList>&,int);
 
     void signalObtainAlbums();//获取首页的推荐歌单
     void signalAlbumAndImage(QString album,QImage image);//传回图片和专辑到首页
