@@ -32,11 +32,15 @@ Q_SIGNALS:
     void signalSendNextMusicToList2(QStringList&);
     //将该列表的内容传送到播放列表中
     void signalSendPlayList2(QList<QStringList> &,int);
+    void signalShowMusicsForAlbum(QString album);//点击专辑时显示歌曲
+    void signalShowTableWidget();//显示专辑的表
+    void signalGetAlbums(QString singer);//根据歌手获取专辑
+
 
 public Q_SLOTS:
     void slotAddItem(QString title,QString singer,QString album);
     void slotSaveMusicInfo(QString name,QString pinyin);
-    void slotShowMusics(QString name,QString pinyin);
+    void slotShowMusics(QString name,QString singer,QString album,QString pinyin);//保存推荐列表的歌曲
     void slotReceiveListName(std::vector<QString> listname);//接收列表名
     void slotResponse(QAction *);
     void slot();

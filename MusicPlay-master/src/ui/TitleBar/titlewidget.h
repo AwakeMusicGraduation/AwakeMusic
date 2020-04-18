@@ -24,6 +24,7 @@ Q_SIGNALS:
     void signalSearchContent(const QString &test);
     void signalSearchClicked();
     void signalShowHomePage();//显示首页
+    void signalFirstSearch(QString name,QString data);
 public Q_SLOTS:
     void slotUpdateName(QString name);//更新用户名
 private Q_SLOTS:

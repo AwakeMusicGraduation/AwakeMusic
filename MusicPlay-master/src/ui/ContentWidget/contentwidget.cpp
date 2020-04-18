@@ -11,6 +11,7 @@
 #include "app.h"
 #include "MusiSongList/musicsongsmedia.h"
 #include "MusiSongList/homepage.h"
+#include "MusiSongList/searchlistwidget.h"
 
 Contentwidget::Contentwidget(QWidget *parent) :
     QWidget(parent)
@@ -35,6 +36,7 @@ Contentwidget::~Contentwidget()
     delete m_musicSongsMedia;
     delete m_musicSongsMedia2;
     delete m_classifyList;
+    delete m_searchwidget;
 }
 
 void Contentwidget::initForm()
@@ -48,10 +50,12 @@ void Contentwidget::initWidget()
     m_musicLyrcWidget = new MusicLyrcWidget(this);
     m_musicSongsMedia = new MusicSongsMedia(this);//搜素列表,分类列表
     m_musicSongsMedia2 = new MusicSongsMedia(this);//推荐列表
+    m_searchwidget = new Searchlistwidget(this);
     m_classifyList = new classifyList(this);
     MusicSongsListWidget *widget = new MusicSongsListWidget(this);
     m_musicSongList.append(widget);
     m_home = new HomePage(this);
+    //m_searchwidget->initWidget(m_musicSongsMedia);
     //    widget->addMusicFold("/root/CloudMusic/");
 }
 
@@ -66,6 +70,7 @@ void Contentwidget::initLayout()
     m_mainLayout->addWidget(m_musicSongsMedia2,Qt::AlignRight);
     m_mainLayout->addWidget(m_classifyList,Qt::AlignRight);
     m_mainLayout->addWidget(m_home,Qt::AlignRight);
+    m_mainLayout->addWidget(m_searchwidget,Qt::AlignRight);
 
     m_mainLayout->setSpacing(5);
 
@@ -79,6 +84,7 @@ void Contentwidget::initLayout()
     m_classifyList->hide();
     m_musicSongList.at(m_currentwidget)->hide();
     m_home->show();
+    m_searchwidget->hide();
 
 
     //m_searchContent->setVisible(true);
@@ -135,8 +141,8 @@ void Contentwidget::initConnect()
             this,SIGNAL(signalCategoryClicked()));
     connect(this,SIGNAL(signalSendList(QString)),
             m_classifyList,SLOT(addItemContent(QString)));
-    connect(this,SIGNAL(signalShowMusics(QString,QString)),
-            m_musicSongsMedia,SLOT(slotShowMusics(QString,QString)));
+    connect(this,SIGNAL(signalShowMusics(QString,QString,QString,QString)),
+            m_musicSongsMedia,SLOT(slotShowMusics(QString,QString,QString,QString)));
 
     //更新用户列表
     connect(this,&Contentwidget::signalUpdateList,
@@ -171,7 +177,41 @@ void Contentwidget::initConnect()
     connect(m_home,&HomePage::signalShowWidget,this,&Contentwidget::slotShowTip);
     //获取推荐歌单里面的歌曲
     connect(m_home,&HomePage::signalShowMusicsFromTip,this,&Contentwidget::signalLoadTipMusics);
+    //发送搜索内容
+    connect(this,SIGNAL(signalSendSearch(QString)),m_searchwidget,SLOT(slotSaveSearchContent(QString)));
+    connect(m_searchwidget,SIGNAL(signalSendData(QString,QString)),this,SIGNAL(signalSearchData(QString,QString)));
+    connect(m_searchwidget,SIGNAL(signalBtnClicked()),this,SLOT(slotNewSearch()));
+    //点击专辑时显示歌曲和窗口
+    connect(m_musicSongsMedia,&MusicSongsMedia::signalShowMusicsForAlbum,this,&Contentwidget::slotShowTip);
+    connect(m_musicSongsMedia,&MusicSongsMedia::signalShowMusicsForAlbum,this,&Contentwidget::signalLoadTipMusics);
+    connect(m_musicSongsMedia2,&MusicSongsMedia::signalShowMusicsForAlbum,this,&Contentwidget::slotShowTip);
+    connect(m_musicSongsMedia2,&MusicSongsMedia::signalShowMusicsForAlbum,this,&Contentwidget::signalLoadTipMusics);
+    //点击歌手后显示表和专辑
+    connect(m_musicSongsMedia,&MusicSongsMedia::signalShowTableWidget,this,&Contentwidget::slotShowTableWidget);
+    connect(m_musicSongsMedia,&MusicSongsMedia::signalGetAlbums,this,&Contentwidget::signalGetAlbums);
+    connect(m_musicSongsMedia2,&MusicSongsMedia::signalShowTableWidget,this,&Contentwidget::slotShowTableWidget);
+    connect(m_musicSongsMedia2,&MusicSongsMedia::signalGetAlbums,this,&Contentwidget::signalGetAlbums);
 
+
+}
+
+void Contentwidget::slotAddAlbum(QString album)
+{
+    m_classifyList->addItemContent(album);
+}
+
+void Contentwidget::slotShowTableWidget()
+{
+    m_musicLyrcWidget->hide();
+    m_showOrHide = false;
+    m_musicSongList.at(m_currentwidget)->hide();
+    this->disConnectMusicList(m_currentwidget);
+    m_classifyList->removeAllItem();
+    m_classifyList->m_currentCatagory = 2;
+    m_classifyList->show();
+    m_musicSongsMedia2->hide();
+    m_musicSongsMedia->hide();
+    m_home->hide();
 }
 
 void Contentwidget::connectMusicList(int index)
@@ -263,6 +303,7 @@ void Contentwidget::slotShowList(int row,QString list)
     this->disConnectMusicList(m_currentwidget);
     if(row == 1){
         m_classifyList->hide();
+        m_searchwidget->hide();
         m_musicSongsMedia2->show();
     }else{
         m_musicSongsMedia2->hide();
@@ -314,6 +355,7 @@ void Contentwidget::slotShowHomePage()
     m_classifyList->hide();
     m_musicSongsMedia2->hide();
     m_musicSongsMedia->hide();
+    m_searchwidget->hide();
     m_home->show();
 }
 
@@ -343,12 +385,25 @@ void Contentwidget::slotShowOrHide()
 void Contentwidget::slotShowMediaSongs()
 {
     m_musicSongsMedia->removeAllItem();
-    m_musicSongsMedia->show();
+    if(m_searchwidget->isHidden()){
+        m_searchwidget->show();
+        m_searchwidget->initWidget(m_musicSongsMedia);
+        if(m_musicSongsMedia->isHidden()){
+            m_musicSongsMedia->show();
+            //m_searchwidget->initWidget(m_musicSongsMedia);
+        }
+    }
     m_musicSongList.at(m_currentwidget)->hide();
     m_musicLyrcWidget->hide();
     m_musicSongsMedia2->hide();
     m_classifyList->hide();
+    m_home->hide();
     m_showOrHide = false;
+}
+
+void Contentwidget::slotNewSearch()
+{
+    m_musicSongsMedia->removeAllItem();
 }
 
 void Contentwidget::slotSetName(QString name)

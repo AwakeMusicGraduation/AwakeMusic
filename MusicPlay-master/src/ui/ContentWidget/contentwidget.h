@@ -13,6 +13,7 @@ class MusicSongsMedia;
 class classifyList;
 class DisplaySearchContent;
 class HomePage;
+class Searchlistwidget;
 
 class Contentwidget : public QWidget
 {
@@ -57,7 +58,7 @@ Q_SIGNALS:
     void signalSendData(QString,QString data);
     void signalSendList(QString);
     void signalCategoryClicked();
-    void signalShowMusics(QString,QString);
+    void signalShowMusics(QString,QString,QString,QString);
 
     void signalUpdateList(std::vector<QString> userMessage);//更新用户列表
     void signalCreateSongsList(QString label,QString name,QString list);//传输创建的列表名
@@ -77,6 +78,11 @@ Q_SIGNALS:
     void signalObtainAlbums();//获取首页的推荐歌单
     void signalAlbumAndImage(QString album,QImage image);//传回图片和专辑到首页
     void signalLoadTipMusics(QString tip);//获取推荐歌单的歌曲
+
+    //发送搜索内容
+    void signalSendSearch(QString);//发给searchlistwidget
+    void signalSearchData(QString name,QString data);//发给服务器
+    void signalGetAlbums(QString singer);//根据歌手获取专辑
     
 public slots:
     //接收bottombar发送过来的播放命令
@@ -88,9 +94,12 @@ public slots:
     void slotDeleteList(int row);
     void slotShowOrHide();
     void slotShowMediaSongs();
+    void slotNewSearch();
     void slotSetName(QString name);
     void slotShowTip();//显示推荐歌单的列表
     void slotShowHomePage();//显示首页
+    void slotShowTableWidget();//显示点击歌手后的界面
+    void slotAddAlbum(QString album);//加入专辑
 
 private:
 //    MusicSongsSummarizied *m_songsSummarizied;
@@ -101,6 +110,7 @@ private:
     MusicSongsMedia *m_musicSongsMedia2;
     classifyList *m_classifyList;
     DisplaySearchContent *m_searchContent;
+    Searchlistwidget *m_searchwidget;
     int m_currentwidget;
     bool m_showOrHide;
 

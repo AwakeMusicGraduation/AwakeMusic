@@ -9,7 +9,7 @@
 #include <QActionGroup>
 #include <QMouseEvent>
 //#define MusicPath "rtsp://10.253.241.175/mp3/"
-#define MusicPath "rtsp://192.168.43.46/mp3/"
+#define MusicPath "rtsp://192.168.0.105/mp3/"
 
 
 MusicSongsMedia::MusicSongsMedia(QWidget *parent)
@@ -25,9 +25,9 @@ void MusicSongsMedia::slotSaveMusicInfo(QString name, QString pinyin)
     m_musicInfo[name] = pinyin;
 }
 
-void MusicSongsMedia::slotShowMusics(QString name, QString pinyin)
+void MusicSongsMedia::slotShowMusics(QString name,QString singer, QString album, QString pinyin)
 {
-    slotAddItem(name,"","");
+    slotAddItem(name,singer,album);
     slotSaveMusicInfo(name,pinyin);
 }
 
@@ -140,13 +140,27 @@ void MusicSongsMedia::slotAddItem(QString title, QString singer, QString album)
 
 void MusicSongsMedia::slotCellDoubleClicked(int row, int cloumn)
 {
-    QString songName = item(row,0)->text();
-    QString songPinYin = getMusicPinYin(songName);
-    emit signalShowMediaLrc(songPinYin);
-    emit signalPlayMediaMusic(MusicPath + songPinYin + ".mp3");
-    emit signalShowPicture(songName);
-    saveMusicInfo();//发送信息前总是先刷新保存列表中的歌曲信息
-    emit signalSendPlayList2(m_music,row);
+    if(cloumn == 0)
+    {
+        QString songName = item(row,0)->text();
+        QString songPinYin = getMusicPinYin(songName);
+        emit signalShowMediaLrc(songPinYin);
+        emit signalPlayMediaMusic(MusicPath + songPinYin + ".mp3");
+        emit signalShowPicture(songName);
+        saveMusicInfo();//发送信息前总是先刷新保存列表中的歌曲信息
+        emit signalSendPlayList2(m_music,row);
+    }
+    else if(cloumn == 1)
+    {
+        QString singer = item(row,cloumn)->text();
+        emit signalShowTableWidget();
+        emit signalGetAlbums(singer);
+    }
+    else if(cloumn == 2)
+    {
+        QString album = item(row,cloumn)->text();
+        emit signalShowMusicsForAlbum(album);
+    }
 }
 
 void MusicSongsMedia::slotPlayMusic()

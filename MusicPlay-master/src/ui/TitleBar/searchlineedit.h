@@ -24,6 +24,7 @@ private slots:
     void slotSendSearchContent();
 signals:
     void signalSearchContent(const QString &test);
+    void signalFirstSearch(QString name,QString data);//点击搜索按钮时首先显示按歌曲分类
     void signalSearchClicked();
 
 private:

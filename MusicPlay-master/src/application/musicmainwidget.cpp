@@ -27,6 +27,7 @@ MusicMainWidget::MusicMainWidget(QWidget *parent) :
     initLayout();
     initPlayList();
     initConnect();
+    m_client->slotObtainAlbums();
 
 }
 
@@ -103,6 +104,11 @@ void MusicMainWidget::initConnect()
             this,SLOT(slotClose()));
     connect(m_titleWidget,SIGNAL(signalSearchContent(QString)),
             m_client,SLOT(sendData(QString)));
+    //标题栏发送搜索内容
+    connect(m_titleWidget,SIGNAL(signalFirstSearch(QString,QString)),
+            m_client,SLOT(sendData(QString,QString)));
+    connect(m_titleWidget,SIGNAL(signalSearchContent(QString)),m_contentWidget,SIGNAL(signalSendSearch(QString)));
+    connect(m_contentWidget,SIGNAL(signalSearchData(QString,QString)),m_client,SLOT(sendData(QString,QString)));
 
     //中央窗体信号和槽关联
     connect(m_contentWidget,SIGNAL(signalPlayMusic(QString)),
@@ -201,8 +207,8 @@ void MusicMainWidget::initConnect()
             m_client,SLOT(newSingerConnect()));
     connect(m_client,SIGNAL(signalShowMusicWidget()),
             m_contentWidget,SLOT(slotShowMediaSongs()));
-    connect(m_client,SIGNAL(signalMediaPinYins(QString,QString)),
-            m_contentWidget,SIGNAL(signalShowMusics(QString,QString)));
+    connect(m_client,SIGNAL(signalMediaPinYins(QString,QString,QString,QString)),
+            m_contentWidget,SIGNAL(signalShowMusics(QString,QString,QString,QString)));
 
     //刷新用户登录列表
     //connect(login,&loginform_test::signalUpdateList,
@@ -247,6 +253,11 @@ void MusicMainWidget::initConnect()
     connect(m_contentWidget,&Contentwidget::signalLoadTipMusics,m_client,&Client::slotLoadTipMusics);
     //显示首页
     connect(m_titleWidget,&TitleWidget::signalShowHomePage,m_contentWidget,&Contentwidget::slotShowHomePage);
+    //传送歌手的专辑
+    connect(m_contentWidget,&Contentwidget::signalGetAlbums,m_client,&Client::slotGetAlbums);
+    //接收歌手的专辑
+    connect(m_client,&Client::signalAddAlbum,m_contentWidget,&Contentwidget::slotAddAlbum);
+
 
 }
 

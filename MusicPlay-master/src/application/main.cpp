@@ -5,7 +5,7 @@
 #include "loginform_test.h"
 #include <QtSql>
 #include <QSqlQuery>
-#include <ContentWidget/MusiSongList/musiccenterwidget.h>
+//#include <ContentWidget/MusiSongList/musiccenterwidget.h>
 
 int main(int argc,char *argv[])
 {

@@ -97,6 +97,7 @@ void SearchLineEdit::slotSendSearchContent()
     if(str != ""){
     qDebug()<<"\nsearch content:"<<str<<endl;
     emit signalSearchContent(str);
+    emit signalFirstSearch("music",str);
     emit signalSearchClicked();
     }
 }

@@ -52,6 +52,7 @@ void TitleWidget::initWidget()
 
     m_labelTitle->setFont(QFont("Times New Roman", 20, QFont::Bold));
     m_labelTitle->setObjectName("whiteLabel");
+    m_labelTitle->setCursor(Qt::PointingHandCursor);
 
     //搜索框
     m_search = new SearchLineEdit(this);
@@ -124,6 +125,7 @@ void TitleWidget::initConnect()
             this,SIGNAL(signalSearchContent(QString)));
     connect(m_search,SIGNAL(signalSearchClicked()),
             this,SIGNAL(signalSearchClicked()));
+    connect(m_search,SIGNAL(signalFirstSearch(QString,QString)),this,SIGNAL(signalFirstSearch(QString,QString)));
     connect(m_labelTitle,&ClickableLabel::clicked,this,&TitleWidget::signalShowHomePage);
 }
 

@@ -25,6 +25,7 @@ Q_SIGNALS:
     void signalCategoryClicked();
 private:
     std::vector<QString> m_catagory;
+public:
     int m_currentCatagory;
 };
 

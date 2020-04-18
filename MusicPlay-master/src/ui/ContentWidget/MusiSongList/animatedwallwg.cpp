@@ -63,6 +63,10 @@ void AnimatedWallWG::initWallpaper()
         m_pWall[i] = new ClickableLabel("",this);
         setWallpaper(m_pWall[i], i);
     }
+    for (auto l:m_pWall)
+    {
+        l->setCursor(Qt::PointingHandCursor);
+    }
 
     //默认索引为1的Wall置顶
     m_pWall[1]->raise();
@@ -84,6 +88,10 @@ void AnimatedWallWG::initLRButton()
     //创建两个移动按钮
     m_pLRButton[0] = new QPushButton(this);
     m_pLRButton[1] = new QPushButton(this);
+    for(auto l:m_pLRButton)
+    {
+        l->setCursor(Qt::PointingHandCursor);
+    }
 
     m_pLRButton[0]->hide();
     m_pLRButton[1]->hide();
