@@ -13,6 +13,7 @@ class MusicSongsMedia;
 class classifyList;
 class DisplaySearchContent;
 class HomePage;
+class Searchlistwidget;
 
 class Contentwidget : public QWidget
 {
@@ -77,6 +78,10 @@ Q_SIGNALS:
     void signalObtainAlbums();//获取首页的推荐歌单
     void signalAlbumAndImage(QString album,QImage image);//传回图片和专辑到首页
     void signalLoadTipMusics(QString tip);//获取推荐歌单的歌曲
+
+    //发送搜索内容
+    void signalSendSearch(QString);//发给searchlistwidget
+    void signalSearchData(QString name,QString data);//发给服务器
     
 public slots:
     //接收bottombar发送过来的播放命令
@@ -88,6 +93,7 @@ public slots:
     void slotDeleteList(int row);
     void slotShowOrHide();
     void slotShowMediaSongs();
+    void slotNewSearch();
     void slotSetName(QString name);
     void slotShowTip();//显示推荐歌单的列表
     void slotShowHomePage();//显示首页
@@ -101,6 +107,7 @@ private:
     MusicSongsMedia *m_musicSongsMedia2;
     classifyList *m_classifyList;
     DisplaySearchContent *m_searchContent;
+    Searchlistwidget *m_searchwidget;
     int m_currentwidget;
     bool m_showOrHide;
 

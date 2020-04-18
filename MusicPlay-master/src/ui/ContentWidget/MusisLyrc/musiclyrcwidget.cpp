@@ -137,6 +137,7 @@ void MusicLyrcWidget::slotAnalyseMedia(QString name)
             line.replace(QRegExp("\\[\\d{2}:\\d{2}\\.\\d{2}\\]"),"");
             m_lrcText->append("<a name=\"" + name + "\" href=\"#word\">" + line +"</a>");
             m_lrcText->setFont(QFont("black",15,20));
+            m_lrcText->setAlignment(Qt::AlignCenter);
 
         }
         file.close();

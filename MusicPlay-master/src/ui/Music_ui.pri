@@ -1,5 +1,4 @@
 HEADERS += \
-    $$PWD/ContentWidget/MusiSongList/musiccenterwidget.h \
     $$PWD/ContentWidget/MusiSongList/mymediaplaylist.h \
     $$PWD/TitleBar/titlewidget.h \
     $$PWD/BottomBar/bottomwidget.h \
@@ -17,10 +16,10 @@ HEADERS += \
     $$PWD/ContentWidget/MusiSongList/classifylist.h \
     $$PWD/ContentWidget/MusiSongList/animatedwallwg.h \
     $$PWD/ContentWidget/MusiSongList/homepage.h \
-    $$PWD/TitleBar/clickablelabel.h
+    $$PWD/TitleBar/clickablelabel.h \
+    $$PWD/ContentWidget/MusiSongList/searchlistwidget.h
 
 SOURCES += \
-    $$PWD/ContentWidget/MusiSongList/musiccenterwidget.cpp \
     $$PWD/ContentWidget/MusiSongList/mymediaplaylist.cpp \
     $$PWD/TitleBar/titlewidget.cpp \
     $$PWD/BottomBar/bottomwidget.cpp \
@@ -37,7 +36,8 @@ SOURCES += \
     $$PWD/ContentWidget/MusiSongList/musicsongsmedia.cpp \
     $$PWD/ContentWidget/MusiSongList/classifylist.cpp \
     $$PWD/ContentWidget/MusiSongList/animatedwallwg.cpp \
-    $$PWD/ContentWidget/MusiSongList/homepage.cpp
+    $$PWD/ContentWidget/MusiSongList/homepage.cpp \
+    $$PWD/ContentWidget/MusiSongList/searchlistwidget.cpp
 
 FORMS += \
     $$PWD/ContentWidget/MusiSongList/mymediaplaylist.ui

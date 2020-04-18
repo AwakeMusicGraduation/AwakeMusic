@@ -30,7 +30,7 @@ public slots:
     void showString();
     void sendSongName(QString name);//发送歌曲名,接收专辑图片和歌词
     void showPictureandLrc();
-    void sendData(QString data);
+    void sendData(QString name,QString data);
     void sendLoginData(QString user,QString name,QString password);//发送登录信息
     void sendRegisterData(QString user,QString name,QString password);//发送注册信息
     void sendSongsListData(QString label,QString name,QString list);//发送创建的列表名

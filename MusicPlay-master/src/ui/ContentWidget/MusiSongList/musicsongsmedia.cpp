@@ -9,7 +9,7 @@
 #include <QActionGroup>
 #include <QMouseEvent>
 //#define MusicPath "rtsp://10.253.241.175/mp3/"
-#define MusicPath "rtsp://192.168.43.46/mp3/"
+#define MusicPath "rtsp://192.168.43.194/mp3/"
 
 
 MusicSongsMedia::MusicSongsMedia(QWidget *parent)

@@ -145,6 +145,7 @@ void HomePage::slotAddMusicTip(QString album,QImage image)
     {
         row = 0;
         column = 0;
+        m_albumsName.clear();
     }
     QWidget *widget = new QWidget;
     QLabel *label = new QLabel(album);

@@ -124,6 +124,7 @@ void TitleWidget::initConnect()
             this,SIGNAL(signalSearchContent(QString)));
     connect(m_search,SIGNAL(signalSearchClicked()),
             this,SIGNAL(signalSearchClicked()));
+    connect(m_search,SIGNAL(signalFirstSearch(QString,QString)),this,SIGNAL(signalFirstSearch(QString,QString)));
     connect(m_labelTitle,&ClickableLabel::clicked,this,&TitleWidget::signalShowHomePage);
 }
 

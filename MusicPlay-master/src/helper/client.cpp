@@ -45,20 +45,18 @@ Client::Client()
 }
 
 
-void Client::sendData(QString data)
+void Client::sendData(QString name,QString data)
 {
     newConnect();
-    //    QString data = "xiaochou";
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
 
     out.setVersion(QDataStream::Qt_5_10);
 
-    out << quint32(data.size());
-
+    out << quint32(data.size() + name.size());
+    out << name;
     out << data;
 
-    // qDebug() << m;
 
     tcpSocket->write(block);
     block.resize(0);
@@ -326,7 +324,7 @@ void Client::newConnect()
     blockSize = 0;
     tcpSocket = new QTcpSocket();
     //tcpSocket->abort();
-    tcpSocket->connectToHost("192.168.43.46", 6668);
+    tcpSocket->connectToHost("192.168.43.194", 6668);
     //connect(tcpSocket, &QIODevice::readyRead,this,&Client::showPicture);
 }
 
@@ -334,7 +332,7 @@ void Client::newFileConnect()
 {
     blockSize = 0;
     fileSocket->abort();
-    fileSocket->connectToHost("192.168.43.46", 8888);
+    fileSocket->connectToHost("192.168.43.194", 8888);
     connect(fileSocket, &QIODevice::readyRead, this, &Client::receivePlaylist);
 }
 
@@ -342,7 +340,7 @@ void Client::newSingerConnect()
 {
     blockSize = 0;
     singerSocket->abort();
-    singerSocket->connectToHost("192.168.43.46", 2222);
+    singerSocket->connectToHost("192.168.43.194", 2222);
 
     qDebug() << "连接成功";
     connect(singerSocket, &QIODevice::readyRead, this, &Client::receiveCategory);
@@ -487,23 +485,25 @@ void Client::showString()
         //判断接收数据是否大于两字节，也就是文件的大小信息所占的空间
         //如果时则保存到blockSize变量中，否则直接返回，继续接受数据
         if(tcpSocket->bytesAvailable() < (int)sizeof(quint32)) return;
-        in >> blockSize;
+       // in >> blockSize;
     }
     //如果没有得到全部的数据，则返回，继续接收数据
     if(tcpSocket->bytesAvailable()<blockSize) return;
     //将接收到的数据存放到变量中
     //message顺序：中文，英文，歌手，专辑，图片，文件
     QString name, pinyin,singer,album;
-    in >> name >> pinyin >> singer >>album;
-    if(name.isNull()&&pinyin.isNull()&&singer.isNull() && album.isNull())
-    {
-        qDebug()<<"kong";
+    while(tcpSocket->bytesAvailable()){
+        in >> name >> pinyin >> singer >>album;
+        if(name.isNull()&&pinyin.isNull()&&singer.isNull() && album.isNull())
+        {
+            qDebug()<<"kong";
+        }
+        emit signalSendInfo(name,singer,album);
+        emit signalSendPinYin(name,pinyin);
+        //显示接收到的数据
+        qDebug()<<name << pinyin << singer <<album;
+       // blockSize = blockSize - name.size() - pinyin.size() - singer.size()-album.size();
     }
-    emit signalSendInfo(name,singer,album);
-    emit signalSendPinYin(name,pinyin);
-    //显示接收到的数据
-    qDebug()<<name << pinyin << singer <<album;
-    blockSize = blockSize - name.size() - pinyin.size() - singer.size()-album.size();
     blockSize = 0;
     tcpSocket->close();
 }

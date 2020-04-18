@@ -27,6 +27,7 @@ MusicMainWidget::MusicMainWidget(QWidget *parent) :
     initLayout();
     initPlayList();
     initConnect();
+    m_client->slotObtainAlbums();
 
 }
 
@@ -103,6 +104,11 @@ void MusicMainWidget::initConnect()
             this,SLOT(slotClose()));
     connect(m_titleWidget,SIGNAL(signalSearchContent(QString)),
             m_client,SLOT(sendData(QString)));
+    //标题栏发送搜索内容
+    connect(m_titleWidget,SIGNAL(signalFirstSearch(QString,QString)),
+            m_client,SLOT(sendData(QString,QString)));
+    connect(m_titleWidget,SIGNAL(signalSearchContent(QString)),m_contentWidget,SIGNAL(signalSendSearch(QString)));
+    connect(m_contentWidget,SIGNAL(signalSearchData(QString,QString)),m_client,SLOT(sendData(QString,QString)));
 
     //中央窗体信号和槽关联
     connect(m_contentWidget,SIGNAL(signalPlayMusic(QString)),
