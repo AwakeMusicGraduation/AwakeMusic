@@ -5,9 +5,30 @@ MusicBroker::MusicBroker()
     sqltable = new Sqltable();
 }
 
-Music* MusicBroker::findByName(QString name)
+std::vector<Music *> MusicBroker::findByName(QString name)
 {
-    return sqltable->querysingle(name);
+    std::vector<Music *> m;
+    Music *music = sqltable->querysingle(name);
+    if(music != nullptr)
+    {
+        m.push_back(music);
+    }
+    return m;
+}
+
+std::vector<Music *> MusicBroker::findBySinger(QString singer)
+{
+    return sqltable->searchMusicBySinger(singer);
+}
+
+std::vector<Music *> MusicBroker::findByAlbum(QString album)
+{
+    return sqltable->searchMusicByAlbum(album);
+}
+
+std::vector<Music *> MusicBroker::findByList(QString list)
+{
+    return sqltable->searchMusicByList(list);
 }
 
 QString MusicBroker::findSpell(QString name)

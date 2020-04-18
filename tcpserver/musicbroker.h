@@ -9,7 +9,10 @@ class MusicBroker
 {
 public:
     MusicBroker();
-    Music* findByName(QString name);
+    std::vector<Music *> findByName(QString name);
+    std::vector<Music *> findBySinger(QString singer);
+    std::vector<Music *> findByAlbum(QString album);
+    std::vector<Music *> findByList(QString list);
     QString findSpell(QString name);
     std::vector<Singer*> findSinger();
     std::vector<Music*> findPlayList(std::vector<QString> musics);

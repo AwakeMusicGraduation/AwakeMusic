@@ -9,6 +9,7 @@ Server::Server(QWidget *parent)
 {
     ui->setupUi(this);
     tcpServer = new QTcpServer();
+    musicBroker = new MusicBroker();
 
     blockSize = 0;
     bytesToWrite = 0;
@@ -101,7 +102,6 @@ void Server::receiveCategoryData()
 
 void Server::sendSinger()
 {
-    musicBroker = new MusicBroker();
     std::vector<QString> singers;
     singers = musicBroker->findSingers(data2);
     identity = "singer";
@@ -136,7 +136,6 @@ void Server::sendSinger()
 
 void Server::sendAlbum()
 {
-    musicBroker = new MusicBroker();
     std::vector<QString> albums;
     albums = musicBroker->findAlbums(data2);
     identity = "album";
@@ -172,7 +171,6 @@ void Server::sendMusic()
     identity = "music";
     total += identity.size();
     //m = new Music();
-    musicBroker = new MusicBroker();
     m = musicBroker->findMusics(data2);
     musics = musicBroker->findSpells(m);
     for(auto l:musics){
@@ -266,12 +264,25 @@ void Server::receiveData()
         in >> tip;
         sendTipMusics(tip);
     }
-    else{
-
-        if(!data.isNull())
-        {
-            sendMessage();
-        }
+    else if(data == "music"){
+        in >> name;
+        musics = musicBroker->findByName(name);
+        sendMessage();
+    }
+    else if(data == "singer"){
+        in >> name;
+        musics = musicBroker->findBySinger(name);
+        sendMessage();
+    }
+    else if(data == "album"){
+        in >> name;
+        musics = musicBroker->findByAlbum(name);
+        sendMessage();
+    }
+    else if(data == "musicList"){
+        in >> name;
+        musics = musicBroker->findByList(name);
+        sendMessage();
     }
 
     blockSize = 0;
@@ -285,7 +296,6 @@ void Server::sendLoginMessage()
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_10);
-    musicBroker = new MusicBroker();
     std::vector<QString> m = musicBroker->findUser(name,password);
     qint32 total = 0;
     for(auto l:m)
@@ -310,7 +320,6 @@ void Server::sendRegisterMessage()
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_10);
-    musicBroker = new MusicBroker();
     QString m = musicBroker->findRegisterInfo(name,password);
     out << qint32(m.size());
     out << m;
@@ -322,7 +331,6 @@ void Server::sendRegisterMessage()
 
 void Server::sendCreateSongsList()
 {
-    musicBroker = new MusicBroker();
     QString message = musicBroker->createSongsList(user,list);
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
@@ -336,7 +344,6 @@ void Server::sendCreateSongsList()
 
 void Server::sendDeleteSongsList()
 {
-    musicBroker = new MusicBroker();
     QString message = musicBroker->deleteSongsList(user,list);
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
@@ -350,7 +357,6 @@ void Server::sendDeleteSongsList()
 
 void Server::sendAddMusicToList(QString list,QString name,QString singer,QString album)
 {
-    musicBroker = new MusicBroker();
     QString message = musicBroker->addMusicToList(list,name,singer,album);
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
@@ -364,7 +370,6 @@ void Server::sendAddMusicToList(QString list,QString name,QString singer,QString
 void Server::sendMusicFromList(QString list)
 {
     qDebug() << "准备从数据库查找音乐";
-    musicBroker = new MusicBroker();
     std::vector<QString> allmusics = musicBroker->findMusicFromList(list);
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
@@ -391,10 +396,7 @@ void Server::sendMessage()
     QBuffer buffer;
 
     out.setVersion(QDataStream::Qt_5_10);
-    //m = new Music();
-    musicBroker = new MusicBroker();
-    m = musicBroker->findByName(data);
-    if(m == nullptr){
+    if(musics.empty()){
         QString error = "亲，我们暂时没有权限哟！";
         qDebug() << error;
         out << qint32(error.size());
@@ -403,10 +405,11 @@ void Server::sendMessage()
         ui->label->setText("歌曲不存在！");
     }
     else{
-        a = m->getInformation(a);
-        delete m;
-        m = nullptr;
-        message4 = musicBroker->findSpell(data);//拼音
+        //out << qint32(0);
+        totalBytes = 0;
+        for(auto l:musics){
+        a = l->getInformation(a);
+        message4 = musicBroker->findSpell(a.at(0));//拼音
         qDebug() << "徐露";
         qDebug() << a[0] << a[1] << a[2] << a[3];
         qDebug() << message4;
@@ -414,9 +417,15 @@ void Server::sendMessage()
         message2 = a.at(1);//歌手
         message3 = a.at(2);//专辑
 
+        totalBytes += message1.size() +message2.size()+message3.size() +message4.size();
 
-        out << quint32(message1.size() +message2.size()+message3.size() +message4.size());
+
+        //out << quint32(message1.size() +message2.size()+message3.size() +message4.size());
         out << message1 << message4 << message2 << message3;
+        a.clear();
+        }
+       // out.device()->seek(0);
+       // out << totalBytes;
 
 
         connect(clientConnection, &QAbstractSocket::disconnected,
@@ -428,7 +437,8 @@ void Server::sendMessage()
     }
     clientConnection->disconnectFromHost();
     ui->label->setText("发送歌曲成功");
-    a.clear();
+
+    musics.clear();
 }
 
 void Server::sendPicture()
@@ -438,8 +448,8 @@ void Server::sendPicture()
     QBuffer buffer;
 
     out.setVersion(QDataStream::Qt_5_10);
-    musicBroker = new MusicBroker();
-    m = musicBroker->findByName(name);
+    musics = musicBroker->findByName(name);
+    m = musics.at(0);
     if(m == nullptr){
         QString error = "亲，我们暂时没有权限哟！";
         qDebug() << error;
@@ -517,7 +527,6 @@ void Server::sendMusicTips()
     QString album;
     QString path;
 
-    musicBroker = new MusicBroker();
     albums = musicBroker->findAlbums2();
     picturepaths = musicBroker->findPicturesForAlbum(albums);
     qint32 total = 0;
@@ -575,7 +584,6 @@ void Server::sendTipMusics(QString tip)
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_10);
-    musicBroker = new MusicBroker();
     std::vector<QString> musics = musicBroker->findMusicsForTip(tip);
     qint32 total = 0;
     for(auto l:musics)

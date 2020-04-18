@@ -383,7 +383,6 @@ std::vector<Album*> Sqltable::queryAlbum()
             album = nullptr;
         }
     }
-   // db.close();
     return albums;
 }
 
@@ -467,7 +466,6 @@ Music* Sqltable::querysingle(QString name)
         qDebug()<<"查询成功" ;
         if(!sql_query.first())
         {
-            db.close();
             return nullptr;
         }
         sql_query.previous();
@@ -614,7 +612,6 @@ std::vector<QString> Sqltable::querySingerAlbum(QString name)
 //输入专辑名返回专辑里的所有歌曲
 std::vector<QString> Sqltable::queryAlbumMusics(QString name)
 {
-    db.open();
     std::vector<QString> musics;
     QString select_sql = "select * from music where album = '" + name +"'";
     sql_query.prepare(select_sql);
@@ -635,7 +632,6 @@ std::vector<QString> Sqltable::queryAlbumMusics(QString name)
             qDebug()<<QString("Name:%1 ").arg(name);
         }
     }
-    db.close();
     return musics;
 
 }
@@ -835,62 +831,6 @@ QString Sqltable::deleteMusicList(QString list)
     return message;
 }
 
-void Sqltable::search(QString content)
-{
-    QString select_music = "select * from music where name = '" + content+ "'";
-    QString select_singer = "select * from music where singer = '" + content + "'";
-    QString select_album = "select * from music where album = '" + content + "'";
-    QString select_list = "select * from user_list where list = '" + content + "'";
-    QSqlQuery sql_query1;
-    //搜索音乐
-    sql_query1.prepare(select_music);
-    if(!sql_query1.exec())
-    {
-        qDebug() << sql_query1.lastError();
-    }
-    else{
-        while(sql_query1.next())
-        {
-            qDebug() << "music " << sql_query1.value(1).toString() << " " << sql_query1.value(2).toString() << " "<<sql_query1.value(5).toString();
-        }
-    }
-    //搜索歌手
-    sql_query1.prepare(select_singer);
-    if(!sql_query1.exec())
-    {
-        qDebug() << sql_query1.lastError();
-    }
-    else{
-        while(sql_query1.next())
-        {
-            qDebug() << "singer " << sql_query1.value(1).toString() << " " << sql_query1.value(2).toString() << " "<<sql_query1.value(5).toString();
-        }
-    }
-    //搜索专辑
-    sql_query1.prepare(select_album);
-    if(!sql_query1.exec())
-    {
-        qDebug() << sql_query1.lastError();
-    }
-    else{
-        while(sql_query1.next())
-        {
-            qDebug() << "album " << sql_query1.value(1).toString() << " " << sql_query1.value(2).toString() << " "<<sql_query1.value(5).toString();
-        }
-    }
-    //搜索歌单
-    sql_query1.prepare(select_list);
-    if(!sql_query1.exec())
-    {
-        qDebug() << sql_query1.lastError();
-    }
-    else{
-        while(sql_query1.next())
-        {
-            qDebug() << "list " << sql_query1.value(1).toString();
-        }
-    }
-}
 
 std::vector<QString> Sqltable::loadMusicFromList(QString list)
 {
@@ -928,7 +868,6 @@ std::vector<QString> Sqltable::loadMusicFromList(QString list)
 
 std::vector<QString> Sqltable::randomSelectAlbum()
 {
-    db.open();
 
     QString select_album_sql = "select name from album order by random() limit 8";
     QSqlQuery sql_query;
@@ -950,13 +889,98 @@ std::vector<QString> Sqltable::randomSelectAlbum()
             qDebug()<< QString("album:%1").arg(name);
         }
     }
-    db.close();
     return albums;
+}
+std::vector<Music *> Sqltable::searchMusicBySinger(QString content)
+{
+    std::vector<Music *> musics;
+    QString select_singer = "select * from music where singer = '" + content + "'";
+    QSqlQuery sql_query1;
+    QString name1,singer,lyric,album,audiopath;
+    //搜索歌手
+    sql_query1.prepare(select_singer);
+    if(!sql_query1.exec())
+    {
+        qDebug() << sql_query1.lastError();
+    }
+    else{
+        while(sql_query1.next())
+        {
+            name1 = sql_query1.value(1).toString();
+            //qDebug() << QString("%1").arg(name1);
+            singer = sql_query1.value(2).toString();
+            lyric = sql_query1.value(3).toString();
+            album = sql_query1.value(4).toString();
+            audiopath = sql_query1.value(5).toString();
+
+            Music *music = new Music(name1,singer,lyric,audiopath,album);
+            musics.push_back(music);
+            qDebug() << "singer " << sql_query1.value(1).toString() << " " << sql_query1.value(2).toString() << " "<<sql_query1.value(5).toString();
+        }
+        return musics;
+    }
+}
+
+std::vector<Music *> Sqltable::searchMusicByAlbum(QString content)
+{
+    std::vector<Music *> musics;
+    Music *music;
+    QString select_album = "select * from music where album = '" + content + "'";
+    QSqlQuery sql_query1;
+    //搜索专辑
+    sql_query1.prepare(select_album);
+    if(!sql_query1.exec())
+    {
+        qDebug() << sql_query1.lastError();
+    }
+    else{
+        while(sql_query1.next())
+        {
+            QString name1 = sql_query1.value(1).toString();
+            //qDebug() << QString("%1").arg(name1);
+            QString singer = sql_query1.value(2).toString();
+            QString lyric = sql_query1.value(3).toString();
+            QString album = sql_query1.value(4).toString();
+            QString audiopath = sql_query1.value(5).toString();
+            music = new Music(name1,singer,lyric,audiopath,album);
+            musics.push_back(music);
+            qDebug() << name1 << singer << album;
+            qDebug() << "album " << sql_query1.value(1).toString() << " " << sql_query1.value(2).toString() << " "<<sql_query1.value(5).toString();
+        }
+    }
+    return musics;
+}
+
+std::vector<Music *> Sqltable::searchMusicByList(QString content)
+{
+    std::vector<Music *> musics;
+    QString select_list = "select * from user_list where list = '" + content + "'";
+    QSqlQuery sql_query1;
+    //搜索歌单
+    sql_query1.prepare(select_list);
+    if(!sql_query1.exec())
+    {
+        qDebug() << sql_query1.lastError();
+    }
+    else{
+        while(sql_query1.next())
+        {
+            QString name1 = sql_query1.value(1).toString();
+            //qDebug() << QString("%1").arg(name1);
+            QString singer = sql_query1.value(2).toString();
+            QString lyric = sql_query1.value(3).toString();
+            QString album = sql_query1.value(4).toString();
+            QString audiopath = sql_query1.value(5).toString();
+            Music *music = new Music(name1,singer,lyric,audiopath,album);
+            musics.push_back(music);
+            qDebug() << "list " << sql_query1.value(1).toString();
+        }
+    }
+    return musics;
 }
 
 std::vector<QString> Sqltable::albumsToPictures(std::vector<QString> albums)
 {
-    db.open();
     QString album;
     std::vector<QString> picturepaths;
     QSqlQuery sql_query;
@@ -984,7 +1008,6 @@ std::vector<QString> Sqltable::albumsToPictures(std::vector<QString> albums)
                picturepaths.push_back("root/薛之谦/yiwai");
         }
     }
-    db.close();
     return picturepaths;
 }
 
