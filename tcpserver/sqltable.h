@@ -57,11 +57,15 @@ public:
     QString insertMusicList(QString list,QString music,QString album,QString singer);//用户往特定歌单插入歌曲
     void deletemusicFromList(QString list,QString music,QString album,QString singer);//用户删除特定歌单的歌曲
     QString deleteMusicList(QString list);//用户删除特定歌单
-    void search(QString content);//根据搜素内容搜素
     std::vector<QString> loadMusicFromList(QString list);//根据列表搜素对应的音乐
     std::vector<QString> randomSelectAlbum();//随机从专辑中选出8个专辑作为推荐歌单
     std::vector<QString> albumsToPictures(std::vector<QString> albums);//根据专辑得出图片的路径
     std::vector<QString> searchMusicsForTip(QString tip);//根据推荐歌单搜素歌曲
+    std::vector<Music *> searchMusicBySinger(QString content);
+    std::vector<Music *> searchMusicByAlbum(QString content);
+    std::vector<Music *> searchMusicByList(QString content);
+    std::vector<QString> queryAlbumsForSinger(QString singer);//根据歌手查询专辑
+    //std::vector<QString> loadMusicFromList(QString list);//根据列表搜素对应的音乐
 };
 
 

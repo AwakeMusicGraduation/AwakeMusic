@@ -9,7 +9,10 @@ class MusicBroker
 {
 public:
     MusicBroker();
-    Music* findByName(QString name);
+    std::vector<Music *> findByName(QString name);
+    std::vector<Music *> findBySinger(QString singer);
+    std::vector<Music *> findByAlbum(QString album);
+    std::vector<Music *> findByList(QString list);
     QString findSpell(QString name);
     std::vector<Singer*> findSinger();
     std::vector<Music*> findPlayList(std::vector<QString> musics);
@@ -27,6 +30,7 @@ public:
     std::vector<QString> findAlbums2();//找到随机选取的专辑
     std::vector<QString> findPicturesForAlbum(std::vector<QString> albums);//根据选取的album找到对应的图片
     std::vector<QString> findMusicsForTip(QString tip);//根据歌单查询音乐
+    std::vector<QString> findAlbumsForSinger(QString name);//根据歌手查专辑
 
 private:
     Sqltable *sqltable;

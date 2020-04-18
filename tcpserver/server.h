@@ -56,6 +56,7 @@ private:
 
 
     Music *m;
+    std::vector<Music *> musics;
     MusicBroker *musicBroker;
 
     Ui::MainWindow *ui;
