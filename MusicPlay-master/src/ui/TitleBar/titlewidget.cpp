@@ -44,8 +44,6 @@ void TitleWidget::initWidget()
     //IconHelper::Instance()->SetIcoMain(m_labelIcon);
     //程序标题
     m_labelTitle  = new ClickableLabel("AwakeMusic",this);
-//    m_labelTitle->setPixmap(QPixmap(":/image/MusicTitle.png"));
-   // m_labelTitle->setText("AwakeMusic");
     QPalette pe;
     pe.setColor(QPalette::WindowText,Qt::white);
     m_labelTitle->setPalette(pe);

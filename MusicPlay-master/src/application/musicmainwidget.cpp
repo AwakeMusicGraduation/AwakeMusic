@@ -16,6 +16,7 @@
 #include "musicdesktoplrcmanage.h"
 #include "loginform_test.h"
 #include "MusiSongList/mymediaplaylist.h"
+#include "miniplaylayout.h"
 
 #include <QApplication>
 
@@ -68,6 +69,11 @@ void MusicMainWidget::initWidget()
     m_contentWidget = new Contentwidget(this);
     m_bottomWidget = new BottomWidget(this);
     m_playlist = new MyMediaPlayList(this);
+
+    m_miniplay = new MiniPlayLayout(this);
+    m_miniplay ->setGeometry(0,470,180,50);
+    m_miniplay->hide();
+
 
     m_player = new PlayMusic(this);
     m_desktopLrc = new MusicDesktopLrcManage;
@@ -135,8 +141,10 @@ void MusicMainWidget::initConnect()
             m_player,SLOT(slotSetPlayPostion(qint64)));
 
     //底部菜单栏控制信号和槽关联
-    connect(m_bottomWidget,SIGNAL(signalShowOrHide()),
-            m_contentWidget,SLOT(slotShowOrHide()));
+//    connect(m_bottomWidget,SIGNAL(signalShowOrHide()),
+//            m_contentWidget,SLOT(slotShowOrHide()));
+    connect(m_miniplay,&MiniPlayLayout::signalShowOrHide,
+            m_contentWidget,&Contentwidget::slotShowOrHide);
     connect(m_bottomWidget,SIGNAL(signalHidOrShowLyrc(int)),
             this,SLOT(slotShowOrHideDesktopLrc(int)));
     connect(m_bottomWidget,SIGNAL(signalHidOrShowPlayList()),this,SLOT(slotShowOrHideCornorList()));
@@ -187,8 +195,9 @@ void MusicMainWidget::initConnect()
 //    connect(m_playlist,SIGNAL(signalSendPlayCmdMusic(QString)),
 //            m_player,SLOT(slotReceivePlayCmdMusic(QString)));//signalCategoryClicked;
     /******************获取从服务器发过来的消息**********************/
-    connect(m_client,SIGNAL(signalShowImage(QImage)),
-            m_bottomWidget,SLOT(slotShowImage(QImage)));
+//    connect(m_client,SIGNAL(signalShowImage(QImage)),
+//            m_bottomWidget,SLOT(slotShowImage(QImage)));
+     connect(m_client,SIGNAL(signalShowImage(QImage)),m_miniplay,SLOT(slotReceiveImage(QImage)));
     connect(m_client,SIGNAL(signalSendInfo(QString,QString,QString)),
             m_contentWidget,SIGNAL(signalShowInfo(QString,QString,QString)));
     connect(m_client,SIGNAL(signalSendPinYin(QString,QString)),
@@ -225,7 +234,7 @@ void MusicMainWidget::initConnect()
 
     //将歌曲加入到对应的列表并传到服务器
     connect(m_contentWidget,&Contentwidget::signalAddMusicToList,m_client,&Client::slotAddMusicToList);
-
+    connect(m_playlist,&MyMediaPlayList::signalAddMusicToList,m_client,&Client::slotAddMusicToList);
 
     //加载列表里面的歌曲
     connect(m_contentWidget,&Contentwidget::signalLoadMusicFromList,
@@ -242,6 +251,9 @@ void MusicMainWidget::initConnect()
     connect(m_playlist,SIGNAL(signalPlayMusic(QString)),
             m_player,SLOT(slotOpenMusic(QString)));
     connect(m_playlist,SIGNAL(signalPlayMediaMusic(QString)),m_player,SLOT(slotOpenMediaMusic(QString)));
+    //为播放列表获取列表名
+    connect(m_playlist,SIGNAL(signalObtainListName()),m_contentWidget,SIGNAL(signalObtainListName()));
+    connect(m_contentWidget,SIGNAL(signalSendListName(std::vector<QString>)),m_playlist,SLOT(slotReceiveListName(std::vector<QString>)));
     //发送该歌曲重复信号
     connect(m_playlist,SIGNAL(signalReatMusic()), this, SLOT(slotShowRepeatMessage()));
 
@@ -258,13 +270,16 @@ void MusicMainWidget::initConnect()
     //接收歌手的专辑
     connect(m_client,&Client::signalAddAlbum,m_contentWidget,&Contentwidget::slotAddAlbum);
 
+    //连接到小窗口的播放
+    connect(m_playlist,SIGNAL(signalSendNameAndSinger(QString,QString)),m_miniplay,SLOT(slotReceiveNameAndSinger(QString,QString)));
+    connect(m_playlist,SIGNAL(signalSendNameAndSinger(QString,QString)),this,SLOT(slotShowMiniPlay(QString,QString)));
 
 }
 
 void MusicMainWidget::initPlayList()
 {
     qDebug()<<"显示播放列表";
-    m_playlist->setGeometry(427,140,450,400);
+    m_playlist->setGeometry(427,160,450,400);
     m_playlist->hide();
 }
 
@@ -453,4 +468,10 @@ void MusicMainWidget::slotShowOrHideCornorList()
 void MusicMainWidget::slotTest(const QString &name)
 {
     qDebug()<<"请求回来的歌曲为:"<<name;
+}
+
+void MusicMainWidget::slotShowMiniPlay(QString s,QString d)
+{
+    qDebug() <<s<<d;
+    m_miniplay->show();
 }

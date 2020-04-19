@@ -83,6 +83,10 @@ Q_SIGNALS:
     void signalSendSearch(QString);//发给searchlistwidget
     void signalSearchData(QString name,QString data);//发给服务器
     void signalGetAlbums(QString singer);//根据歌手获取专辑
+
+    //为播放列表获取列表名
+    void signalObtainListName();
+    void signalSendListName(std::vector<QString> listname);
     
 public slots:
     //接收bottombar发送过来的播放命令

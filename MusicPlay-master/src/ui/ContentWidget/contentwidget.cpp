@@ -20,6 +20,7 @@ Contentwidget::Contentwidget(QWidget *parent) :
     initWidget();
     initLayout();
     initConnect();
+    m_searchwidget->initWidget(m_musicSongsMedia);
 }
 
 Contentwidget::~Contentwidget()
@@ -156,9 +157,11 @@ void Contentwidget::initConnect()
             m_musicSongsLists,&MusicSongsLists::slotObtainListName);
     connect(m_musicSongsMedia2,&MusicSongsMedia::signalObtainListName,
             m_musicSongsLists,&MusicSongsLists::slotObtainListName);
+    connect(this, SIGNAL(signalObtainListName()), m_musicSongsLists,SLOT(slotObtainListName()));
     //接收列表名
     connect(m_musicSongsLists,&MusicSongsLists::signalSendListName,m_musicSongsMedia,&MusicSongsMedia::slotReceiveListName);
     connect(m_musicSongsLists,&MusicSongsLists::signalSendListName,m_musicSongsMedia2,&MusicSongsMedia::slotReceiveListName);
+    connect(m_musicSongsLists,SIGNAL(signalSendListName(std::vector<QString>)),SIGNAL(signalSendListName(std::vector<QString>)));
     //将歌曲加入到对应列表并传到服务器
     connect(m_musicSongsMedia,&MusicSongsMedia::signalAddMusicToList,this,&Contentwidget::signalAddMusicToList);
     connect(m_musicSongsMedia2,&MusicSongsMedia::signalAddMusicToList,this,&Contentwidget::signalAddMusicToList);
@@ -174,7 +177,7 @@ void Contentwidget::initConnect()
     //传回图片和专辑到首页
     connect(this,&Contentwidget::signalAlbumAndImage,m_home,&HomePage::slotAddMusicTip);
     //显示点击推荐的歌单后的界面
-    connect(m_home,&HomePage::signalShowWidget,this,&Contentwidget::slotShowTip);
+    connect(m_home,&HomePage::signalShowWidget,this,&Contentwidget::slotShowMediaSongs);
     //获取推荐歌单里面的歌曲
     connect(m_home,&HomePage::signalShowMusicsFromTip,this,&Contentwidget::signalLoadTipMusics);
     //发送搜索内容
@@ -182,9 +185,9 @@ void Contentwidget::initConnect()
     connect(m_searchwidget,SIGNAL(signalSendData(QString,QString)),this,SIGNAL(signalSearchData(QString,QString)));
     connect(m_searchwidget,SIGNAL(signalBtnClicked()),this,SLOT(slotNewSearch()));
     //点击专辑时显示歌曲和窗口
-    connect(m_musicSongsMedia,&MusicSongsMedia::signalShowMusicsForAlbum,this,&Contentwidget::slotShowTip);
+    connect(m_musicSongsMedia,&MusicSongsMedia::signalShowMusicsForAlbum,this,&Contentwidget::slotShowMediaSongs);
     connect(m_musicSongsMedia,&MusicSongsMedia::signalShowMusicsForAlbum,this,&Contentwidget::signalLoadTipMusics);
-    connect(m_musicSongsMedia2,&MusicSongsMedia::signalShowMusicsForAlbum,this,&Contentwidget::slotShowTip);
+    connect(m_musicSongsMedia2,&MusicSongsMedia::signalShowMusicsForAlbum,this,&Contentwidget::slotShowMediaSongs);
     connect(m_musicSongsMedia2,&MusicSongsMedia::signalShowMusicsForAlbum,this,&Contentwidget::signalLoadTipMusics);
     //点击歌手后显示表和专辑
     connect(m_musicSongsMedia,&MusicSongsMedia::signalShowTableWidget,this,&Contentwidget::slotShowTableWidget);
@@ -222,8 +225,6 @@ void Contentwidget::connectMusicList(int index)
             this,SIGNAL(signalSendFirstPlayMusic(QString)));
     connect(m_musicSongList.at(index),SIGNAL(signalPlayMusicPath(QString)),
             this,SIGNAL(signalPlayMusic(QString)));
-    connect(m_musicSongList.at(index),SIGNAL(signalShowLyric()),
-            this,SLOT(slotShowLrc()));
     connect(m_musicSongList.at(index),SIGNAL(signalSendPlayCmdMusicInfo(QString)),
             this,SIGNAL(signalSendPlayCmdMusic(QString)));
     connect(m_musicSongList.at(index), SIGNAL(signalSendToPlayList(QList<QString> &,int)),this,SIGNAL(signalSendSongsListWidget(QList<QString>  &,int)));
@@ -245,8 +246,6 @@ void Contentwidget::disConnectMusicList(int index)
 
     disconnect(m_musicSongList.at(m_currentwidget),SIGNAL(signalPlayMusicPath(QString)),
                this,SIGNAL(signalPlayMusic(QString)));
-    disconnect(m_musicSongList.at(m_currentwidget),SIGNAL(signalShowLyric()),
-               this,SLOT(slotShowLrc()));
     disconnect(m_musicSongList.at(m_currentwidget), SIGNAL(signalSendToPlayList(QList<QString> &,int)),this,SIGNAL(signalSendSongsListWidget(QList<QString>  &,int)));
     //添加下一首播放
     disconnect(m_musicSongList.at(m_currentwidget), SIGNAL(signalSendNextMusicToList(QString&)),this,SIGNAL(signalSendNextMusic(QString&)));
@@ -274,7 +273,7 @@ void Contentwidget::slotReceiveFirstPlayMusic(int cmd)
 void Contentwidget::slotShowLrc()
 {
     m_musicLyrcWidget->show();
-    m_musicSongsMedia->hide();
+    m_searchwidget->hide();
     m_musicSongsMedia2->hide();
     m_classifyList->hide();
     m_home->hide();
@@ -336,7 +335,7 @@ void Contentwidget::slotShowList(int row,QString list)
 void Contentwidget::slotShowTip()
 {
     m_musicLyrcWidget->hide();
-    m_showOrHide = false;
+    //m_showOrHide = false;
     m_musicSongList.at(m_currentwidget)->hide();
     this->disConnectMusicList(m_currentwidget);
     m_classifyList->hide();
@@ -344,6 +343,8 @@ void Contentwidget::slotShowTip()
     m_home->close();
     m_musicSongsMedia->removeAllItem();
     m_musicSongsMedia->show();
+    //m_searchwidget->show();
+    //slotShowMediaSongs();
 }
 
 void Contentwidget::slotShowHomePage()
@@ -354,7 +355,7 @@ void Contentwidget::slotShowHomePage()
     this->disConnectMusicList(m_currentwidget);
     m_classifyList->hide();
     m_musicSongsMedia2->hide();
-    m_musicSongsMedia->hide();
+    //m_musicSongsMedia->hide();
     m_searchwidget->hide();
     m_home->show();
 }
@@ -375,6 +376,7 @@ void Contentwidget::slotDeleteList(int row)
 
 void Contentwidget::slotShowOrHide()
 {
+    qDebug()<<"显示或隐藏歌词";
     if(m_showOrHide)
         slotHideLrc();
     else
@@ -385,13 +387,12 @@ void Contentwidget::slotShowOrHide()
 void Contentwidget::slotShowMediaSongs()
 {
     m_musicSongsMedia->removeAllItem();
+    if(m_musicSongsMedia->isHidden()){
+        m_musicSongsMedia->show();
+    }
     if(m_searchwidget->isHidden()){
+        //m_searchwidget->initWidget(m_musicSongsMedia);
         m_searchwidget->show();
-        m_searchwidget->initWidget(m_musicSongsMedia);
-        if(m_musicSongsMedia->isHidden()){
-            m_musicSongsMedia->show();
-            //m_searchwidget->initWidget(m_musicSongsMedia);
-        }
     }
     m_musicSongList.at(m_currentwidget)->hide();
     m_musicLyrcWidget->hide();

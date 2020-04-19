@@ -38,7 +38,6 @@ Q_SIGNALS:
     void signalAddMusicFolder();
     void signalDeleteMusic();
     void signalDeleteAllMusic();
-    void signalShowLyric();
     void signalPlayMusicPath(QString path);
     void signalSendNextMusicToList(QString&);
 

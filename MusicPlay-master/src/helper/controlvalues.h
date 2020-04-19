@@ -19,7 +19,7 @@
 #define CENTERWIDGET_RIGHT       700
 
 #define TITLE_HEIGHT            40  //标题栏宽度
-#define BOTTOM_HEIGHT           70  //底部
+#define BOTTOM_HEIGHT           50  //底部
 
 //枚举播放或者暂停状态
 enum PlayState{

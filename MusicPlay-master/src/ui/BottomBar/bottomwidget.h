@@ -32,7 +32,6 @@ public Q_SLOTS:
     void slotReceivePlayLength(qint64); //接收媒体长度
     void slotSetPlayVolume(int);        //设置播放音量
     void slotReceivePlayPostion(qint64);//接收播放位置
-    void slotShowImage(QImage image);
 private Q_SLOTS:
     void slotPlayOrPause();             //播放模式
     void slotSetPlayOrPause(int);       //设置播放模式
@@ -55,7 +54,6 @@ private:
     void playMusic();
 
 private:
-    QPushButton *m_showOrHide;
     QPushButton *m_pbnPreviousMusic;    //上一首
     QPushButton *m_pbnPlayOrPause;      //播放或者暂停
     QPushButton *m_pbnNextMusic;        //下一首

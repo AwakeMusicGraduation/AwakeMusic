@@ -15,6 +15,7 @@ class MusicDesktopLrcManage;
 class Client;
 class loginform_test;
 class MyMediaPlayList;
+class MiniPlayLayout;
 
 class MusicMainWidget : public QFrame
 {
@@ -48,6 +49,8 @@ private Q_SLOTS:
 
     void slotTest(const QString &);
 
+    void slotShowMiniPlay(QString,QString);
+
 
 protected :
     virtual void mousePressEvent(QMouseEvent *);
@@ -63,6 +66,7 @@ private:
     MusicDesktopLrcManage *m_desktopLrc;//桌面歌词
     QVBoxLayout *m_mainLayout;          //主布局
     MyMediaPlayList *m_playlist;
+    MiniPlayLayout *m_miniplay;
 
 
     QPoint m_move_point;                //移动的距离

@@ -185,7 +185,6 @@ void MusicSongsListWidget::slotCellDoubleClicked(int row, int column)
     QString s = songName;
     //    Client *client = new Client();
     //    client->sendData(s.remove(s.right(4)));
-    emit signalShowLyric();
     emit signalSendToPlayList(m_musicpath,row);
     //    emit signalPlayMusic(songName);
     PlayMusics(songName);

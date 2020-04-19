@@ -69,25 +69,42 @@ void MyMediaPlayList::initForm()
 
     //鼠标右键初始化
     //    m_menu = new MusicListMenu(this);
+    setFocusPolicy(Qt::NoFocus);
+    m_table2->setColumnCount(3);
+    m_table2->setRowCount(0);
+    m_table2->setShowGrid(false);//display the grid
+    m_table2->setEditTriggers(QAbstractItemView::NoEditTriggers);     //设置表格不能编辑
+    m_table2->setSelectionBehavior(QAbstractItemView::SelectRows);    //进整行选择
+    m_table2->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_table2->verticalHeader()->setDefaultSectionSize(25);
+    m_table2->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);    //设置不可滑动
+
+
+    //进行“列设置”
+    //    m_table1->setSelectionBehavior(QAbstractItemView::SelectColumns);
+    m_table2->setColumnWidth(0,250);
+    m_table2->horizontalHeader()->setVisible(false);
+    m_table2->verticalHeader()->setVisible(false);
 }
 
 void MyMediaPlayList::initMenu()
 {
     qDebug()<<"初始化菜单";
     m_menu = new QMenu(m_table1);
+    m_furthermenu = new QMenu("加入播放列表");
 
     QAction *actionpPlayMusic = new QAction("播放",this);
-    QAction *actionAddMusicToList = new QAction("收藏到歌单",this);
     QAction *actionDeleteFromPlayList = new QAction("从列表中删除",this);
     QAction *actionDeleteAll = new QAction("清空",this);
 
     m_menu->addAction(actionpPlayMusic);
-    m_menu->addSeparator();
-    m_menu->addAction(actionAddMusicToList);
+
     m_menu->addSeparator();
     m_menu->addAction(actionDeleteFromPlayList);
     m_menu->addSeparator();
     m_menu->addAction(actionDeleteAll);
+    m_menu->addSeparator();
+    m_menu->addMenu(m_furthermenu);
 
     connect(m_table1, SIGNAL(customContextMenuRequested(QPoint)),this, SLOT(slotShowQmenu(QPoint)));
     connect(actionpPlayMusic,SIGNAL(triggered(bool)),this,SLOT(slotPlayMusic()));
@@ -112,6 +129,15 @@ void MyMediaPlayList::addContenItem(QStringList m,int i)
     m_table1->setItem(i,1,new QTableWidgetItem(m.at(1)));
     m_table1->setItem(i,2,new QTableWidgetItem(m.at(2)));
 
+}
+
+void MyMediaPlayList::addItemToHistoryList(QStringList m)
+{
+    int rowIndex = m_table2->rowCount();
+    m_table2->setRowCount(rowIndex+1);
+    m_table2->setItem(rowIndex,0,new QTableWidgetItem(m.at(0)));
+    m_table2->setItem(rowIndex,1,new QTableWidgetItem(m.at(1)));
+    m_table2->setItem(rowIndex,2,new QTableWidgetItem(m.at(2)));
 }
 
 void MyMediaPlayList::slotRemoveAllItem()
@@ -155,7 +181,7 @@ void MyMediaPlayList::playMusicByOrder()
         m_table1->setCurrentCell(0,0,QItemSelectionModel::Clear);
         m_table1->setCurrentCell(rowIndex + 1,0,QItemSelectionModel::SelectCurrent);
         m_currentplay++;
-            emit signalSendPlayNextMusic(m_musicpath.at(m_currentplay).path,m_musicpath.at(m_currentplay).i);
+        emit signalSendPlayNextMusic(m_musicpath.at(m_currentplay).path,m_musicpath.at(m_currentplay).i);
     }
     else {
         //播放到最后一首歌曲时停止播放
@@ -180,19 +206,38 @@ void MyMediaPlayList::playMusicByDisorder()
     emit signalSendPlayNextMusic(m_musicpath.at(m_currentplay).path,m_musicpath.at(m_currentplay).i);
 }
 
+void MyMediaPlayList::addMusicToHistoryList()
+{
+    if(m_historypath.size()<30){
+        m_historypath.push_back(m_musicpath.at(m_currentplay).path);
+        QStringList s;
+        s<<m_table1->item(m_currentplay,0)->text()<<m_table1->item(m_currentplay,1)->text()<<m_table1->item(m_currentplay,2)->text();
+        addItemToHistoryList(s);
+    }
+    else {
+        m_historypath.pop_front();
+        m_historypath.push_back(m_musicpath.at(m_currentplay).path);
+        m_table2->removeRow(0);
+        QStringList s;
+        s<<m_table1->item(m_currentplay,0)->text()<<m_table1->item(m_currentplay,1)->text()<<m_table1->item(m_currentplay,2)->text();
+        addItemToHistoryList(s);
+    }
+}
+
 void MyMediaPlayList::slotCellDoubleClicked(int row, int column)
 {
     //    qDebug() << "接收到播放列表信号";
     m_currentplay = row;
     QString musicPath = m_musicpath.at(row).path;
     qDebug()<<"路径"<<musicPath;
-    emit signalShowLyric();//显示歌词界面
     if(m_musicpath.at(row).i==0){
         emit signalPlayMusic(musicPath);
     }
     else {
         emit signalPlayMediaMusic(musicPath);
     }
+    emit signalSendNameAndSinger(m_table1->item(row,0)->text(),m_table1->item(row,1)->text());
+    addMusicToHistoryList();
 }
 
 void MyMediaPlayList::slotPlayMusic()
@@ -200,13 +245,15 @@ void MyMediaPlayList::slotPlayMusic()
     int rowIndex = m_table1->currentRow();
     m_currentplay = rowIndex;
     QString musicPath = m_musicpath.at(rowIndex).path;
-    emit signalShowLyric();//显示歌词界面
+
     if(m_musicpath.at(rowIndex).i==0){
         emit signalPlayMusic(musicPath);
     }
     else {
         emit signalPlayMediaMusic(musicPath);
     }
+    emit signalSendNameAndSinger(m_table1->item(m_currentplay,0)->text(),m_table1->item(m_currentplay,1)->text());
+    addMusicToHistoryList();
 }
 
 void MyMediaPlayList::slotAddNextLocalPlayMusic(QString& path)
@@ -258,6 +305,8 @@ void MyMediaPlayList::slotReceiveList1(QList<QString>  &musicname,int row)
     }
     m_currentplay=row;//设置当前播放的歌曲的行数
     m_table1->setCurrentCell(m_currentplay,0,QItemSelectionModel::SelectCurrent);
+    emit signalSendNameAndSinger(m_table1->item(m_currentplay,0)->text(),m_table1->item(m_currentplay,1)->text());
+    addMusicToHistoryList();
 }
 
 void MyMediaPlayList::slotReceiveList2(QList<QStringList> &musicinfo, int row)
@@ -274,10 +323,13 @@ void MyMediaPlayList::slotReceiveList2(QList<QStringList> &musicinfo, int row)
     }
     m_currentplay=row;//设置当前播放的歌曲的行数
     m_table1->setCurrentCell(m_currentplay,0,QItemSelectionModel::SelectCurrent);
+    emit signalSendNameAndSinger(m_table1->item(m_currentplay,0)->text(),m_table1->item(m_currentplay,1)->text());
+    addMusicToHistoryList();
 }
 
 void MyMediaPlayList::slotShowQmenu(QPoint pos)
 {
+    emit signalObtainListName();
     qDebug() << "接收到菜单信号";
     QModelIndex index = m_table1->indexAt(pos);
     if(index.row()>=0){
@@ -381,6 +433,43 @@ void MyMediaPlayList::slotSendPlayCmd(int mode)
     default:
         break;
     }
+    emit signalSendNameAndSinger(m_table1->item(m_currentplay,0)->text(),m_table1->item(m_currentplay,1)->text());
+    addMusicToHistoryList();
+}
+
+void MyMediaPlayList::slotReceiveListName(std::vector<QString> listname)
+{
+    qDebug() << "初始化二级菜单";
+    QAction *action1;
+    if(!listname.empty()){
+        m_furthermenu->clear();
+        for(auto l:listname)
+        {
+            qDebug() <<"接收到列表名" << l << "listnamename";
+            action1 = new QAction(l,this);
+            m_furthermenu->addAction(action1);
+            m_furthermenu->addSeparator();
+        }
+    }
+    else {
+        m_furthermenu->clear();
+        action1 = new QAction("无列表，请新增列表");
+        m_furthermenu->addAction(action1);
+    }
+    connect(m_furthermenu,SIGNAL(triggered(QAction*)),SLOT(slotResponse(QAction*)));
+}
+
+void MyMediaPlayList::slotResponse(QAction *action)
+{
+    QString list = action->text();
+    qDebug() << "like the name" << list;
+    int row = m_table1->currentRow();
+    QString label = "addmusictolist";
+    QString name = m_table1->item(row,0)->text();
+    QString singer = m_table1->item(row,1)->text();
+    QString album = m_table1->item(row,2)->text();
+    qDebug() << name << singer << album;
+    emit signalAddMusicToList(label,list,name,singer,album);
 }
 
 

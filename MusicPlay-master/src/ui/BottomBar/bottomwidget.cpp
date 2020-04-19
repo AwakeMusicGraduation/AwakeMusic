@@ -64,15 +64,15 @@ void BottomWidget::slotReceivePlayPostion(qint64 postion)
     m_progressSlider->setValue(temp);
 }
 
-void BottomWidget::slotShowImage(QImage image)
-{
-    QPixmap pix = QPixmap::fromImage(image,Qt::AutoColor);
-    //    m_showOrHide->setIcon(QIcon(":/image/hide"));
-    QIcon icon;
-    icon.addPixmap(pix);
-    m_showOrHide->setIcon(icon);
-    m_showOrHide->setIconSize(QSize(35,35));
-}
+//void BottomWidget::slotShowImage(QImage image)
+//{
+//    QPixmap pix = QPixmap::fromImage(image,Qt::AutoColor);
+//    //    m_showOrHide->setIcon(QIcon(":/image/hide"));
+//    QIcon icon;
+//    icon.addPixmap(pix);
+//    m_showOrHide->setIcon(icon);
+//    m_showOrHide->setIconSize(QSize(35,35));
+//}
 
 //切换声音控制状态槽函数
 void BottomWidget::slotNoVoice()
@@ -186,11 +186,6 @@ void BottomWidget::initForm()
 
 void BottomWidget::initWidget()
 {
-    m_showOrHide = new QPushButton(this);
-    m_showOrHide->setFlat(true);
-    m_showOrHide->setCursor(Qt::PointingHandCursor);
-    m_showOrHide->setToolTip("显示/隐藏歌词");
-    m_showOrHide->setObjectName("pbnPreviousMusic");
     //上一首
     m_pbnPreviousMusic = new QPushButton(this);
     m_pbnPreviousMusic->setFlat(true);
@@ -278,7 +273,7 @@ void BottomWidget::initLayout()
 {
     QHBoxLayout *playLayout = new QHBoxLayout;
     playLayout->addSpacing(20);
-    playLayout->addWidget(m_showOrHide);
+//    playLayout->addWidget(m_showOrHide);
     playLayout->addWidget(m_pbnPreviousMusic);
     playLayout->addWidget(m_pbnPlayOrPause);
     playLayout->addWidget(m_pbnNextMusic);
@@ -303,8 +298,8 @@ void BottomWidget::initLayout()
 
 void BottomWidget::initConnect()
 {
-    connect(m_showOrHide,SIGNAL(clicked()),
-            this,SIGNAL(signalShowOrHide()));
+//    connect(m_showOrHide,SIGNAL(clicked()),
+//            this,SIGNAL(signalShowOrHide()));
     connect(m_pbnPreviousMusic,SIGNAL(clicked()),
             this,SIGNAL(signalPreviousMusic()));
     connect(m_pbnPlayOrPause,SIGNAL(clicked()),

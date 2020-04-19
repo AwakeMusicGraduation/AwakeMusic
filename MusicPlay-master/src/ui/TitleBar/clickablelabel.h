@@ -12,6 +12,7 @@ public:
     {
         setText(text);
     }
+    ClickableLabel(){}
     ~ClickableLabel()
     {
 
