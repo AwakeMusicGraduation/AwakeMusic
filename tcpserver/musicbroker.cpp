@@ -92,13 +92,13 @@ QString MusicBroker::findRegisterInfo(QString name,QString password)
 QString MusicBroker::createSongsList(QString user,QString list)
 {
     sqltable->user = user;
-    return sqltable->createMusicList(list);
+    return sqltable->createMusicList(user,list);
 }
 
 QString MusicBroker::deleteSongsList(QString user, QString list)
 {
     sqltable->user = user;
-    return sqltable->deleteMusicList(list);
+    return sqltable->deleteMusicList(user,list);
 }
 
 QString MusicBroker::addMusicToList(QString list, QString name, QString singer,QString album)

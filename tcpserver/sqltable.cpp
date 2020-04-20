@@ -5,7 +5,6 @@
 
 Sqltable::Sqltable()
 {  
-    user = "";
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("MusicPlayer.db");
     if(db.open()){
@@ -306,8 +305,7 @@ std::vector<QString> Sqltable::login(QString name,QString password)//先查询�
             QString s = "Sign in success";
             m.push_back(s);
             qDebug()<<"Sign in success.";
-            user = name;
-            searchMusicList(&m);
+            searchMusicList(name,&m);
             //return m;
         }
         else
@@ -454,7 +452,7 @@ void Sqltable::updatamusic(int id,QString name)
 Music* Sqltable::querysingle(QString name)
 {
     Music *music;
-    QString select_sql = "select * from music where name = '" + name +"'";
+    QString select_sql = "select * from music where name like '%" + name +"%'";
     sql_query.prepare(select_sql);
     //sql_query.addBindValue(name);
     if(!sql_query.exec())
@@ -478,7 +476,7 @@ Music* Sqltable::querysingle(QString name)
             QString lyric = sql_query.value(3).toString();
             QString album = sql_query.value(4).toString();
             QString audiopath = sql_query.value(5).toString();
-            music = new Music(name1,singer,lyric,album,audiopath);
+            music = new Music(name1,singer,lyric,audiopath,album);
 
             qDebug()<<"checked";
             qDebug()<<QString("ID:%1  Name:%2  singer:%3 lyric:%4 album:%5 audiopath:%6" ).arg(id).arg(name1).arg(singer).arg(lyric).arg(album).arg(audiopath);
@@ -662,7 +660,7 @@ std::vector<QString> Sqltable::querySingerCategory(QString category)
 
 }
 
-QString Sqltable::createMusicList(QString name)//用户自己创建的音乐列表
+QString Sqltable::createMusicList(QString user,QString name)//用户自己创建的音乐列表
 {
     QString create_sql = "create table '" + name +"'(music varchar(30), singer varchar(30),album varchar(30))";
     QString insert_user_list = "insert into user_list values(?,?)";
@@ -689,7 +687,7 @@ QString Sqltable::createMusicList(QString name)//用户自己创建的音乐列�
     return message;
 }
 
-void Sqltable::searchMusicList(std::vector<QString> *m)//用户登录后自动搜索属于自己的歌单并加载
+void Sqltable::searchMusicList(QString user,std::vector<QString> *m)//用户登录后自动搜索属于自己的歌单并加载
 {
     qDebug() << "查询用户创建的列表";
     QString select_sql = "select * from user_list where user = '" + user +"'";
@@ -793,7 +791,7 @@ void Sqltable::deletemusicFromList(QString list, QString music, QString album, Q
     }
 }
 
-QString Sqltable::deleteMusicList(QString list)
+QString Sqltable::deleteMusicList(QString user,QString list)
 {
     QString select_sql = "select * from user_list where list = '" + list +"'";
     QString delete_sql = "drop table '" + list +"'";
@@ -896,7 +894,8 @@ std::vector<QString> Sqltable::randomSelectAlbum()
 std::vector<Music *> Sqltable::searchMusicBySinger(QString content)
 {
     std::vector<Music *> musics;
-    QString select_singer = "select * from music where singer = '" + content + "'";
+    QString select_singer1 = "select * from music where singer like '%%1%'";
+    QString select_singer = select_singer1.arg(content);
     QSqlQuery sql_query1;
     QString name1,singer,lyric,album,audiopath;
     //搜索歌手
@@ -927,7 +926,7 @@ std::vector<Music *> Sqltable::searchMusicByAlbum(QString content)
 {
     std::vector<Music *> musics;
     Music *music;
-    QString select_album = "select * from music where album = '" + content + "'";
+    QString select_album = "select * from music where album like '%" + content + "%" + "'";
     QSqlQuery sql_query1;
     //搜索专辑
     sql_query1.prepare(select_album);
@@ -956,7 +955,7 @@ std::vector<Music *> Sqltable::searchMusicByAlbum(QString content)
 std::vector<Music *> Sqltable::searchMusicByList(QString content)
 {
     std::vector<Music *> musics;
-    QString select_list = "select * from user_list where list = '" + content + "'";
+    QString select_list = "select * from user_list where list like '%" + content + "%" + "'";
     QSqlQuery sql_query1;
     //搜索歌单
     sql_query1.prepare(select_list);
@@ -1046,7 +1045,6 @@ std::vector<QString> Sqltable::searchMusicsForTip(QString tip)
 
 std::vector<QString> Sqltable::queryAlbumsForSinger(QString singer)
 {
-    db.open();
     QString select_sql = "select * from album where singername = '" + singer +"'";
     QSqlQuery albums_query;
     albums_query.prepare(select_sql);
@@ -1064,6 +1062,5 @@ std::vector<QString> Sqltable::queryAlbumsForSinger(QString singer)
             albums.push_back(name);
         }
    }
-    db.close();
     return albums;
 }
