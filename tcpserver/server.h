@@ -43,8 +43,9 @@ private slots:
     void sendTipMusics(QString tip);//根据推荐歌单搜素歌曲
 
     void displayError(QAbstractSocket::SocketError socketError);
-signals:
-    void sendToMaiWindow();
+
+Q_SIGNALS:
+    void signalSendToMaiWindow();
 
 private:
     QTcpServer *tcpServer;

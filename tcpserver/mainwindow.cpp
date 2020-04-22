@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     Server *server = new Server();
-    connect(server,SIGNAL(sendToMainWindow()),this,SLOT(receiveServer()));
+    connect(server,SIGNAL(signalSendToMaiWindow()),this,SLOT(receiveServer()));
     initUI();
 }
 
@@ -109,3 +109,18 @@ void MainWindow::receiveServer()
     qDebug() << "连接成功";
     ui->label->setText("连接成功");
 }
+
+void MainWindow::on_pushButton_7_clicked()
+{
+    QString name = ui->lineEdit->text();
+    int i=ui->tabWidget->currentIndex();
+    switch (i) {
+    case 0:
+        m_ptab->queryDB(name);
+        break;
+    case 1:
+        m_psingerTab->queryDB(name);
+    }
+
+}
+

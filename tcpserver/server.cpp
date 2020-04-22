@@ -48,7 +48,7 @@ void Server::acceptConnection()
 {
     ui->label->setText("连接成功");
     qDebug() << "connect success";
-    emit sendToMaiWindow();
+    emit signalSendToMaiWindow();
     clientConnection = tcpServer->nextPendingConnection();
     //sendPlaylist();
     connect(clientConnection, &QIODevice::readyRead,this,&Server::receiveData);
