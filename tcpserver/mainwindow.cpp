@@ -40,6 +40,7 @@ void MainWindow::on_pushButton_clicked()
         break;
     case 1:
         m_psingerTab->updateDB();
+        break;
     }
 
 }
@@ -65,6 +66,7 @@ void MainWindow::on_pushButton_3_clicked()
         break;
     case 1:
         m_psingerTab->appendDB();
+        break;
     }
 }
 
@@ -77,6 +79,7 @@ void MainWindow::on_pushButton_4_clicked()
         break;
     case 1:
         m_psingerTab->deleteDB();
+        break;
     }
 }
 
@@ -89,6 +92,7 @@ void MainWindow::on_pushButton_5_clicked()
         break;
     case 1:
         m_psingerTab->ascendDB();
+        break;
     }
 }
 
@@ -101,6 +105,7 @@ void MainWindow::on_pushButton_6_clicked()
         break;
     case 1:
         m_psingerTab->descendDB();
+        break;
     }
 }
 
@@ -109,6 +114,7 @@ void MainWindow::receiveServer()
     qDebug() << "连接成功";
     ui->label->setText("连接成功");
 }
+
 
 void MainWindow::on_pushButton_7_clicked()
 {
@@ -120,7 +126,21 @@ void MainWindow::on_pushButton_7_clicked()
         break;
     case 1:
         m_psingerTab->queryDB(name);
+        break;
     }
 
+}
+
+void MainWindow::on_pushButton_8_clicked()
+{
+    int i=ui->tabWidget->currentIndex();
+    switch (i) {
+    case 0:
+        m_ptab->showDB();
+        break;
+    case 1:
+        m_psingerTab->showDB();
+        break;
+    }
 }
 

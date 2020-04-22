@@ -99,6 +99,6 @@ void SingerTable::queryDB(QString name)
 
 void SingerTable::showDB()
 {
-    model->setTable("student");
+    model->setTable("singer");
     model->select();
 }

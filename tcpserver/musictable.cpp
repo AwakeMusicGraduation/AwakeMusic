@@ -104,6 +104,6 @@ void MusicTable::queryDB(QString name)
 
 void MusicTable::showDB()
 {
-    model->setTable("student");
+    model->setTable("music");
     model->select();
 }

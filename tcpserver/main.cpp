@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
 
 /*
-     sqltable->insertParmeter(1,"初学者","薛之谦","/root/薛之谦/初学者/chuxuezhe.lrc","/root/薛之谦/chuxuezhe","初学者");
+   sqltable->insertParmeter(1,"初学者","薛之谦","/root/薛之谦/初学者/chuxuezhe.lrc","/root/薛之谦/chuxuezhe","初学者");
         sqltable->insertParmeter(2,"刚刚好","薛之谦","/root/薛之谦/初学者/gangganghao.lrc","/root/薛之谦/chuxuezhe","初学者");
         sqltable->insertParmeter(3,"花儿和少年","薛之谦","/root/薛之谦/初学者/huaerheshaonian.lrc","/root/薛之谦/chuxuezhe","初学者");
         sqltable->insertParmeter(4,"我好像在哪见过你","薛之谦","/root/薛之谦/初学者/wohaxiangzainaerjianguoni.lrc","/root/薛之谦/chuxuezhe","初学者");
@@ -179,8 +179,7 @@ int main(int argc, char *argv[])
       sqltable->insertParmeterTransform("公路之歌","gongluzhige");
       sqltable->insertParmeterTransform("再见杰克","zaijianjieke");
       sqltable->insertParmeterTransform("恶作剧","ezuoju");
-      sqltable->insertParmeterTransform("暗里着迷","anlizhaomi");
-      */
+      sqltable->insertParmeterTransform("暗里着迷","anlizhaomi");*/
 
     MainWindow *w=new MainWindow;
     w->show();

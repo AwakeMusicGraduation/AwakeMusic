@@ -36,6 +36,7 @@ public:
     void deletemusic(QString name);
     void updatamusic(int id,QString name);
     Music* querysingle(QString name);
+    std::vector<Music*> queryMusicsByName(QString name);
     void insertParmeterSinger(int id, QString name,QString category);
     void insertParmeterAlbum(int id, QString name, QString startDate,QString  singerName);
     void insertParmeterTransform(QString name, QString spell);
@@ -55,7 +56,7 @@ public:
     QString createMusicList(QString user,QString name);//用户自己创建的音乐列表
     void searchMusicList(QString user,std::vector<QString> *m);//用户登录后自动搜索属于自己的歌单并加载
     QString insertMusicList(QString list,QString music,QString album,QString singer);//用户往特定歌单插入歌曲
-    void deletemusicFromList(QString list,QString music,QString album,QString singer);//用户删除特定歌单的歌曲
+    QString deletemusicFromList(QString list,QString music,QString album,QString singer);//用户删除特定歌单的歌曲
     QString deleteMusicList(QString user,QString list);//用户删除特定歌单
     std::vector<QString> loadMusicFromList(QString list);//根据列表搜素对应的音乐
     std::vector<QString> randomSelectAlbum();//随机从专辑中选出8个专辑作为推荐歌单

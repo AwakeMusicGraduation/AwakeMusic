@@ -242,6 +242,12 @@ void Server::receiveData()
         in >> list >> name >> singer >> album;
         sendAddMusicToList(list,name,singer,album);
     }
+    else if(data == "deletemusicfromlist")
+    {
+        QString list,name,singer,album;
+        in >> list >> name >> singer >> album;
+        sendDeleteMusicFromList(list,name,singer,album);
+    }
 
     else if(data == "loadmusicfromlist")
     {
@@ -306,7 +312,12 @@ void Server::receiveData()
     else if(data == "musicList"){
         in >> name;
         musics = musicBroker->findByList(name);
-        sendMessage();
+        //sendMessage();
+        if(!musics.empty()){
+            sendMusicFromList(name);
+        }
+        else
+            clientConnection->disconnectFromHost();
     }
 
     blockSize = 0;
@@ -379,6 +390,18 @@ void Server::sendDeleteSongsList()
     clientConnection->disconnectFromHost();
 }
 
+void Server::sendDeleteMusicFromList(QString list,QString name,QString singer,QString album)
+{
+    QString message = musicBroker->deletemusicFromList(list,name,singer,album);
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_10);
+    out << qint32(message.size());
+    out << message;
+    clientConnection->write(block);
+    clientConnection->disconnectFromHost();
+}
+
 void Server::sendAddMusicToList(QString list,QString name,QString singer,QString album)
 {
     QString message = musicBroker->addMusicToList(list,name,singer,album);
@@ -403,7 +426,7 @@ void Server::sendMusicFromList(QString list)
     {
         total += l.size();
     }
-    out << qint32(total);
+    //out << qint32(total);
     for(auto l:allmusics)
     {
         out << l;

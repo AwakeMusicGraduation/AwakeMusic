@@ -7,13 +7,8 @@ MusicBroker::MusicBroker()
 
 std::vector<Music *> MusicBroker::findByName(QString name)
 {
-    std::vector<Music *> m;
-    Music *music = sqltable->querysingle(name);
-    if(music != nullptr)
-    {
-        m.push_back(music);
-    }
-    return m;
+    std::vector<Music *> musics = sqltable->queryMusicsByName(name);
+    return musics;
 }
 
 std::vector<Music *> MusicBroker::findBySinger(QString singer)
@@ -99,6 +94,11 @@ QString MusicBroker::deleteSongsList(QString user, QString list)
 {
     sqltable->user = user;
     return sqltable->deleteMusicList(user,list);
+}
+
+QString MusicBroker::deletemusicFromList(QString list, QString name, QString singer, QString album)
+{
+    return sqltable->deletemusicFromList(list,name,album,singer);
 }
 
 QString MusicBroker::addMusicToList(QString list, QString name, QString singer,QString album)
