@@ -7,6 +7,8 @@ class QString;
 class App
 {
 public:
+    static QString user;                    //用户名
+    static QString password;                //密码
     static QString AppPath;                 //应用程序路径
     static int AppFontSize;                 //应用程序字体大小
     static QString AppFontName;             //应用程序字体名称

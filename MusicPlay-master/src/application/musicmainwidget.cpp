@@ -28,7 +28,7 @@ MusicMainWidget::MusicMainWidget(QWidget *parent) :
     initLayout();
     initPlayList();
     initConnect();
-    m_client->slotObtainAlbums();
+    emit signalSendLogin("user",App::user,App::password);
 
 }
 
@@ -56,6 +56,7 @@ void MusicMainWidget::initForm()
     App::ReadConfig();
     m_curSkin = App::AppSkin;
     setStyleSheet(QString("#MainFrame {background-image:url(:/image/skin/%1);border:1px solid black;}").arg(m_curSkin));
+
 }
 
 //窗体初始化
@@ -79,7 +80,6 @@ void MusicMainWidget::initWidget()
     m_desktopLrc = new MusicDesktopLrcManage;
     m_client = new Client();
 
-//    m_client->newConnect();
 }
 
 //布局初始化
@@ -279,6 +279,14 @@ void MusicMainWidget::initConnect()
     connect(m_playlist,SIGNAL(signalSendNameAndSinger(QString,QString)),this,SLOT(slotShowMiniPlay(QString,QString)));
     //删除列表中的歌曲
     connect(m_contentWidget,SIGNAL(signalDeleteMusicFromList(QString,QString,QString,QString,QString)),m_client,SLOT(sendDeleteMusicFromList(QString,QString,QString,QString,QString)));
+
+    //用户登录
+    connect(login,SIGNAL(signalLoginClicked(QString,QString,QString)),m_client,SLOT(sendLoginData(QString,QString,QString)));
+    connect(m_client,SIGNAL(signalAcceptUserMessage(std::vector<QString>)),login,SLOT(slotAcceptUserMessage(std::vector<QString>)));
+    connect(login,SIGNAL(signalRegisterClicked(QString,QString,QString)),m_client,SLOT(sendRegisterData(QString,QString,QString)));
+    connect(m_client,SIGNAL(signalAcceptRegisterMessage(QString)),login,SLOT(slotAcceptRegisterMessage(QString)));
+    connect(this,SIGNAL(signalSendLogin(QString,QString,QString)),m_client,SLOT(sendLoginData(QString,QString,QString)));
+    connect(this,SIGNAL(signalSendLogin(QString,QString,QString)),login,SLOT(slotSetName(QString,QString,QString)));
 
 }
 

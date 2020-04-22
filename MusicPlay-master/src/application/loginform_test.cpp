@@ -5,6 +5,7 @@
 #include <QHBoxLayout>
 #include <QGridLayout>
 #include "client.h"
+#include "app.h"
 
 loginform_test::loginform_test(QDialog *parent) :
     QDialog(parent)
@@ -80,18 +81,10 @@ loginform_test::loginform_test(QDialog *parent) :
     //m_grid->addLayout(m_layout1,2,1);
 
 
-    m_client = new Client();
-
     //单击登录按钮时 执行 LoginForm::login 槽函数；//单击退出按钮时 执行 LoginForm::close 槽函数
     connect(loginBtn,&QPushButton::clicked,this,&loginform_test::login);
-    connect(this,&loginform_test::signalLoginClicked,m_client,&Client::sendLoginData);
-    connect(m_client,&Client::signalAcceptUserMessage,
-            this,&loginform_test::slotAcceptUserMessage);
-    connect(reBtn,&QPushButton::clicked,this,&loginform_test::regis);
-    connect(this,&loginform_test::signalRegisterClicked,m_client,&Client::sendRegisterData);
-    connect(m_client,SIGNAL(signalAcceptRegisterMessage(QString)),
-            this,SLOT(slotAcceptRegisterMessage(QString)));
     connect(exitBtn,&QPushButton::clicked,this,&loginform_test::close);
+    connect(reBtn,&QPushButton::clicked,this,&loginform_test::regis);
 
 
 }
@@ -100,13 +93,12 @@ void loginform_test::login()
 {
     QString user = "user";
     m_name = userNameLEd->text().trimmed();
-    QString name = userNameLEd->text().trimmed();
-    QString password = pwdLEd->text().trimmed();
+    m_password = pwdLEd->text().trimmed();
     //获得userNameLEd输入框的文本userNameLEd->text()；
     //trimmed()去掉前后空格
     //tr()函数，防止设置中文时乱码
     qDebug() << "登录";
-    emit signalLoginClicked(user,name,password);
+    emit signalLoginClicked(user,m_name,m_password);
  /*   if(d.queryAll(name,password))
     {
        accept();//关闭窗体，并设置返回值为Accepted
@@ -165,6 +157,10 @@ void loginform_test::slotAcceptUserMessage(std::vector<QString> userMessage)
         }
         emit signalUpdateList(userMessage);//更新用户列表
         emit signalUpdateName(m_name);//更新用户名
+
+        App::user = m_name;
+        App::password = m_password;
+        App::WriteConfig();
     }
 }
 
@@ -206,4 +202,10 @@ void loginform_test::slotAcceptRegisterMessage(QString message)
                     tr("注册成功"),
                     QMessageBox::Yes);
     }
+}
+
+void loginform_test::slotSetName(QString user,QString name, QString password)
+{
+    m_name = name;
+    m_password = password;
 }

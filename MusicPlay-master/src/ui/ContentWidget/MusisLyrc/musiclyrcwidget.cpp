@@ -104,15 +104,14 @@ void MusicLyrcWidget::slotReceiveCurrentPlayTime(qint64 time)
 #endif
 
     QTime curTime (0,(time/60000) % 60,(time / 1000) %60,time %1000);
-////    //    QString scrollToMe = curTime.toString("mm:ss").left(7);
-////    //    m_lrcText->append("<a name=\"scrollToMe\" href=\"#word\">" + scrollToMe +"</a>");
 
     if (m_lrcText1->find(curTime.toString("mm:ss").left(7)))
     {
-        //        QString str = m_lrcText->textCursor().block().text().replace(
-        //                    QRegExp("\\[\\d{2}:\\d{2}\\.\\d{2}\\]"),"");
         QString str = curTime.toString("mm:ss").left(7);
-        m_lrcText->scrollToAnchor(str);
+        QString str1 = m_lrcText1->textCursor().block().text().replace(
+                                        QRegExp("\\[\\d{2}:\\d{2}\\.\\d{2}\\]"),"");
+        if(!str1.isEmpty())
+            m_lrcText->scrollToAnchor(str);
     }
 
 

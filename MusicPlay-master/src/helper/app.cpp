@@ -3,7 +3,7 @@
 #include <QSettings>
 #include "controlvalues.h"
 
-QString App::AppPath = "/root/MusicPlay-master/";
+QString App::AppPath = "/root/AwakeMusic/MusicPlay-master/";
 int App::AppFontSize = 13;
 QString App::AppFontName = "文泉驿微米黑";
 
@@ -16,6 +16,8 @@ QString App::AppTitle = "音乐播放器";
 
 //默认开始没有播放音乐
 bool App::IsPlaying = false;
+QString App::user = "";
+QString App::password = "";
 
 
 //读取配置文件
@@ -37,6 +39,8 @@ void App::ReadConfig()
     App::AppPlayMode = set->value("AppPlayMode").toInt();
     App::AppTitle = set->value("AppTitle").toString();
     App::IsPlaying = set->value("IsPlaying").toBool();
+    App::user = set->value("user").toString();
+    App::password = set->value("password").toString();
     set->endGroup();
 }
 
@@ -51,6 +55,8 @@ void App::WriteConfig()
     set->setValue("AppPlayMode",App::AppPlayMode);
     set->setValue("AppTitle", App::AppTitle);
     set->setValue("IsPlaying",App::IsPlaying);
+    set->setValue("user",App::user);
+    set->setValue("password",App::password);
     set->endGroup();
 }
 

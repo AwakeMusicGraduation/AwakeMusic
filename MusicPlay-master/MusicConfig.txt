@@ -5,3 +5,5 @@ AppStyle=blue.css
 AppTitle=?????
 AutoRun=false
 IsPlaying=true
+password=123
+user=123

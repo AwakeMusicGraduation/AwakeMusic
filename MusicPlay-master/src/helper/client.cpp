@@ -724,8 +724,7 @@ void Client::acceptUserMessage()
     blockSize = 0;
     //tcpSocket->abort();
     emit signalAcceptUserMessage(userMessage);
-
-
+    slotObtainAlbums();
 }
 
 void Client::acceptRegisterMessage()

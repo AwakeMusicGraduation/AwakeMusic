@@ -24,6 +24,7 @@ public slots:
     void slotAcceptUserMessage(std::vector<QString> userMessage);//接收传回的登录信息
     void regis();
     void slotAcceptRegisterMessage(QString message);
+    void slotSetName(QString ,QString name,QString password);
 Q_SIGNALS:
     void signalLoginClicked(QString user,QString name,QString password);//向服务端传输用户名和密码
     void signalUpdateList(std::vector<QString> userMessage);//更新登录传回的用户列表
@@ -42,6 +43,7 @@ private:
     QGridLayout *m_grid;
     Client *m_client;
     QString m_name;
+    QString m_password;
 };
 
 #endif // LOGINFORM_TEST_H

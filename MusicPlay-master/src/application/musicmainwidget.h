@@ -25,6 +25,7 @@ public:
     ~MusicMainWidget();
     
 Q_SIGNALS:
+    void signalSendLogin(QString user,QString name,QString password);
 
 private:
     void initForm();
