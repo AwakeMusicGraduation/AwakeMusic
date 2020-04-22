@@ -50,6 +50,7 @@ public slots:
     void acceptTipMusics();//接收推荐歌单的歌曲
     void slotGetAlbums(QString singer);//获取歌手的专辑
     void acceptAlbums();//接收专辑
+    void sendDeleteMusicFromList(QString label,QString list, QString name, QString singer, QString album);
 
 
 Q_SIGNALS:
