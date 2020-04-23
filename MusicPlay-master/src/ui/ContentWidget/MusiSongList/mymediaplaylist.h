@@ -36,6 +36,8 @@ private:
     void addContenItem(QStringList,int);
     void addItemToHistoryList(QStringList);
     bool checkRepeatMusic(QString&);//查看是否有重复的歌曲
+    bool checkRepeatMusicFromHistory(QString&);
+    void invertContentItem(int);//将历史记录的某行放在最后一行
     void playMusicByOrder();//顺序循环播放音乐
     void playMusicByDisorder();//随机播放音乐
     void addMusicToHistoryList();//将播放了的歌曲放在历史记录里面，可以双击进行播放

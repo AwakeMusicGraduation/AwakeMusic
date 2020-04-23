@@ -162,6 +162,28 @@ bool MyMediaPlayList::checkRepeatMusic(QString &path)
     return true;
 }
 
+bool MyMediaPlayList::checkRepeatMusicFromHistory(QString &path)
+{
+    for(int i=0; i<m_historypath.size(); i++){
+        if(m_historypath.at(i)==path){
+            m_historypath.erase(m_historypath.begin()+i);
+            m_historypath.push_back(path);
+            invertContentItem(i);
+            return false;
+        }
+    }
+    return true;
+}
+
+void MyMediaPlayList::invertContentItem(int row)
+{
+    qDebug()<<"交换歌曲";
+    QStringList musicinfo;
+    musicinfo << m_table2->item(row,0)->text()<<m_table2->item(row,1)->text()<<m_table2->item(row,2)->text();
+    m_table2->removeRow(row);
+    addItemToHistoryList(musicinfo);
+}
+
 void MyMediaPlayList::playMusicByOrder()
 {
     //判断当前列表是否为空
@@ -208,19 +230,22 @@ void MyMediaPlayList::playMusicByDisorder()
 
 void MyMediaPlayList::addMusicToHistoryList()
 {
-    if(m_historypath.size()<30){
-        m_historypath.push_back(m_musicpath.at(m_currentplay).path);
-        QStringList s;
-        s<<m_table1->item(m_currentplay,0)->text()<<m_table1->item(m_currentplay,1)->text()<<m_table1->item(m_currentplay,2)->text();
-        addItemToHistoryList(s);
-    }
-    else {
-        m_historypath.pop_front();
-        m_historypath.push_back(m_musicpath.at(m_currentplay).path);
-        m_table2->removeRow(0);
-        QStringList s;
-        s<<m_table1->item(m_currentplay,0)->text()<<m_table1->item(m_currentplay,1)->text()<<m_table1->item(m_currentplay,2)->text();
-        addItemToHistoryList(s);
+    QString s = m_musicpath.at(m_currentplay).path;
+    if(checkRepeatMusicFromHistory(s)){
+        if(m_historypath.size()<30){
+            m_historypath.push_back(m_musicpath.at(m_currentplay).path);
+            QStringList s;
+            s<<m_table1->item(m_currentplay,0)->text()<<m_table1->item(m_currentplay,1)->text()<<m_table1->item(m_currentplay,2)->text();
+            addItemToHistoryList(s);
+        }
+        else {
+            m_historypath.pop_front();
+            m_historypath.push_back(m_musicpath.at(m_currentplay).path);
+            m_table2->removeRow(0);
+            QStringList s;
+            s<<m_table1->item(m_currentplay,0)->text()<<m_table1->item(m_currentplay,1)->text()<<m_table1->item(m_currentplay,2)->text();
+            addItemToHistoryList(s);
+        }
     }
 }
 
