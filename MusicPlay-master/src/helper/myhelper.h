@@ -26,6 +26,7 @@ public:
 
     //支持的文件文件格式
     static QStringList supportFormatsFilterDialogString();
+    static QStringList supportFormatsPicture();
 
 public:
     explicit myHelper(QObject *parent = 0);

@@ -34,7 +34,7 @@ public slots:
     void sendLoginData(QString user,QString name,QString password);//发送登录信息
     void sendRegisterData(QString user,QString name,QString password);//发送注册信息
     void sendSongsListData(QString label,QString name,QString list);//发送创建的列表名
-    void sendModifyListName(QString,QString,QString,QString);
+    void sendModifyListName(QString,QString,QString,QString);//更改列表名
     void sendDeleteListFromServer(QString label,QString name,QString list);//发送删除用户创建的列表名
     void displayError(QAbstractSocket::SocketError);
     void acceptUserMessage();//接收登录信息
@@ -53,6 +53,8 @@ public slots:
     void slotGetAlbums(QString singer);//获取歌手的专辑
     void acceptAlbums();//接收专辑
     void sendDeleteMusicFromList(QString label,QString list, QString name, QString singer, QString album);
+    void slotAddTipPictureToServer(QString list,QString filePath);//将歌单的图片传送到服务器
+    void acceptResult();//接收传送歌单图片成功与否
 
 
 Q_SIGNALS:
@@ -65,7 +67,7 @@ Q_SIGNALS:
     void signalSendList(QString);
     void signalShowMusicWidget();
     void signalMediaPinYins(QString,QString,QString,QString);
-    void signalAcceptUserMessage(std::vector<QString> userMessage);//接收点击登录后传回的相关信息
+    void signalAcceptUserMessage(std::vector<QString> userMessage,std::vector<QImage> images);//接收点击登录后传回的相关信息
     void signalAcceptRegisterMessage(QString message);//接收是否注册成功
     void signalAlbumAndImage(QString album,QImage image);//将传回的专辑和图片传到首页
     void signalAddAlbum(QString album);//将专辑加入列表

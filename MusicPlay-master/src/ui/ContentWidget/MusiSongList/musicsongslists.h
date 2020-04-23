@@ -13,33 +13,35 @@ class MusicSongsLists : public QTableWidget
 public:
     explicit MusicSongsLists(QWidget *parent);
     void addItemContent(QString content);
+    void addItemContentImage(QString content,QImage image);
 
 private:
     void initForm();
     void initWidget();
     void initConnect();
     void insertItemContent(QString , int);
-
 //    void setRowColor(int ,QColor);
 Q_SIGNALS:
     void signalShowList(int row,QString list);      //发送信号，显示哪个界面
     void signalDeleteList(int row);
     void signalAddNewList();
-    void signalCreateSongsList(QString label,QString name,QString list);//创建歌曲列表
     void signalModifySongsList(QString,QString,QString,QString);
+    void signalCreateSongsList(QString label,QString name,QString list);//创建歌曲列表
     void signalDeleteListFromServer(QString label,QString user,QString name);//从服务端删除用户创建的列表
     void signalSendListName(std::vector<QString> listname);//将用户创建的列表传过来
+    void signalAddTipPictureToServer(QString list,QString filePath);//将歌单的图片传送到服务器
 
 private Q_SLOTS:
     void slotCellClicked(int,int);
     void slotAddNewPlayList();
     void slotDeletePlayList();
     void slotCreateList();
+    void slotAddTipPicture();
     void slotModifyPlayListNameWidget();
     void slotModifyPlayListName();
 
 public Q_SLOTS:
-    void slotUpdateList(std::vector<QString> userMessage);
+    void slotUpdateList(std::vector<QString> userMessage,std::vector<QImage>);
     void slotObtainListName();//获取列表名
 public slots:
 //    void cellEntered(int,int);//鼠标移动时间，返回item的行和列
@@ -50,6 +52,7 @@ protected:
 
 private:
     int currentrow;
+    SongMenu *m_menu;
     QDialog *d;
     QLineEdit *m;
     QPushButton *push;

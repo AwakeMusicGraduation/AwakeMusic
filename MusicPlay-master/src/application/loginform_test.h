@@ -21,13 +21,13 @@ public:
 signals:
 public slots:
     void login();
-    void slotAcceptUserMessage(std::vector<QString> userMessage);//接收传回的登录信息
+    void slotAcceptUserMessage(std::vector<QString> userMessage,std::vector<QImage> images);//接收传回的登录信息
     void regis();
     void slotAcceptRegisterMessage(QString message);
     void slotSetName(QString ,QString name,QString password);
 Q_SIGNALS:
     void signalLoginClicked(QString user,QString name,QString password);//向服务端传输用户名和密码
-    void signalUpdateList(std::vector<QString> userMessage);//更新登录传回的用户列表
+    void signalUpdateList(std::vector<QString> userMessage,std::vector<QImage> images);//更新登录传回的用户列表
     void signalUpdateName(QString name);//显示登录进去的用户
     void signalRegisterClicked(QString user,QString name,QString password);//向服务端注册用户名和密码
 private:

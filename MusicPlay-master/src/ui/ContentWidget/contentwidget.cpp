@@ -213,6 +213,8 @@ void Contentwidget::initConnect()
 
     //列表删除音乐
     connect(m_musicSongsMedia2,SIGNAL(signalDeleteMusicFromList(QString,QString,QString,QString)),this,SLOT(slotDeleteMusicFromList(QString,QString,QString,QString)));
+    //传输歌单图片到服务器保存
+    connect(m_musicSongsLists,&MusicSongsLists::signalAddTipPictureToServer,this,&Contentwidget::signalAddTipPictureToServer);
 
 }
 

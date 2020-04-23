@@ -9,9 +9,8 @@ class SongMenu : public QMenu
     Q_OBJECT
 public:
     explicit SongMenu(QWidget *parent = 0);
-    ~SongMenu();
     void addModifyAction(QAction *);
-
+    ~SongMenu();
 private:
     void initForm();
     void initAction();
@@ -22,6 +21,7 @@ Q_SIGNALS:
     void signalAddMusiFolder();
     void signalDeleteList();
     void signalRename();
+    void signalAddTipPicture();
     void signalModifyList();
 private Q_SLOTS:
 
@@ -31,6 +31,7 @@ private:
 //    QAction *m_actionAddMusicFolder;    //添加歌曲文件夹
     QAction *m_actionDeleteList;        //删除列表
     QAction *m_actionReName;            //重命名
+    QAction *m_actionAddTipPicture;//添加创建歌单的图片
 };
 
 #endif // SONGMENU_H

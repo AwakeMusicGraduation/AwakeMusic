@@ -234,7 +234,7 @@ void MusicMainWidget::initConnect()
     connect(m_contentWidget,&Contentwidget::signalCreateSongsList,
             m_client,&Client::sendSongsListData);//传输列表名
     connect(m_contentWidget,&Contentwidget::signalModifySongsList,
-            m_client,&Client::sendModifyListName);
+            m_client,&Client::sendModifyListName);//更改列表名
 
     //将歌曲加入到对应的列表并传到服务器
     connect(m_contentWidget,&Contentwidget::signalAddMusicToList,m_client,&Client::slotAddMusicToList);
@@ -284,11 +284,13 @@ void MusicMainWidget::initConnect()
 
     //用户登录
     connect(login,SIGNAL(signalLoginClicked(QString,QString,QString)),m_client,SLOT(sendLoginData(QString,QString,QString)));
-    connect(m_client,SIGNAL(signalAcceptUserMessage(std::vector<QString>)),login,SLOT(slotAcceptUserMessage(std::vector<QString>)));
+    connect(m_client,SIGNAL(signalAcceptUserMessage(std::vector<QString>,std::vector<QImage>)),login,SLOT(slotAcceptUserMessage(std::vector<QString>,std::vector<QImage>)));
     connect(login,SIGNAL(signalRegisterClicked(QString,QString,QString)),m_client,SLOT(sendRegisterData(QString,QString,QString)));
     connect(m_client,SIGNAL(signalAcceptRegisterMessage(QString)),login,SLOT(slotAcceptRegisterMessage(QString)));
     connect(this,SIGNAL(signalSendLogin(QString,QString,QString)),m_client,SLOT(sendLoginData(QString,QString,QString)));
     connect(this,SIGNAL(signalSendLogin(QString,QString,QString)),login,SLOT(slotSetName(QString,QString,QString)));
+    //传输歌单图片到服务器保存
+    connect(m_contentWidget,&Contentwidget::signalAddTipPictureToServer,m_client,&Client::slotAddTipPictureToServer);
 
 }
 

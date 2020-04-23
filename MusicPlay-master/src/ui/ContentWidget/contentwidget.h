@@ -60,10 +60,10 @@ Q_SIGNALS:
     void signalCategoryClicked();
     void signalShowMusics(QString,QString,QString,QString);
 
-    void signalUpdateList(std::vector<QString> userMessage);//更新用户列表
+    void signalUpdateList(std::vector<QString> userMessage,std::vector<QImage>);//更新用户列表
     void signalCreateSongsList(QString label,QString name,QString list);//传输创建的列表名
-    void signalModifySongsList(QString,QString,QString,QString);
     void signalDeleteListFromServer(QString label,QString user,QString name);//删除列表名
+    void signalModifySongsList(QString,QString,QString,QString);//修改列表名
 
     void signalAddMusicToList(QString label,QString list,QString name,QString singer,QString album);//将歌曲加入到对应的列表并传到服务器
     void signalLoadMusicFromList(QString label,QString list);//加载用户创建的列表里面的内容
@@ -90,7 +90,8 @@ Q_SIGNALS:
     void signalSendListName(std::vector<QString> listname);
     //删除列表中的歌曲
     void signalDeleteMusicFromList(QString label,QString list, QString name, QString singer, QString album);
-    
+    void signalAddTipPictureToServer(QString list,QString filePath);//将歌单的图片传送到服务器
+
 public slots:
     //接收bottombar发送过来的播放命令
     void slotReceiveFirstPlayMusic(int);

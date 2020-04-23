@@ -65,19 +65,21 @@ void Client::sendData(QString name,QString data)
 
 void Client::sendLoginData(QString user, QString name, QString password)
 {
-    newConnect();
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
+    if(!name.isEmpty()){
+        newConnect();
+        QByteArray block;
+        QDataStream out(&block, QIODevice::WriteOnly);
 
-    out.setVersion(QDataStream::Qt_5_10);
-    out << quint32(user.size() + name.size() + password.size());
+        out.setVersion(QDataStream::Qt_5_10);
+        out << quint32(user.size() + name.size() + password.size());
 
-    out << user << name << password;
-    tcpSocket->write(block);
-    block.resize(0);
-    qDebug() << "发送登录信息";
+        out << user << name << password;
+        tcpSocket->write(block);
+        block.resize(0);
+        qDebug() << "发送登录信息";
 
-    connect(tcpSocket,&QIODevice::readyRead,this,&Client::acceptUserMessage);
+        connect(tcpSocket,&QIODevice::readyRead,this,&Client::acceptUserMessage);
+    }
 }
 
 void Client::sendRegisterData(QString user,QString name,QString password)
@@ -132,6 +134,7 @@ void Client::sendModifyListName(QString name, QString label, QString user, QStri
 
 void Client::sendDeleteListFromServer(QString label,QString name,QString list)
 {
+    qDebug() << name << list;
     newConnect();
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
@@ -231,6 +234,49 @@ void Client::slotGetAlbums(QString singer)
     connect(tcpSocket,&QIODevice::readyRead,this,&Client::acceptAlbums);
 }
 
+void Client::slotAddTipPictureToServer(QString list,QString filePath)
+{
+    totalBytes = 0;
+    newConnect();
+    QByteArray block;
+    QByteArray block2;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_10);
+    qDebug() << "传输图片到服务器";
+    QString label = "tippicture";
+    QBuffer buffer;
+    QPixmap(filePath).save(&buffer,"JPG");
+    block2.append(buffer.data());
+    qint32 picturesize = buffer.data().size();
+    totalBytes = label.size() + list.size() + buffer.data().size();
+    out << qint32(totalBytes) << label << list ;
+    block.append(buffer.data());
+    tcpSocket->write(block);
+
+    connect(tcpSocket,&QIODevice::readyRead,this,&Client::acceptResult);
+}
+
+void Client::acceptResult()
+{
+    QDataStream in(tcpSocket);
+    //设置数据流版本，这里要和服务器端相同。
+    in.setVersion(QDataStream::Qt_5_10);
+
+    //如果这是刚开始接受数据
+    if(blockSize==0){
+        //判断接收数据是否大于两字节，也就是文件的大小信息所占的空间
+        //如果时则保存到blockSize变量中，否则直接返回，继续接受数据
+        if(tcpSocket->bytesAvailable() < (int)sizeof(quint32)) return;
+        in >> blockSize;
+    }
+    //如果没有得到全部的数据，则返回，继续接收数据
+    if(tcpSocket->bytesAvailable()<blockSize) return;
+    QString message;
+    in >> message;
+    qDebug() << message << "图片路径是否保存成功";
+    tcpSocket->close();
+}
+
 
 void Client::acceptAlbums()
 {
@@ -320,6 +366,7 @@ void Client::acceptCreateList()
     QString message;
     in >> message;
     qDebug() << message;
+    blockSize = 0;
     tcpSocket->close();
 }
 
@@ -341,6 +388,7 @@ void Client::acceptModifyList()
     QString message;
     in >> message;
     qDebug() << message;
+    blockSize = 0;
     tcpSocket->close();
 }
 
@@ -424,7 +472,7 @@ void Client::newConnect()
     blockSize = 0;
     tcpSocket = new QTcpSocket();
     //tcpSocket->abort();
-    tcpSocket->connectToHost("192.168.0.104", 6668);
+    tcpSocket->connectToHost("192.168.0.105", 6668);
     //connect(tcpSocket, &QIODevice::readyRead,this,&Client::showPicture);
 }
 
@@ -432,7 +480,7 @@ void Client::newFileConnect()
 {
     blockSize = 0;
     fileSocket->abort();
-    fileSocket->connectToHost("192.168.0.104", 8888);
+    fileSocket->connectToHost("192.168.0.105", 8888);
     connect(fileSocket, &QIODevice::readyRead, this, &Client::receivePlaylist);
 }
 
@@ -440,7 +488,7 @@ void Client::newSingerConnect()
 {
     blockSize = 0;
     singerSocket->abort();
-    singerSocket->connectToHost("192.168.0.104", 2222);
+    singerSocket->connectToHost("192.168.0.105", 2222);
 
     qDebug() << "连接成功";
     connect(singerSocket, &QIODevice::readyRead, this, &Client::receiveCategory);
@@ -736,6 +784,7 @@ void Client::acceptUserMessage()
 {
     QDataStream in(tcpSocket);
     in.setVersion(QDataStream::Qt_5_10);
+    qDebug() << "正在接收列表和专辑";
 
     if(blockSize==0){
         //判断接收数据是否大于两字节
@@ -748,19 +797,36 @@ void Client::acceptUserMessage()
     if(tcpSocket->bytesAvailable()<blockSize) return;
 
     std::vector<QString> userMessage;
+    std::vector<QImage> images;
     QString message;
-    while(blockSize)
+    QString list;
+    in >> message;
+    userMessage.push_back(message);
+    while(tcpSocket->bytesAvailable())
     {
-        in >> message;
-        userMessage.push_back(message);
-        blockSize -= message.size();
+        qDebug() << "正在接收歌单";
+        in >> blockSize;
+        in >> fileNameSize;
+        in >> list;
+        userMessage.push_back(list);
+        QByteArray array = tcpSocket->read(blockSize);
+        QBuffer buffer(&array);
+        buffer.open(QIODevice::ReadOnly);
+        QImageReader reader(&buffer,"JPG");
+        QImage image = reader.read();
+        images.push_back(image);
+        qDebug() << "完成一次传输" << blockSize << fileNameSize;
+        blockSize = 0;
+        fileNameSize = 0;
     }
     qDebug() << "客户端接收登录信息";
+    blockSize = 0;
+    fileNameSize = 0;
+    total = 0;
     tcpSocket->disconnected();
     tcpSocket->close();
-    blockSize = 0;
-    //tcpSocket->abort();
-    emit signalAcceptUserMessage(userMessage);
+    emit signalAcceptUserMessage(userMessage,images);
+
     slotObtainAlbums();
 }
 

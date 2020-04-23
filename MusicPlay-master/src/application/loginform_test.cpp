@@ -114,7 +114,7 @@ void loginform_test::login()
  //   }
 }
 
-void loginform_test::slotAcceptUserMessage(std::vector<QString> userMessage)
+void loginform_test::slotAcceptUserMessage(std::vector<QString> userMessage,std::vector<QImage> images)
 {
     qDebug() << "接收登录信息";
     QString m = userMessage.at(0);
@@ -155,7 +155,7 @@ void loginform_test::slotAcceptUserMessage(std::vector<QString> userMessage)
         {
             qDebug() << l <<"listname";
         }
-        emit signalUpdateList(userMessage);//更新用户列表
+        emit signalUpdateList(userMessage,images);//更新用户列表
         emit signalUpdateName(m_name);//更新用户名
 
         App::user = m_name;

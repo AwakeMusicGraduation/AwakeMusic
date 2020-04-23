@@ -74,3 +74,8 @@ QStringList myHelper::supportFormatsFilterDialogString()
 {
     return QStringList() <<"*.mp3" <<"*.mp2" <<"*.mp1" <<"*.wav" <<"*.ogg";
 }
+
+QStringList myHelper::supportFormatsPicture()
+{
+    return  QStringList() << "*.JPG";
+}
