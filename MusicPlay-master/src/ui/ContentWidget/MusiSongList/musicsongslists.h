@@ -18,12 +18,15 @@ private:
     void initForm();
     void initWidget();
     void initConnect();
+    void insertItemContent(QString , int);
+
 //    void setRowColor(int ,QColor);
 Q_SIGNALS:
     void signalShowList(int row,QString list);      //发送信号，显示哪个界面
     void signalDeleteList(int row);
     void signalAddNewList();
     void signalCreateSongsList(QString label,QString name,QString list);//创建歌曲列表
+    void signalModifySongsList(QString,QString,QString,QString);
     void signalDeleteListFromServer(QString label,QString user,QString name);//从服务端删除用户创建的列表
     void signalSendListName(std::vector<QString> listname);//将用户创建的列表传过来
 
@@ -32,6 +35,8 @@ private Q_SLOTS:
     void slotAddNewPlayList();
     void slotDeletePlayList();
     void slotCreateList();
+    void slotModifyPlayListNameWidget();
+    void slotModifyPlayListName();
 
 public Q_SLOTS:
     void slotUpdateList(std::vector<QString> userMessage);
@@ -44,7 +49,7 @@ protected:
 
 
 private:
-    SongMenu *m_menu;
+    int currentrow;
     QDialog *d;
     QLineEdit *m;
     QPushButton *push;

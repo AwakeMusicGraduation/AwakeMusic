@@ -62,6 +62,7 @@ Q_SIGNALS:
 
     void signalUpdateList(std::vector<QString> userMessage);//更新用户列表
     void signalCreateSongsList(QString label,QString name,QString list);//传输创建的列表名
+    void signalModifySongsList(QString,QString,QString,QString);
     void signalDeleteListFromServer(QString label,QString user,QString name);//删除列表名
 
     void signalAddMusicToList(QString label,QString list,QString name,QString singer,QString album);//将歌曲加入到对应的列表并传到服务器

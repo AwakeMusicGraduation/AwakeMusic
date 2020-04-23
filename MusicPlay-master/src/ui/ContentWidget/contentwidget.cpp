@@ -163,6 +163,9 @@ void Contentwidget::initConnect()
     //传输创建的列表名
     connect(m_musicSongsLists,&MusicSongsLists::signalCreateSongsList,
             this,&Contentwidget::signalCreateSongsList);
+    //修改列表名
+    connect(m_musicSongsLists,&MusicSongsLists::signalModifySongsList,
+            this,&Contentwidget::signalModifySongsList);
 
     //获取创建的列表名
     connect(m_musicSongsMedia,&MusicSongsMedia::signalObtainListName,

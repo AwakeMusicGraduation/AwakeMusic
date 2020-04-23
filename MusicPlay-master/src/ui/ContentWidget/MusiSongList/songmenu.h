@@ -10,6 +10,8 @@ class SongMenu : public QMenu
 public:
     explicit SongMenu(QWidget *parent = 0);
     ~SongMenu();
+    void addModifyAction(QAction *);
+
 private:
     void initForm();
     void initAction();
@@ -20,6 +22,7 @@ Q_SIGNALS:
     void signalAddMusiFolder();
     void signalDeleteList();
     void signalRename();
+    void signalModifyList();
 private Q_SLOTS:
 
 private:

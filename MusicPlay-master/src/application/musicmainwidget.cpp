@@ -233,6 +233,8 @@ void MusicMainWidget::initConnect()
     connect(login,&loginform_test::signalUpdateName,m_contentWidget,&Contentwidget::slotSetName);
     connect(m_contentWidget,&Contentwidget::signalCreateSongsList,
             m_client,&Client::sendSongsListData);//传输列表名
+    connect(m_contentWidget,&Contentwidget::signalModifySongsList,
+            m_client,&Client::sendModifyListName);
 
     //将歌曲加入到对应的列表并传到服务器
     connect(m_contentWidget,&Contentwidget::signalAddMusicToList,m_client,&Client::slotAddMusicToList);

@@ -114,6 +114,22 @@ void Client::sendSongsListData(QString label,QString name,QString list)
     //tcpSocket->close();
 }
 
+void Client::sendModifyListName(QString name, QString label, QString user, QString s)
+{
+    newConnect();
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+
+    out.setVersion(QDataStream::Qt_5_10);
+    out << quint32(label.size() + name.size()+user.size()+s.size());
+
+    out << label << user <<name << s;
+    tcpSocket->write(block);
+    qDebug() << "修改列表名";
+    block.resize(0);
+    connect(tcpSocket,&QIODevice::readyRead,this,&Client::acceptModifyList);
+}
+
 void Client::sendDeleteListFromServer(QString label,QString name,QString list)
 {
     newConnect();
@@ -307,6 +323,27 @@ void Client::acceptCreateList()
     tcpSocket->close();
 }
 
+void Client::acceptModifyList()
+{
+    QDataStream in(tcpSocket);
+    //设置数据流版本，这里要和服务器端相同。
+    in.setVersion(QDataStream::Qt_5_10);
+
+    //如果这是刚开始接受数据
+    if(blockSize==0){
+        //判断接收数据是否大于两字节，也就是文件的大小信息所占的空间
+        //如果时则保存到blockSize变量中，否则直接返回，继续接受数据
+        if(tcpSocket->bytesAvailable() < (int)sizeof(quint32)) return;
+        in >> blockSize;
+    }
+    //如果没有得到全部的数据，则返回，继续接收数据
+    if(tcpSocket->bytesAvailable()<blockSize) return;
+    QString message;
+    in >> message;
+    qDebug() << message;
+    tcpSocket->close();
+}
+
 void Client::acceptDeleteList()
 {
     QDataStream in(tcpSocket);
@@ -387,7 +424,7 @@ void Client::newConnect()
     blockSize = 0;
     tcpSocket = new QTcpSocket();
     //tcpSocket->abort();
-    tcpSocket->connectToHost("192.168.0.14", 6668);
+    tcpSocket->connectToHost("192.168.0.104", 6668);
     //connect(tcpSocket, &QIODevice::readyRead,this,&Client::showPicture);
 }
 
@@ -395,7 +432,7 @@ void Client::newFileConnect()
 {
     blockSize = 0;
     fileSocket->abort();
-    fileSocket->connectToHost("192.168.0.14", 8888);
+    fileSocket->connectToHost("192.168.0.104", 8888);
     connect(fileSocket, &QIODevice::readyRead, this, &Client::receivePlaylist);
 }
 
@@ -403,7 +440,7 @@ void Client::newSingerConnect()
 {
     blockSize = 0;
     singerSocket->abort();
-    singerSocket->connectToHost("192.168.0.14", 2222);
+    singerSocket->connectToHost("192.168.0.104", 2222);
 
     qDebug() << "连接成功";
     connect(singerSocket, &QIODevice::readyRead, this, &Client::receiveCategory);

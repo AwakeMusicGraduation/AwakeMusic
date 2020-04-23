@@ -14,6 +14,12 @@ SongMenu::~SongMenu()
 {
 }
 
+void SongMenu::addModifyAction(QAction *action)
+{
+    addAction(action);
+    connect(action, SIGNAL(triggered()),SIGNAL(signalModifyList()));
+}
+
 void SongMenu::initForm()
 {
 }

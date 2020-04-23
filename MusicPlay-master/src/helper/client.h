@@ -34,11 +34,13 @@ public slots:
     void sendLoginData(QString user,QString name,QString password);//发送登录信息
     void sendRegisterData(QString user,QString name,QString password);//发送注册信息
     void sendSongsListData(QString label,QString name,QString list);//发送创建的列表名
+    void sendModifyListName(QString,QString,QString,QString);
     void sendDeleteListFromServer(QString label,QString name,QString list);//发送删除用户创建的列表名
     void displayError(QAbstractSocket::SocketError);
     void acceptUserMessage();//接收登录信息
     void acceptRegisterMessage();//接收注册信息
     void acceptCreateList();//创建列表成功
+    void acceptModifyList();//修改列表名成功
     void acceptDeleteList();//删除列表
     void slotAddMusicToList(QString label,QString list,QString name,QString singer,QString album);//将歌曲加入到对应的列表并传到服务器
     void slotLoadMusicFromList(QString label,QString list);//从服务端加载音乐列表里面的歌曲到客户端
