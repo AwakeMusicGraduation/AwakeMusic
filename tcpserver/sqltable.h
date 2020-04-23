@@ -67,6 +67,8 @@ public:
     std::vector<Music *> searchMusicByAlbum(QString content);
     std::vector<Music *> searchMusicByList(QString content);
     std::vector<QString> queryAlbumsForSinger(QString singer);//根据歌手查询专辑
+    QString insertTipPicturePath(QString list,QString path);//向userlist中插入歌单图片的路径
+
     //std::vector<QString> loadMusicFromList(QString list);//根据列表搜素对应的音乐
 };
 

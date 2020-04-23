@@ -43,6 +43,8 @@ private slots:
     void sendMusicFromList(QString list);//向客服端传输查询列表的音乐
     void sendMusicTips();//接收推荐歌单
     void sendTipMusics(QString tip);//根据推荐歌单搜素歌曲
+    void sendTipPicturePath();//是否成功插入专辑图片路径
+
 
     void displayError(QAbstractSocket::SocketError socketError);
 
@@ -91,7 +93,7 @@ private:
     qint32 totalBytes;
     QString user;//用户
     QString list;//列表
-    QString newname;//新表明
+    QString newname;
 };
 
 #endif // SERVER_H

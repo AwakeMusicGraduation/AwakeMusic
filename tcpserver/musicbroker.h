@@ -33,6 +33,8 @@ public:
     std::vector<QString> findPicturesForAlbum(std::vector<QString> albums);//根据选取的album找到对应的图片
     std::vector<QString> findMusicsForTip(QString tip);//根据歌单查询音乐
     std::vector<QString> findAlbumsForSinger(QString name);//根据歌手查专辑
+    QString saveTipPicturePathToUersList(QString name,QString path);//向user_list插入歌单图片路径
+
 
 private:
     Sqltable *sqltable;

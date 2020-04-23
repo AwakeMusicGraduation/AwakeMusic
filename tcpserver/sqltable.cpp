@@ -7,6 +7,7 @@ Sqltable::Sqltable()
 {  
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("MusicPlayer.db");
+    db.open();
     if(db.open()){
         qDebug() << "Database Opened";
 
@@ -22,7 +23,7 @@ Sqltable::Sqltable()
         QString create_sql3 = "create table transform (name varchar(30), spell varchar(30))"; //创建数据表
 
         QString create_sql4 = "create table user (name varchar(30), password varchar(30))"; //创建用户注册数据表
-        QString create_sql5 = "create table user_list (user varchar(30), list varchar(30))";//创建用户歌单关联表
+        QString create_sql5 = "create table user_list (user varchar(30), list varchar(30), picturepath varchar(50))";//创建用户歌单关联表
 
         QSqlQuery sql_query1,sql_query2,sql_query3,sql_query4,sql_query5;
         sql_query1.prepare(create_sql);
@@ -703,7 +704,7 @@ std::vector<QString> Sqltable::querySingerCategory(QString category)
 QString Sqltable::createMusicList(QString user,QString name)//用户自己创建的音乐列表
 {
     QString create_sql = "create table '" + name +"'(music varchar(30), singer varchar(30),album varchar(30))";
-    QString insert_user_list = "insert into user_list values(?,?)";
+    QString insert_user_list = "insert into user_list values(?,?,?)";
     QSqlQuery sql_query1;
     sql_query1.prepare(create_sql);
     QString message;
@@ -719,6 +720,7 @@ QString Sqltable::createMusicList(QString user,QString name)//用户自己创建
         sql_query1.prepare(insert_user_list);
         sql_query1.addBindValue(user);
         sql_query1.addBindValue(name);
+        sql_query1.addBindValue("");
         if(!sql_query1.exec())
         {
             qDebug()<<sql_query1.lastError();
@@ -731,7 +733,7 @@ QString Sqltable::modifyMusicList(QString user, QString name, QString nowname)
 {
     qDebug()<<"正在修改列表名......" << name << "to" << nowname;
     QString create_sql = "ALTER TABLE '" +name+ "' RENAME TO '"+nowname+"'";
-    QString insert_user_list = "insert into user_list values(?,?)";
+    QString insert_user_list = "update user_list set list = :nowlist where list = :list";
     QSqlQuery sql_query1;
     sql_query1.prepare(create_sql);
     QString message;
@@ -745,8 +747,8 @@ QString Sqltable::modifyMusicList(QString user, QString name, QString nowname)
         message = "Table MusicList Create Succeed";
         qDebug()<<QObject::tr("Table MusicList Modify Succeed");
         sql_query1.prepare(insert_user_list);
-        sql_query1.addBindValue(user);
-        sql_query1.addBindValue(name);
+        sql_query1.bindValue(":nowlist",nowname);
+        sql_query1.bindValue(":list",name);
         if(!sql_query1.exec())
         {
             qDebug()<<sql_query1.lastError();
@@ -754,6 +756,7 @@ QString Sqltable::modifyMusicList(QString user, QString name, QString nowname)
     }
     return message;
 }
+
 
 void Sqltable::searchMusicList(QString user,std::vector<QString> *m)//用户登录后自动搜索属于自己的歌单并加载
 {
@@ -768,7 +771,9 @@ void Sqltable::searchMusicList(QString user,std::vector<QString> *m)//用户登�
     while(sql_query1.next())
     {
         QString s = sql_query1.value(1).toString();
+        QString path = sql_query1.value(2).toString();
         m->push_back(s);
+        m->push_back(path);
         qDebug() << sql_query1.value(1).toString();
     }
     //    QString search_table = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name";
@@ -866,20 +871,25 @@ QString Sqltable::deletemusicFromList(QString list, QString music, QString album
 
 QString Sqltable::deleteMusicList(QString user,QString list)
 {
-    qDebug() << user << list;
+    db.open();
     QString select_sql = "select * from user_list where list = '" + list +"'";
-    QString delete_sql = "drop table '" + list +"'";
+    QString delete_sql = "drop table '" + list + "'";
+    qDebug() << delete_sql;
     QString delete_user_list = "delete from user_list where list = '" + list + "'";
     QSqlQuery sql_query1;
     QString message;
+    qDebug() << "find table";
     sql_query1.prepare(select_sql);
     if(!sql_query1.exec())
     {
+        qDebug() << "获取列表";
         qDebug() << sql_query1.lastError();
     }
     if(sql_query1.next()){
+        qDebug() << "此表存在";
         if(sql_query1.value(0).toString() == user)
         {
+            qDebug() << "正准备删除";
             sql_query1.prepare(delete_sql);
             if(!sql_query1.exec())
             {
@@ -1089,7 +1099,6 @@ std::vector<QString> Sqltable::albumsToPictures(std::vector<QString> albums)
 
 std::vector<QString> Sqltable::searchMusicsForTip(QString tip)
 {
-    db.open();
     std::vector<QString> musics;
     QString select_sql = "select * from music where album = '" + tip +"'";
     sql_query.prepare(select_sql);
@@ -1138,4 +1147,23 @@ std::vector<QString> Sqltable::queryAlbumsForSinger(QString singer)
         }
    }
     return albums;
+}
+
+QString Sqltable::insertTipPicturePath(QString list, QString path)
+{
+    QString message;
+    QString update_sql = "update user_list set picturepath = :path where list = :list";
+    QSqlQuery update_query;
+    update_query.prepare(update_sql);
+    update_query.bindValue(":path",path);
+    update_query.bindValue(":list",list);
+    if(!update_query.exec())
+    {
+        message = "update picturepath failed";
+        qDebug()<<update_query.lastError();
+    }
+    else
+        message = "update picturepath successed";
+
+    return message;
 }

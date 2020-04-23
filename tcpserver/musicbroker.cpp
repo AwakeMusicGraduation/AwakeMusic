@@ -138,3 +138,8 @@ std::vector<QString> MusicBroker::findAlbumsForSinger(QString name)
     return sqltable->queryAlbumsForSinger(name);
 }
 
+QString MusicBroker::saveTipPicturePathToUersList(QString name,QString path)
+{
+    return sqltable->insertTipPicturePath(name,path);
+}
+

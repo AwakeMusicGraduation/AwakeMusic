@@ -3,6 +3,7 @@
 #include <QTcpServer>
 #include <QPushButton>
 #include <QGridLayout>
+#include <QImageReader>
 
 Server::Server(QWidget *parent)
     : ui(new Ui::MainWindow)
@@ -326,11 +327,35 @@ void Server::receiveData()
         else
             clientConnection->disconnectFromHost();
     }
+    else if(data == "tippicture")
+    {
+        in >> name;
+        sendTipPicturePath();
+
+    }
 
     blockSize = 0;
     //显示接收到的数据
 }
 
+void Server::sendTipPicturePath()
+{
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_10);
+    QByteArray array = clientConnection->readAll();
+    QBuffer buffer(&array);
+    buffer.open(QIODevice::ReadOnly);
+
+    QImageReader reader(&buffer,"JPG");
+    QImage image = reader.read();
+    QString path = "/root/tippictures/" + name + ".JPG";
+    image.save(path);
+    QString message = musicBroker->saveTipPicturePathToUersList(name,path);
+    out << qint32(message.size()) << message;
+    clientConnection->write(block);
+    clientConnection->disconnectFromHost();
+}
 
 //登陆时验证信息是否正确
 void Server::sendLoginMessage()
@@ -338,9 +363,60 @@ void Server::sendLoginMessage()
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_10);
+    QString list,path;
     std::vector<QString> m = musicBroker->findUser(name,password);
     qint32 total = 0;
-    for(auto l:m)
+    total += m.at(0).size();
+    qDebug() << m.at(0) << "check content";
+    if(m.size() > 1)
+    {
+    for(int i = 1; i < m.size() ; i += 2)
+    {   QByteArray block2;
+        qDebug() << "正首页";
+        QBuffer buffer;
+        list = m.at(i);
+        qint32 t = list.size();
+        total += list.size();
+        total += t;
+        qDebug() << total;
+        path = m.at(i+1);
+        QPixmap(path).save(&buffer,"JPG");
+        total += buffer.data().size();
+        block2.append(buffer.data());
+        total += block.size();
+        qDebug() << total;
+        qDebug() << list << path <<"this is tips";
+
+    }
+
+    out << total << m.at(0);
+    for(int i = 1; i < m.size() ; i += 2)
+    {
+        qDebug() << m.size() << "总数";
+        qDebug() << "正在传输列表和图片到首页";
+        QBuffer buffer;
+        //qDebug() << buffer.data().size() << "this is size";
+        list = m.at(i);
+        path = m.at(i+1);
+        QPixmap(path).save(&buffer,"JPG");
+        qDebug() << list << path <<"this is tips";
+        out << qint32(buffer.data().size()) << qint32(list.size()) << list;
+        block.append(buffer.data());
+        clientConnection->write(block);
+        block.resize(0);
+        clientConnection->reset();
+        out.device()->seek(0);
+
+     }
+    }
+    else
+    {
+        out << total << m.at(0);
+        clientConnection->write(block);
+    }
+    m.clear();
+    clientConnection->disconnectFromHost();
+    /*for(auto l:m)
     {
         total += l.size();
     }
@@ -352,7 +428,7 @@ void Server::sendLoginMessage()
     }
     clientConnection->write(block);
     qDebug() << "传输登录信息";
-    clientConnection->disconnectFromHost();
+    clientConnection->disconnectFromHost();*/
     //connect(clientConnection, &QAbstractSocket::disconnected,
     //        clientConnection, &QObject::deleteLater);
 }
@@ -384,7 +460,6 @@ void Server::sendCreateSongsList()
     clientConnection->disconnectFromHost();
 }
 
-//修改列表名
 void Server::sendModifySongsList()
 {
     QString message = musicBroker->modifySongsList(user,list,newname);
@@ -400,6 +475,7 @@ void Server::sendModifySongsList()
 void Server::sendDeleteSongsList()
 {
     QString message = musicBroker->deleteSongsList(user,list);
+    qDebug() << user << list << "删除的列表";
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_10);
