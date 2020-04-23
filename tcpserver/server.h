@@ -36,6 +36,7 @@ private slots:
     void sendLoginMessage();//验证登录信息
     void sendRegisterMessage();//验证注册信息
     void sendCreateSongsList();//创建歌曲列表
+    void sendModifySongsList();//修改列表名
     void sendDeleteSongsList();//删除列表
     void sendDeleteMusicFromList(QString list,QString name,QString singer,QString album);//删除列表中的音乐
     void sendAddMusicToList(QString list,QString name,QString singer,QString album);//音乐插入到对应列表
@@ -90,6 +91,7 @@ private:
     qint32 totalBytes;
     QString user;//用户
     QString list;//列表
+    QString newname;//新表明
 };
 
 #endif // SERVER_H

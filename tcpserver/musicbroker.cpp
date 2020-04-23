@@ -90,6 +90,12 @@ QString MusicBroker::createSongsList(QString user,QString list)
     return sqltable->createMusicList(user,list);
 }
 
+QString MusicBroker::modifySongsList(QString user, QString list, QString nowlist)
+{
+    sqltable->user = user;
+    return sqltable->modifyMusicList(user,list,nowlist);
+}
+
 QString MusicBroker::deleteSongsList(QString user, QString list)
 {
     sqltable->user = user;

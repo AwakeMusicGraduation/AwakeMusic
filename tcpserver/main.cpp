@@ -22,8 +22,8 @@ int main(int argc, char *argv[])
 //    sqltable->deleteMusicList("favor","初学者","初学者","薛之谦");
 
 
-
 /*
+
    sqltable->insertParmeter(1,"初学者","薛之谦","/root/薛之谦/初学者/chuxuezhe.lrc","/root/薛之谦/chuxuezhe","初学者");
         sqltable->insertParmeter(2,"刚刚好","薛之谦","/root/薛之谦/初学者/gangganghao.lrc","/root/薛之谦/chuxuezhe","初学者");
         sqltable->insertParmeter(3,"花儿和少年","薛之谦","/root/薛之谦/初学者/huaerheshaonian.lrc","/root/薛之谦/chuxuezhe","初学者");

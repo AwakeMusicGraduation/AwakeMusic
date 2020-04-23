@@ -54,6 +54,7 @@ public:
     std::vector<QString> querySingerCategory(QString category);
 
     QString createMusicList(QString user,QString name);//用户自己创建的音乐列表
+    QString modifyMusicList(QString user,QString name, QString nowname);//用户修改自己创建的音乐列表
     void searchMusicList(QString user,std::vector<QString> *m);//用户登录后自动搜索属于自己的歌单并加载
     QString insertMusicList(QString list,QString music,QString album,QString singer);//用户往特定歌单插入歌曲
     QString deletemusicFromList(QString list,QString music,QString album,QString singer);//用户删除特定歌单的歌曲

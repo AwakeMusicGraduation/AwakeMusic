@@ -229,6 +229,13 @@ void Server::receiveData()
         sendCreateSongsList();
         ui->label->setText("创建歌曲列表");
     }
+    else if(data == "modifylist"){
+        in >> user;
+        in >> list;
+        in >> newname;
+        sendModifySongsList();
+        ui->label->setText("修改列表");
+    }
     else if(data == "deletelist")
     {
         in >> user;
@@ -371,6 +378,19 @@ void Server::sendCreateSongsList()
     QDataStream out(&block, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_10);
     //QString message = "创建列表成功";
+    out << qint32(message.size());
+    out << message;
+    clientConnection->write(block);
+    clientConnection->disconnectFromHost();
+}
+
+//修改列表名
+void Server::sendModifySongsList()
+{
+    QString message = musicBroker->modifySongsList(user,list,newname);
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_10);
     out << qint32(message.size());
     out << message;
     clientConnection->write(block);

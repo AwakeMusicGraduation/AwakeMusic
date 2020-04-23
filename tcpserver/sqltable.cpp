@@ -727,6 +727,34 @@ QString Sqltable::createMusicList(QString user,QString name)//用户自己创建
     return message;
 }
 
+QString Sqltable::modifyMusicList(QString user, QString name, QString nowname)
+{
+    qDebug()<<"正在修改列表名......" << name << "to" << nowname;
+    QString create_sql = "ALTER TABLE '" +name+ "' RENAME TO '"+nowname+"'";
+    QString insert_user_list = "insert into user_list values(?,?)";
+    QSqlQuery sql_query1;
+    sql_query1.prepare(create_sql);
+    QString message;
+    if(!sql_query1.exec()) //查看创建表是否成功
+    {
+        message = "Table MusicList Modify failed";
+        qDebug()<<QObject::tr("Table MusicList Modify failed");
+        qDebug()<<sql_query1.lastError();
+    }
+    else{
+        message = "Table MusicList Create Succeed";
+        qDebug()<<QObject::tr("Table MusicList Modify Succeed");
+        sql_query1.prepare(insert_user_list);
+        sql_query1.addBindValue(user);
+        sql_query1.addBindValue(name);
+        if(!sql_query1.exec())
+        {
+            qDebug()<<sql_query1.lastError();
+        }
+    }
+    return message;
+}
+
 void Sqltable::searchMusicList(QString user,std::vector<QString> *m)//用户登录后自动搜索属于自己的歌单并加载
 {
     qDebug() << "查询用户创建的列表";
@@ -838,6 +866,7 @@ QString Sqltable::deletemusicFromList(QString list, QString music, QString album
 
 QString Sqltable::deleteMusicList(QString user,QString list)
 {
+    qDebug() << user << list;
     QString select_sql = "select * from user_list where list = '" + list +"'";
     QString delete_sql = "drop table '" + list +"'";
     QString delete_user_list = "delete from user_list where list = '" + list + "'";
